@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngiSphere - Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { color: #1a73e8; text-align: center; }
+        .form-section { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e0e0e0; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        #submitBtn { background-color: #1a73e8; color: white; }
+        #submitBtn:hover { background-color: #1557b0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background-color: #f1f3f4; color: #5f6368; }
+        .btn-edit { background-color: #f1c40f; color: black; padding: 5px 10px; margin-right: 5px; border-radius: 4px; border: none; cursor: pointer; }
+        .btn-delete { background-color: #d93025; color: white; padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; }
+        .navbar {
+    background-color: #1a73e8;
+    padding: 15px 0;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.nav-container {
+    max-width: 900px;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.nav-logo {
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-decoration: none;
+}
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+    transition: 0.3s;
+}
+.nav-links a:hover {
+    color: #e0e0e0;
+}
+.logout-btn {
+    background-color: #d93025;
+    padding: 8px 15px;
+    border-radius: 4px;
+}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>EngiSphere Management System 🌐</h1>
+
+   <div class="form-section">
+    <h3 id="formTitle">Register New Engineer</h3>
+    <input type="text" id="fullName" placeholder="Full Name">
+    <input type="email" id="email" placeholder="Email Address">
+   <input type="text" id="userType" placeholder="Department (e.g., Software, Civil)">
+    <input type="password" id="password" placeholder="Create Password">
+    <button id="submitBtn" onclick="registerUser()">Register Engineer</button>
+</div>
+
+    <div class="form-section" style="background-color: #e8f0fe;">
+        <h3 style="margin-top: 0; color: #1a73e8;">Search Engineers</h3>
+        <input type="text" id="searchInput" placeholder="Type a name to search..." onkeyup="loadUsers()">
+    </div>
+
+    <h3>Registered Personnel</h3>
+    <table id="usersTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Department</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+</div>
+<script>
+
+const API_URL = "http://127.0.0.1:8000";
+
+async function loadUsers() {
+    try {
+        const response = await fetch(`${API_URL}/users/`);
+        if (response.ok) {
+            const users = await response.json();
+            const tableBody = document.querySelector('#usersTable tbody');
+            tableBody.innerHTML = ''; // Clear table
+            users.forEach(user => {
+                tableBody.innerHTML += `
+                    <tr>
+                        <td>${user.id}</td>
+                        <td>${user.full_name}</td>
+                        <td>${user.email}</td>
+                        <td>${user.user_type}</td>
+                        <td><button onclick="deleteUser(${user.id})">Delete</button></td>
+                    </tr>`;
+            });
+        }
+    } catch (e) { console.error("Connection Error:", e); }
+}
+
+async function registerUser() {
+    const data = {
+        full_name: document.getElementById('fullName').value,
+        email: document.getElementById('email').value,
+        user_type: document.getElementById('userType').value,
+        password: document.getElementById('password').value
+    };
+    const response = await fetch(`${API_URL}/users/`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(data)
+    });
+    if (response.ok) { 
+        alert("Engineer Registered!"); 
+        loadUsers(); // Refresh the table
+    }
+}
+
+// Automatically load users when page opens
+loadUsers();
+</script>
+
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="nav-logo">EngiSphere 🏗️</a>
+        <div class="nav-links">
+            <a href="index.html">Engineers</a>
+            <a href="projects.html">Projects</a>
+            <a href="login.html" class="logout-btn">Logout</a>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
