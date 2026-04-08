@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngiSphere - About Us</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #124d77; --text-dark: #333; --bg: #f9f9f9; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); }
+
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .logo { font-size: 26px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; text-decoration: none;}
+        .nav-links { display: flex; gap: 30px; list-style: none; margin: 0; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; }
+        .nav-links a:hover { color: var(--primary); }
+        .btn-login { background: var(--primary); color: white !important; padding: 10px 25px; border-radius: 5px; }
+
+        .about-container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
+        .story-section { background: white; padding: 50px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 40px; }
+        .story-section h2 { color: var(--primary); margin-top: 0; font-size: 32px; }
+        .story-section p { color: #555; line-height: 1.8; font-size: 16px; margin-bottom: 20px; }
+        
+        .team-grid { display: flex; gap: 30px; justify-content: space-between; flex-wrap: wrap; }
+        .team-member { flex: 1; min-width: 250px; background: white; padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .avatar { width: 100px; height: 100px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px; margin: 0 auto 20px auto; }
+        .team-member h3 { margin: 0 0 10px 0; color: var(--text-dark); }
+        .team-member p { margin: 0; color: #777; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="home.html" class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</a>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="about.html" style="border-bottom: 2px solid var(--primary); padding-bottom: 5px;">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="login.html" class="btn-login">Client Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="about-container">
+        <div class="story-section">
+            <h2>Our Story</h2>
+            <p>EngiSphere was founded with a singular vision: to revolutionize the engineering and construction industry by seamlessly integrating physical infrastructure with advanced software solutions. We recognized that the traditional methods of project management and structural tracking were inefficient, leading to the creation of our proprietary digital ecosystem.</p>
+            <p>Today, we serve as a bridge between structural engineering and cutting-edge data science, providing clients with real-time insights, interactive dashboards, and unparalleled project transparency.</p>
+        </div>
+
+        <h2 style="text-align: center; color: var(--text-dark); margin-bottom: 30px;">Meet The Founders</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <div class="avatar"><i class="fas fa-user-tie"></i></div>
+                <h3>Mujtaba Mohammed</h3>
+                <p>Lead Software Engineer & CEO</p>
+            </div>
+            <div class="team-member">
+                <div class="avatar"><i class="fas fa-user-cog"></i></div>
+                <h3>Ahmed</h3>
+                <p>Chief Technology Officer</p>
+            </div>
+            <div class="team-member">
+                <div class="avatar"><i class="fas fa-hard-hat"></i></div>
+                <h3>Azzam</h3>
+                <p>Head of Operations</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

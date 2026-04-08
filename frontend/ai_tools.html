@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngiSphere - AI Tools & DevSpace</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #1e5b82; --bg-color: #f4f7f6; --text-main: #333; --card-bg: #fff; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); display: flex; height: 100vh; overflow: hidden; }
+        
+        
+        .sidebar { width: 250px; background-color: var(--primary); color: white; display: flex; flex-direction: column; }
+        .logo-area { padding: 20px; font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px; background: #184c6e; cursor: pointer; }
+        .nav-links { list-style: none; padding: 0; margin: 20px 0; }
+        .nav-links li { padding: 15px 25px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 15px; }
+        .nav-links li:hover, .nav-links li.active { background-color: rgba(255,255,255,0.1); border-left: 4px solid #fff; }
+        .nav-links i { width: 20px; }
+
+        /* Main Content */
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        
+        /* Topbar */
+        .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .topbar h2 { margin: 0; color: var(--text-main); }
+        .profile-icon { background: var(--primary); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+
+        /* AI Tools Container */
+        .ai-container { padding: 30px; display: flex; gap: 30px; height: calc(100vh - 150px); }
+        
+        /* EngiBot Chat (Left Side) */
+        .chat-card { flex: 1; background: var(--card-bg); border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; }
+        .chat-header { background: #2c3e50; color: white; padding: 15px 20px; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .chat-messages { flex: 1; padding: 20px; overflow-y: auto; background: #fdfdfd; display: flex; flex-direction: column; gap: 15px; }
+        .msg { max-width: 80%; padding: 12px 18px; border-radius: 15px; font-size: 14px; line-height: 1.5; }
+        .msg.bot { background: #eef2f5; color: #333; border-bottom-left-radius: 2px; align-self: flex-start; }
+        .msg.user { background: var(--primary); color: white; border-bottom-right-radius: 2px; align-self: flex-end; }
+        .chat-input { padding: 15px; background: white; border-top: 1px solid #eee; display: flex; gap: 10px; }
+        .chat-input input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 20px; outline: none; }
+        .chat-input button { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+
+        /* DevSpace (Right Side) */
+        .dev-card { flex: 1; background: #1e1e1e; color: #d4d4d4; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; overflow: hidden; font-family: 'Courier New', Courier, monospace; }
+        .dev-header { background: #2d2d2d; padding: 15px 20px; display: flex; align-items: center; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #444;}
+        .code-area { padding: 20px; flex: 1; overflow-y: auto; font-size: 13px; line-height: 1.6; }
+        .keyword { color: #569cd6; }
+        .string { color: #ce9178; }
+        .comment { color: #6a9955; }
+        .action-btns { padding: 15px; background: #252526; display: flex; gap: 10px; border-top: 1px solid #444; }
+        .btn-dev { background: #4caf50; color: white; border: none; padding: 8px 15px; border-radius: 3px; cursor: pointer; font-family: inherit; font-weight: bold; }
+        .btn-dev.analyze { background: #007acc; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo-area" onclick="window.location.href='home.html'"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
+        <ul class="nav-links">
+            <li onclick="window.location.href='index.html'"><i class="fas fa-th-large"></i> Dashboard</li>
+            <li onclick="window.location.href='projects.html'"><i class="far fa-folder"></i> Projects</li>
+            <li onclick="window.location.href='client_dashboard.html'"><i class="fas fa-user-tie"></i> Client Portal</li>
+            <li><i class="fas fa-tasks"></i> Tasks</li>
+            <li class="active" onclick="window.location.href='ai_tools.html'"><i class="fas fa-robot"></i> AI & DevSpace</li>
+            <li style="margin-top: auto;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="topbar">
+            <h2>AI Assistant & Developer Tools</h2>
+            <div class="profile-icon">M</div>
+        </div>
+
+        <div class="ai-container">
+            <div class="chat-card">
+                <div class="chat-header">
+                    <i class="fas fa-robot"></i> EngiBot (Engineering AI)
+                </div>
+                <div class="chat-messages" id="chat-box">
+                    <div class="msg bot">Hello Engineer! I am EngiBot. I can help you calculate load-bearing capacities, estimate project costs, or draft site reports. How can I assist today?</div>
+                    </div>
+                <form class="chat-input" onsubmit="event.preventDefault(); sendMessage();">
+                    <input type="text" id="user-input" placeholder="Ask about concrete mixture ratios, structural limits...">
+                    <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                </form>
+            </div>
+
+            <div class="dev-card">
+                <div class="dev-header">
+                    <span><i class="fas fa-terminal"></i> DevSpace (Software Team)</span>
+                    <span style="color: #6a9955; font-size: 12px;">● System Status: Online</span>
+                </div>
+                <div class="code-area" id="code-terminal">
+                    <span class="comment">// EngiSphere Backend Logs - Python/FastAPI</span><br><br>
+                    <span class="keyword">import</span> logging<br>
+                    logger.info(<span class="string">"System started on port 8000"</span>)<br>
+                    <span class="keyword">await</span> db.connect()<br>
+                    <span class="comment"># AI Debugger ready. Click 'Run Diagnostics' to check for DB bottlenecks.</span>
+                </div>
+                <div class="action-btns">
+                    <button class="btn-dev analyze" onclick="runDiagnostics()"><i class="fas fa-bug"></i> AI Diagnostics</button>
+                    <button class="btn-dev" onclick="generateCode()"><i class="fas fa-code"></i> Generate API Docs</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // EngiBot Chat Logic (Mockup for now)
+        function sendMessage() {
+            const inputField = document.getElementById('user-input');
+            const chatBox = document.getElementById('chat-box');
+            const text = inputField.value;
+            
+            if (text.trim() === "") return;
+
+            // Add user message
+            chatBox.innerHTML += `<div class="msg user">${text}</div>`;
+            inputField.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // Simulate Bot Response
+            setTimeout(() => {
+                const botReply = "Based on the ACI 318 code, the minimum compressive strength for this structural element should be 4000 psi (28 MPa). Shall I generate a full stress report?";
+                chatBox.innerHTML += `<div class="msg bot">${botReply}</div>`;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 1000);
+        }
+
+        // DevSpace Logic (Azzam's Idea)
+        function runDiagnostics() {
+            const terminal = document.getElementById('code-terminal');
+            terminal.innerHTML += `<br><br><span style="color: #569cd6;">> Running AI Diagnostics on SQLite DB...</span><br>`;
+            
+            setTimeout(() => {
+                terminal.innerHTML += `<span style="color: #ce9178;">[WARN] Query in models.py line 42 lacks indexing.</span><br>`;
+                terminal.innerHTML += `<span style="color: #4caf50;">[AI FIX] Auto-generating index schema...</span>`;
+            }, 1500);
+        }
+
+        function generateCode() {
+            const terminal = document.getElementById('code-terminal');
+            terminal.innerHTML += `<br><br><span style="color: #569cd6;">> EngiBot is generating Swagger UI documentation link...</span><br>`;
+            terminal.innerHTML += `<span style="color: #4caf50;">Done: http://127.0.0.1:8000/docs</span>`;
+        }
+
+        function logout() { localStorage.clear(); window.location.href = "login.html"; }
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EngiSphere - Building the Future</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #124d77; --text-dark: #333; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; overflow-x: hidden; background: #f9f9f9; }
+
+       
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 26px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+        .nav-links { display: flex; gap: 30px; list-style: none; margin: 0; align-items: center; }
+        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; transition: color 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        .btn-login { background: var(--primary); color: white !important; padding: 10px 25px; border-radius: 5px; font-weight: bold; }
+        .btn-login:hover { background: #0e3b5c; }
+
+        
+        .hero {
+            
+            background: linear-gradient(rgba(18, 77, 119, 0.5), rgba(18, 77, 119, 0.7)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop') center/cover;
+            height: 75vh;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-align: center; padding: 0 20px;
+        }
+        .hero h1 { font-size: 3.5rem; max-width: 900px; margin-bottom: 30px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .btn-start { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; padding: 12px 35px; font-size: 1.1rem; border-radius: 5px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s; text-decoration: none;}
+        .btn-start:hover { background: white; color: var(--primary); }
+
+        
+        .content-section { display: flex; padding: 60px 50px; gap: 50px; flex-wrap: wrap; max-width: 1200px; margin: auto; }
+        
+        .expertise { flex: 1; min-width: 300px; }
+        .expertise h2 { color: var(--text-dark); margin-bottom: 40px; font-size: 28px; }
+        .icons-row { display: flex; gap: 20px; justify-content: space-between;}
+        .icon-box { text-align: center; }
+        .icon-circle { width: 80px; height: 80px; background: white; color: var(--primary); border: 2px solid var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; margin: 0 auto 15px auto; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .icon-box:hover .icon-circle { background: var(--primary); color: white; transform: translateY(-5px); }
+
+        .why-choose-us { flex: 1; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); min-width: 300px;}
+        .why-choose-us h3 { margin-top: 0; color: var(--text-dark); font-size: 26px; margin-bottom: 25px; }
+        .list-item { display: flex; gap: 15px; margin-bottom: 20px; color: #555; line-height: 1.6; }
+        .list-item i { color: var(--primary); margin-top: 5px; font-size: 18px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
+       <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="projects.html">Projects</a></li>
+            <li><a href="about.html">About Us</a></li>
+            <li><a href="contact.html">Contact</a></li>
+            <li><a href="login.html" class="btn-login">Client Login</a></li>
+        </ul>
+    </nav>
+
+    <div class="hero">
+        <h1>EngiSphere: Building the Future with Innovation & Integrity</h1>
+        <a href="#" onclick="checkLoginAndRedirect()" class="btn-start">Start Your Project</a>
+    </div>
+
+    <div class="content-section">
+        <div class="expertise">
+            <h2>Our Expertise</h2>
+            <div class="icons-row">
+                <div class="icon-box">
+                    <div class="icon-circle"><i class="fas fa-city"></i></div>
+                    <strong>Structural</strong>
+                </div>
+                <div class="icon-box">
+                    <div class="icon-circle"><i class="fas fa-hard-hat"></i></div>
+                    <strong>Civil</strong>
+                </div>
+                <div class="icon-box">
+                    <div class="icon-circle"><i class="fas fa-leaf"></i></div>
+                    <strong>Environmental</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="why-choose-us">
+            <h3>Why Choose Us</h3>
+            <div class="list-item">
+                <i class="fas fa-check-circle"></i>
+                <div>We provide professional engineering consultancy to streamline your processes and increase efficiency.</div>
+            </div>
+            <div class="list-item">
+                <i class="fas fa-check-circle"></i>
+                <div>Deep experience in managing complex infrastructural projects from concept to final handover.</div>
+            </div>
+            <div class="list-item">
+                <i class="fas fa-check-circle"></i>
+                <div>Integration of modern AI tools with traditional, solid engineering principles.</div>
+            </div>
+        </div>
+    </div>
+<script>
+        function checkLoginAndRedirect() {
+            const userName = localStorage.getItem("user_name");
+            if (userName) {
+                window.location.href = "index.html"; 
+            } else {
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>

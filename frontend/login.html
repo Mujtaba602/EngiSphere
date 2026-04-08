@@ -3,111 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EngiSphere - Login</title>
+    <title>EngiSphere - Secure Login</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h2 { color: #1a73e8; margin-bottom: 25px; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background-color: #1a73e8; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 15px; }
-        button:hover { background-color: #1557b0; }
-        .error-msg { color: #d93025; font-size: 14px; margin-top: 10px; display: none; }
-        .navbar {
-    background-color: #1a73e8;
-    padding: 15px 0;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-.nav-container {
-    max-width: 900px;
-    margin: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.nav-logo {
-    color: white;
-    font-size: 24px;
-    font-weight: bold;
-    text-decoration: none;
-}
-.nav-links a {
-    color: white;
-    text-decoration: none;
-    margin-left: 20px;
-    font-weight: 500;
-    transition: 0.3s;
-}
-.nav-links a:hover {
-    color: #e0e0e0;
-}
-.logout-btn {
-    background-color: #d93025;
-    padding: 8px 15px;
-    border-radius: 4px;
-}
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 350px; text-align: center; }
+        h2 { color: #1e5b82; margin-bottom: 25px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; padding: 12px; background: #1e5b82; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #184c6e; }
+        #msg { text-align: center; margin-top: 15px; font-weight: bold; min-height: 20px; }
+        .register-link { display: block; margin-top: 15px; color: #1e5b82; text-decoration: none; font-size: 14px; }
+        .register-link:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
-
-<div class="login-card">
-    <h2>EngiSphere Login 🔐</h2>
-    <input type="email" id="email" placeholder="Email Address">
-    <input type="password" id="password" placeholder="Password">
-    <div id="error" class="error-msg">Invalid email or password</div>
-    <button onclick="performLogin()">Login to Dashboard</button>
-</div>
-
-<script>
-   async function performLogin() {
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const errorDiv = document.getElementById('error');
-
-    try {
-        const response = await fetch('http://127.0.0.1:8000/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: email,
-                password: password,
-                full_name: "Auth", // Schema requirement
-                user_type: "Auth"
-            })
-        });
-
-        if (response.ok) {
-            const data = await response.json();
-            
-            // Critical Step: Store the JWT Token in the browser's memory
-            localStorage.setItem('access_token', data.access_token);
-            localStorage.setItem('user_full_name', data.full_name);
-
-            // Hide error and redirect to projects
-            errorDiv.style.display = 'none';
-            alert("Authenticated Successfully. Welcome to EngiSphere!");
-            window.location.href = 'projects.html'; 
-        } else {
-            // Show error message if credentials fail
-            errorDiv.style.display = 'block';
-            errorDiv.innerText = "Invalid credentials. Please try again.";
-        }
-    } catch (err) {
-        console.error("Login Error:", err);
-        errorDiv.style.display = 'block';
-        errorDiv.innerText = "Connection error. Ensure the Backend is running.";
-    }
-}
-</script>
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="index.html" class="nav-logo">EngiSphere 🏗️</a>
-        <div class="nav-links">
-            <a href="index.html">Engineers</a>
-            <a href="projects.html">Projects</a>
-            <a href="login.html" class="logout-btn">Logout</a>
-        </div>
+    <div class="box">
+        <h2>EngiSphere Login</h2>
+        <form id="loginForm">
+            <input type="email" id="l_email" placeholder="Email Address" required>
+            <input type="password" id="l_pass" placeholder="Password" required>
+            <button type="submit">Login</button>
+        </form>
+        <p id="msg"></p>
+        <a href="register.html" class="register-link">New Engineer? Register here</a>
     </div>
-</nav>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const msg = document.getElementById('msg');
+            msg.style.color = "blue";
+            msg.innerText = "Authenticating...";
+
+            
+            const formData = new URLSearchParams();
+            formData.append('username', document.getElementById('l_email').value); 
+            formData.append('password', document.getElementById('l_pass').value);
+
+            try {
+                const res = await fetch("http://127.0.0.1:8000/login/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: formData
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    
+                    
+                    localStorage.setItem("access_token", data.access_token);
+                    localStorage.setItem("user_name", data.user_name);
+                    
+                    msg.style.color = "green";
+                    msg.innerText = "Login Successful! Redirecting...";
+                    
+                    setTimeout(() => {
+                        window.location.href = "index.html";
+                    }, 1000);
+                } else {
+                    msg.style.color = "red";
+                    msg.innerText = "Invalid Email or Password.";
+                }
+            } catch (err) {
+                msg.style.color = "red";
+                msg.innerText = "Connection error to the server.";
+            }
+        });
+    </script>
 </body>
 </html>

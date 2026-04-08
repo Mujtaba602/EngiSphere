@@ -3,216 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EngiSphere - Project Management</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>EngiSphere - Manage Projects</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        :root { --primary: #007bff; --success: #28a745; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 0; }
+        :root { --primary: #1e5b82; --bg-color: #f4f7f6; --text-main: #333; --card-bg: #fff; }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); display: flex; height: 100vh; overflow: hidden; }
         
-        /* Navbar */
-        .navbar { background: #007bff; padding: 1rem; color: white; display: flex; justify-content: space-between; align-items: center; }
-        .nav-links a { color: white; text-decoration: none; margin-left: 20px; font-weight: bold; }
-        .logout-btn { background: #dc3545; padding: 5px 15px; border-radius: 5px; }
+        .sidebar { width: 250px; background-color: var(--primary); color: white; display: flex; flex-direction: column; }
+        .logo-area { padding: 20px; font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px; background: #184c6e; cursor: pointer; }
+        .nav-links { list-style: none; padding: 0; margin: 20px 0; }
+        .nav-links li { padding: 15px 25px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 15px; }
+        .nav-links li:hover, .nav-links li.active { background-color: rgba(255,255,255,0.1); border-left: 4px solid #fff; }
+        .nav-links i { width: 20px; }
 
-        .container { max-width: 1000px; margin: 30px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1, h2 { color: #333; text-align: center; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .topbar { background: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .profile-icon { background: var(--primary); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; }
+
+        .form-container { padding: 40px; max-width: 800px; margin: 0 auto; width: 100%; box-sizing: border-box; }
+        .form-card { background: var(--card-bg); padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .form-card h3 { margin-top: 0; color: var(--primary); margin-bottom: 25px; font-size: 22px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
         
-        /* Form & Inputs */
-        .form-section { margin-bottom: 40px; padding-bottom: 20px; border-bottom: 2px solid #eee; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn-assign { background: var(--success); color: white; border: none; padding: 15px; width: 100%; border-radius: 8px; cursor: pointer; font-size: 16px; }
-
-        /* Chart Section */
-        .chart-container { width: 300px; margin: 30px auto; }
-
-        /* Table */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: #666; }
-        .status-badge { background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: bold; }
+        .input-group { margin-bottom: 20px; text-align: left; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-family: inherit; font-size: 14px; }
+        
+        .btn-submit { background: var(--primary); color: white; border: none; padding: 12px 25px; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-submit:hover { background: #184c6e; }
+        
+        #status-message { margin-top: 15px; text-align: center; font-weight: bold; min-height: 20px; }
     </style>
 </head>
 <body>
 
-    <nav class="navbar">
-        <div class="logo">EngiSphere 🏗️</div>
-        <div class="nav-links">
-            <a href="index.html">Engineers</a>
-            <a href="projects.html">Projects</a>
-            <a href="login.html" class="logout-btn" onclick="localStorage.clear()">Logout</a>
-        </div>
-    </nav>
+    <div class="sidebar">
+        <div class="logo-area" onclick="window.location.href='home.html'"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
+        <ul class="nav-links">
+            <li onclick="window.location.href='index.html'"><i class="fas fa-th-large"></i> Dashboard</li>
+            <li class="active" onclick="window.location.href='projects.html'"><i class="far fa-folder"></i> Add Project</li>
+            <li onclick="window.location.href='client_dashboard.html'"><i class="fas fa-user-tie"></i> Client Portal</li>
+            <li onclick="window.location.href='ai_tools.html'"><i class="fas fa-robot"></i> AI & DevSpace</li>
+            <li style="margin-top: auto;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+        </ul>
+    </div>
 
-    <div class="container">
-        <h1>Project Management Console</h1>
-        
-        <div class="form-section">
-            <h2>Assign New Project</h2>
-            <div class="form-group">
-                <label>Responsible Engineer</label>
-                <select id="engineerSelect"><option>Loading...</option></select>
-            </div>
-            <div class="form-group">
-                <label>Project Title</label>
-                <input type="text" id="projectTitle" placeholder="Project Name">
-            </div>
-            <div class="form-group">
-                <label>Description</label>
-                <textarea id="projectDescription" placeholder="Project details..."></textarea>
-            </div>
-            <button class="btn-assign" onclick="assignNewProject()">Assign Project</button>
+    <div class="main-content">
+        <div class="topbar">
+            <h2 style="margin: 0; color: #333;">Project Management</h2>
+            <div class="profile-icon" id="user-initial">E</div>
         </div>
 
-        <div class="chart-container">
-            <canvas id="statusChart"></canvas>
-        </div>
-
-        <div class="pipeline-section">
-            <h2>Project Pipeline</h2>
-            <table id="projectsTable">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+        <div class="form-container">
+            <div class="form-card">
+                <h3><i class="fas fa-plus-circle"></i> Create New Project</h3>
+                <form id="add-project-form">
+                    <div class="input-group">
+                        <label>Project Title</label>
+                        <input type="text" id="project-title" placeholder="e.g., Dubai Villa Construction" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Project Description</label>
+                        <textarea id="project-desc" rows="4" placeholder="Brief description of the scope of work..." required></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label>Initial Status</label>
+                        <select id="project-status">
+                            <option value="Pending">Pending Approval</option>
+                            <option value="Active">Active / In Progress</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn-submit">Initialize Project</button>
+                    <p id="status-message"></p>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
-        const API_URL = "http://127.0.0.1:8000";
-        let myChart; // لتخزين الرسم البياني وتحديثه
+        document.addEventListener("DOMContentLoaded", () => {
+            const userName = localStorage.getItem("user_name");
+            if (userName) {
+                document.getElementById('user-initial').innerText = userName.charAt(0).toUpperCase();
+            }
+        });
 
-        // 1. تحديث الرسم البياني
-        function updateChart(projects) {
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            const stats = {
-                Active: projects.filter(p => p.status === 'Active').length,
-                Completed: projects.filter(p => p.status === 'Completed').length,
-                Pending: projects.filter(p => p.status === 'Pending').length
+        document.getElementById('add-project-form').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            
+            const msgElement = document.getElementById('status-message');
+            msgElement.style.color = "blue";
+            msgElement.innerText = "Processing...";
+
+            const token = localStorage.getItem("access_token");
+            if (!token) {
+                window.location.href = "login.html";
+                return;
+            }
+
+            const projectData = {
+                title: document.getElementById("project-title").value,
+                description: document.getElementById("project-desc").value,
+                status: document.getElementById("project-status").value
             };
 
-            if (myChart) myChart.destroy(); // حذف الرسم القديم لتجنب التداخل
-
-            myChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Active', 'Completed', 'Pending'],
-                    datasets: [{
-                        data: [stats.Active, stats.Completed, stats.Pending],
-                        backgroundColor: ['#007bff', '#28a745', '#ffc107']
-                    }]
-                },
-                options: { responsive: true, plugins: { title: { display: true, text: 'Projects Overview' } } }
-            });
-        }
-
-        // 2. جلب المشاريع وتحديث الجدول والرسم
-        async function loadProjects() {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(`${API_URL}/projects/`, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            if (response.ok) {
-                const projects = await response.json();
-                const tableBody = document.querySelector('#projectsTable tbody');
-                tableBody.innerHTML = '';
-                projects.forEach(proj => {
-                    tableBody.innerHTML += `<tr><td>${proj.id}</td><td>${proj.title}</td><td>${proj.description}</td><td><span class="status-badge">${proj.status}</span></td></tr>`;
+            try {
+                const response = await fetch("http://127.0.0.1:8000/projects/", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(projectData)
                 });
-                updateChart(projects); // تحديث الرسم بناءً على البيانات القادمة
+
+                if (response.ok) {
+                    msgElement.style.color = "green";
+                    msgElement.innerText = "Project successfully added! Redirecting...";
+                    setTimeout(() => {
+                        window.location.href = "index.html"; 
+                    }, 1000);
+                } else if (response.status === 401) {
+                    localStorage.clear();
+                    window.location.href = "login.html";
+                } else {
+                    msgElement.style.color = "red";
+                    msgElement.innerText = "Error saving project to database.";
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                msgElement.style.color = "red";
+                msgElement.innerText = "Connection error. Ensure backend is running.";
             }
+        });
+
+        function logout() { 
+            localStorage.clear(); 
+            window.location.href = "login.html"; 
         }
-
-        // 3. جلب المهندسين للقائمة
-        async function populateEngineerSelect() {
-            const token = localStorage.getItem('access_token');
-            const response = await fetch(`${API_URL}/users/`, {
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-            if (response.ok) {
-                const engineers = await response.json();
-                const select = document.getElementById('engineerSelect');
-                select.innerHTML = '<option value="">-- Select Engineer --</option>';
-                engineers.forEach(eng => { select.innerHTML += `<option value="${eng.id}">${eng.full_name}</option>`; });
-            }
-        }
-
-        // 4. إسناد مشروع جديد
-        async function assignNewProject() {
-            const token = localStorage.getItem('access_token');
-            const data = {
-                title: document.getElementById('projectTitle').value,
-                description: document.getElementById('projectDescription').value,
-                status: "Active",
-                engineer_id: parseInt(document.getElementById('engineerSelect').value)
-            };
-
-            const response = await fetch(`${API_URL}/projects/`, {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-
-            if (response.ok) {
-                alert("Project Assigned!");
-                loadProjects(); // تحديث الجدول والرسم فوراً
-            }
-        }
-// ... نهاية الدوال السابقة (مثل assignNewProject) ...
-
-// --- بداية كود المساعد الذكي الجديد ---
-function toggleChat() {
-    const chat = document.getElementById('chat-window');
-    chat.style.display = (chat.style.display === 'none' || chat.style.display === '') ? 'flex' : 'none';
-}
-
-async function sendChatMessage() {
-    const input = document.getElementById('chat-input');
-    const messages = document.getElementById('chat-messages');
-    
-    if (!input.value) return;
-
-    // إضافة رسالة المهندس مجتبى للواجهة
-    messages.innerHTML += `<p style="text-align: right; background: #eee; padding: 8px; border-radius: 8px; margin: 5px 0;">${input.value}</p>`;
-    
-    const userText = input.value;
-    input.value = '';
-
-    // محاكاة رد الذكاء الاصطناعي (سنربطها بـ Gemini API لاحقاً)
-    setTimeout(() => {
-        messages.innerHTML += `<p style="background: #e1f5fe; padding: 8px; border-radius: 8px; margin: 5px 0;">I am checking EngiSphere projects... You have Active tasks in the pipeline.</p>`;
-        messages.scrollTop = messages.scrollHeight;
-    }, 1000);
-}
-// --- نهاية كود المساعد الذكي ---
-
-// هذا السطر موجود عندك مسبقاً في السطر 169 تقريباً
-window.onload = () => { 
-    populateEngineerSelect();
-    loadProjects();
-};
-        window.onload = () => { populateEngineerSelect(); loadProjects(); };
     </script>
-    <div id="ai-chat-widget" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
-    <button onclick="toggleChat()" style="background: #007bff; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); font-size: 24px;">🤖</button>
-    
-    <div id="chat-window" style="display: none; position: absolute; bottom: 70px; right: 0; width: 300px; height: 400px; background: white; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden;">
-        <div style="background: #007bff; color: white; padding: 15px; font-weight: bold;">EngiSphere AI Assistant</div>
-        <div id="chat-messages" style="flex: 1; padding: 10px; overflow-y: auto; font-size: 14px; background: #f9f9f9;">
-            <p style="background: #e1f5fe; padding: 8px; border-radius: 8px;">Hello Eng. Mujtaba! How can I help with your projects today?</p>
-        </div>
-        <div style="padding: 10px; border-top: 1px solid #eee; display: flex;">
-            <input type="text" id="chat-input" placeholder="Ask AI..." style="flex: 1; border: 1px solid #ddd; padding: 8px; border-radius: 5px;">
-            <button onclick="sendChatMessage()" style="margin-left: 5px; background: #007bff; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer;">Send</button>
-        </div>
-    </div>
-</div>
 </body>
 </html>
