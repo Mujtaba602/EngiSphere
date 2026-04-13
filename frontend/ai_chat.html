@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI EngiBot - EngiSphere</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* الهوية البصرية الموحدة */
+        :root {
+            --primary: #2563eb; --primary-dark: #1e40af; --text-dark: #0f172a; --text-muted: #64748b;
+            --bg-light: #f8fafc; --card-bg: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; height: 100vh; -webkit-font-smoothing: antialiased; }
+
+        /* Sidebar المتطابق */
+        .sidebar { width: 260px; background: var(--primary-dark); color: white; display: flex; flex-direction: column; padding-top: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 10; }
+        .sidebar .logo { font-size: 24px; font-weight: 700; padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar li { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; font-weight: 400; opacity: 0.8; }
+        .sidebar li:hover, .sidebar li.active { background: rgba(255,255,255,0.1); opacity: 1; border-left: 4px solid white; }
+
+        /* المحتوى الرئيسي */
+        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
+
+        /* الشريط العلوي */
+        .header { background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); z-index: 5; }
+        .header h2 { margin: 0; font-size: 22px; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
+        .header h2 i { color: var(--primary); }
+
+        /* منطقة المحادثة (Chat Area) */
+        .chat-container { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background: var(--bg-light); }
+        
+        .message { display: flex; gap: 15px; max-width: 80%; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .message.bot { align-self: flex-start; }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+
+        .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; flex-shrink: 0; }
+        .bot .avatar { background: var(--primary); color: white; }
+        .user .avatar { background: var(--text-dark); color: white; }
+
+        .bubble { padding: 15px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; box-shadow: var(--shadow-sm); }
+        .bot .bubble { background: white; color: var(--text-dark); border-bottom-left-radius: 0; border: 1px solid rgba(0,0,0,0.03); }
+        .user .bubble { background: var(--primary); color: white; border-bottom-right-radius: 0; }
+
+        /* منطقة الإدخال (Input Area) */
+        .input-area { background: white; padding: 20px 40px; box-shadow: 0 -4px 10px rgba(0,0,0,0.02); display: flex; gap: 15px; align-items: center; z-index: 5; }
+        .chat-input { flex: 1; padding: 15px 20px; border: 1px solid #cbd5e1; border-radius: 12px; font-family: 'Poppins', sans-serif; font-size: 15px; outline: none; transition: 0.3s; background: var(--bg-light); }
+        .chat-input:focus { border-color: var(--primary); background: white; }
+        
+        .send-btn { background: var(--primary); color: white; border: none; width: 50px; height: 50px; border-radius: 12px; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); display: flex; justify-content: center; align-items: center; }
+        .send-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
+        <ul>
+            <li onclick="window.location.href='index.html'"><i class="fas fa-chart-pie"></i> Dashboard</li>
+            <li onclick="window.location.href='projects.html'"><i class="fas fa-folder-open"></i> Projects</li>
+            <li onclick="window.location.href='client_dashboard.html'"><i class="fas fa-users"></i> Client Portal</li>
+            <li class="active"><i class="fas fa-robot"></i> AI EngiBot</li>
+            <li onclick="window.location.href='home.html'"><i class="fas fa-globe"></i> Main Website</li>
+            <li onclick="localStorage.removeItem('isLoggedIn'); window.location.href='login.html';" style="margin-top: auto; margin-bottom: 20px;"><i class="fas fa-sign-out-alt"></i> Logout</li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h2><i class="fas fa-robot"></i> EngiBot Assistant</h2>
+            <div style="font-size: 14px; color: var(--text-muted); background: #f1f5f9; padding: 5px 12px; border-radius: 20px;">
+                <i class="fas fa-circle" style="color: #22c55e; font-size: 10px; margin-right: 5px;"></i> Online
+            </div>
+        </div>
+
+        <div class="chat-container" id="chatBox">
+            <div class="message bot">
+                <div class="avatar"><i class="fas fa-robot"></i></div>
+                <div class="bubble">
+                    Hello! I am <strong>EngiBot</strong>, your engineering AI assistant. I can help you with structural calculations, material specifications, or project management queries. How can I assist you today?
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" class="chat-input" placeholder="Ask about concrete mixing, load-bearing walls, or project timelines..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        // التأكد من تسجيل الدخول
+        if (localStorage.getItem("isLoggedIn") !== "true") { window.location.href = "login.html"; }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') { sendMessage(); }
+        }
+
+        function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const messageText = inputField.value.trim();
+            if (messageText === '') return;
+
+            const chatBox = document.getElementById('chatBox');
+
+            // 1. إضافة رسالة المستخدم للشاشة
+            const userMsgHTML = `
+                <div class="message user">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div class="bubble">${messageText}</div>
+                </div>
+            `;
+            chatBox.innerHTML += userMsgHTML;
+            inputField.value = '';
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // 2. إظهار رسالة "قيد الكتابة..." مؤقتاً
+            setTimeout(() => {
+                const botMsgHTML = `
+                    <div class="message bot">
+                        <div class="avatar"><i class="fas fa-robot"></i></div>
+                        <div class="bubble" style="color: var(--text-muted);">
+                            <i class="fas fa-spinner fa-spin"></i> Connecting to Backend (FastAPI)...
+                        </div>
+                    </div>
+                `;
+                chatBox.innerHTML += botMsgHTML;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 500);
+        }
+    </script>
+</body>
+</html>

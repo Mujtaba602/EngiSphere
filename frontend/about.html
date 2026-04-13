@@ -3,29 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EngiSphere - About Us</title>
+    <title>About Us - EngiSphere</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --primary: #124d77; --text-dark: #333; --bg: #f9f9f9; }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); }
+        /* نفس الهوية البصرية للصفحة الرئيسية */
+        :root {
+            --primary: #2563eb;       
+            --primary-dark: #1e40af;  
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;      
+            --card-bg: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+        }
 
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .logo { font-size: 26px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; text-decoration: none;}
-        .nav-links { display: flex; gap: 30px; list-style: none; margin: 0; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; }
-        .nav-links a:hover { color: var(--primary); }
-        .btn-login { background: var(--primary); color: white !important; padding: 10px 25px; border-radius: 5px; }
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+        }
 
-        .about-container { max-width: 1000px; margin: 60px auto; padding: 0 20px; }
-        .story-section { background: white; padding: 50px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 40px; }
-        .story-section h2 { color: var(--primary); margin-top: 0; font-size: 32px; }
-        .story-section p { color: #555; line-height: 1.8; font-size: 16px; margin-bottom: 20px; }
+        /* شريط التنقل الموحد */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; width: 90%; z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+        .navbar .logo { font-size: 24px; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-links { list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; }
+        .nav-links li a { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 15px; transition: color 0.3s ease; }
+        .nav-links li a:hover, .nav-links li a.active { color: var(--primary); }
+        .btn { background: var(--primary); color: white; padding: 10px 24px; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.3s; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); }
+        .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        /* محتوى صفحة من نحن */
+        .page-container { padding: 120px 5% 50px; max-width: 1200px; margin: 0 auto; }
         
-        .team-grid { display: flex; gap: 30px; justify-content: space-between; flex-wrap: wrap; }
-        .team-member { flex: 1; min-width: 250px; background: white; padding: 30px; text-align: center; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .avatar { width: 100px; height: 100px; background: var(--primary); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px; margin: 0 auto 20px auto; }
-        .team-member h3 { margin: 0 0 10px 0; color: var(--text-dark); }
-        .team-member p { margin: 0; color: #777; font-weight: bold; }
+        .story-card {
+            background: var(--card-bg);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 50px;
+            text-align: center;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .story-card h1 { color: var(--primary-dark); font-size: 36px; margin-bottom: 20px; }
+        .story-card p { color: var(--text-muted); font-size: 18px; line-height: 1.8; max-width: 800px; margin: 0 auto 20px; }
+
+        .section-title { text-align: center; font-size: 32px; color: var(--text-dark); margin-bottom: 40px; font-weight: 700; }
+        
+        /* شبكة فريق العمل */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+        .team-card {
+            background: var(--card-bg);
+            padding: 40px 20px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .team-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); }
+        .team-avatar {
+            width: 80px; height: 80px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 35px;
+            margin: 0 auto 20px;
+        }
+        .team-card h3 { margin: 0 0 10px; color: var(--text-dark); font-size: 20px; }
+        .team-card p { margin: 0; color: var(--primary); font-weight: 500; font-size: 14px; }
     </style>
 </head>
 <body>
@@ -35,39 +101,54 @@
         <ul class="nav-links">
             <li><a href="home.html">Home</a></li>
             <li><a href="services.html">Services</a></li>
-            <li><a href="projects.html">Projects</a></li>
-            <li><a href="about.html" style="border-bottom: 2px solid var(--primary); padding-bottom: 5px;">About Us</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="login.html" class="btn-login">Client Login</a></li>
+            <li><a href="about.html" class="active">About Us</a></li>
+            <li><a href="#" onclick="alert('Contact form will be active in Phase 2')">Contact</a></li>
         </ul>
+        <a href="login.html" class="btn">Client Login</a>
     </nav>
 
-    <div class="about-container">
-        <div class="story-section">
-            <h2>Our Story</h2>
-            <p>EngiSphere was founded with a singular vision: to revolutionize the engineering and construction industry by seamlessly integrating physical infrastructure with advanced software solutions. We recognized that the traditional methods of project management and structural tracking were inefficient, leading to the creation of our proprietary digital ecosystem.</p>
+    <div class="page-container">
+        
+        <div class="story-card">
+            <h1>Our Story</h1>
+            <p>EngiSphere was founded with a singular vision: to revolutionize the engineering and construction industry by seamlessly integrating physical infrastructure with advanced software solutions.</p>
             <p>Today, we serve as a bridge between structural engineering and cutting-edge data science, providing clients with real-time insights, interactive dashboards, and unparalleled project transparency.</p>
         </div>
 
-        <h2 style="text-align: center; color: var(--text-dark); margin-bottom: 30px;">Meet The Founders</h2>
+        <h2 class="section-title">Meet The Founders</h2>
+        
         <div class="team-grid">
-            <div class="team-member">
-                <div class="avatar"><i class="fas fa-user-tie"></i></div>
+            <div class="team-card">
+                <div class="team-avatar"><i class="fas fa-user-tie"></i></div>
                 <h3>Mujtaba Mohammed</h3>
                 <p>Lead Software Engineer & CEO</p>
             </div>
-            <div class="team-member">
-                <div class="avatar"><i class="fas fa-user-cog"></i></div>
+            <div class="team-card">
+                <div class="team-avatar"><i class="fas fa-cogs"></i></div>
                 <h3>Ahmed</h3>
                 <p>Chief Technology Officer</p>
             </div>
-            <div class="team-member">
-                <div class="avatar"><i class="fas fa-hard-hat"></i></div>
+            <div class="team-card">
+                <div class="team-avatar"><i class="fas fa-hard-hat"></i></div>
                 <h3>Azzam</h3>
                 <p>Head of Operations</p>
             </div>
+            <div class="team-card">
+                <div class="team-avatar"><i class="fas fa-laptop-code"></i></div>
+                <h3>Ali</h3>
+                <p>Lead Developer</p>
+            </div>
         </div>
-    </div>
 
+    </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (localStorage.getItem("isLoggedIn") === "true") {
+            let loginBtn = document.querySelector('.navbar .btn');
+            loginBtn.innerHTML = "Go to Dashboard";
+            loginBtn.href = "index.html"; // ينقله للوحة بدلاً من صفحة تسجيل الدخول
+        }
+    });
+</script>
 </body>
 </html>

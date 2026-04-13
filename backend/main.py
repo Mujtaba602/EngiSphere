@@ -8,6 +8,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import models, schemas
 from .database import engine, get_db
 
+# --- 1. استدعاء مكتبات الذكاء الاصطناعي ---
+import google.generativeai as genai
+from pydantic import BaseModel
+
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
@@ -27,16 +31,26 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 120
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-# ... keep the rest of your functions (get_password_hash, etc.) exactly as they are
+# ==========================================
+# إعدادات الذكاء الاصطناعي (AI Configuration)
+# ==========================================
+# الرجاء استبدال "YOUR_API_KEY" بمفتاحك الحقيقي من Google AI Studio
+GEMINI_API_KEY = "YOUR_API_KEY" 
+genai.configure(api_key=GEMINI_API_KEY)
+ai_model = genai.GenerativeModel('gemini-1.5-flash')
 
+class ChatMessage(BaseModel):
+    message: str
+
+# ==========================================
+# دوال التشفير والحماية الأساسية
+# ==========================================
 
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
-
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
@@ -47,6 +61,10 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+# ==========================================
+# روابط تسجيل الدخول والمستخدمين
+# ==========================================
 
 @app.post("/register/", response_model=schemas.UserResponse)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -62,7 +80,6 @@ def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
     return new_user
-
 
 @app.post("/login/")
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
@@ -81,7 +98,6 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     
     return {"access_token": access_token, "token_type": "bearer", "user_name": user.full_name}
 
-
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -99,6 +115,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if user is None:
         raise credentials_exception
     return user
+
+# ==========================================
+# روابط إدارة المشاريع
+# ==========================================
 
 @app.post("/projects/", response_model=schemas.ProjectResponse)
 def create_project(project: schemas.ProjectCreate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
@@ -120,3 +140,38 @@ def delete_project(project_id: int, db: Session = Depends(get_db), current_user:
     db.delete(db_project)
     db.commit()
     return {"message": "Project deleted successfully"}
+
+@app.get("/projects/stats")
+def get_project_stats(db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    active = db.query(models.Project).filter(models.Project.owner_id == current_user.id, models.Project.status == "Active").count()
+    pending = db.query(models.Project).filter(models.Project.owner_id == current_user.id, models.Project.status == "Pending").count()
+    completed = db.query(models.Project).filter(models.Project.owner_id == current_user.id, models.Project.status == "Completed").count()
+    
+    return {
+        "active": active,
+        "pending": pending,
+        "completed": completed,
+        "total": active + pending + completed
+    }
+
+# ==========================================
+# 🤖 رابط الذكاء الاصطناعي (AI Chat API)
+# ==========================================
+
+@app.post("/api/chat")
+def chat_with_engibot(chat: ChatMessage):
+    try:
+        # إعطاء الذكاء الاصطناعي شخصية (Prompt Engineering)
+        system_prompt = f"""
+        You are EngiBot, an expert engineering and construction AI assistant inside the 'EngiSphere' platform. 
+        Your tone is professional, helpful, concise, and related to engineering.
+        Do not use bold markdown tags like ** text ** in your response, keep it clean.
+        Answer this user's query: {chat.message}
+        """
+        
+        response = ai_model.generate_content(system_prompt)
+        return {"reply": response.text}
+    
+    except Exception as e:
+        print(f"AI Error: {e}")
+        return {"reply": "Sorry, I am currently undergoing maintenance. Please check the backend connection or API Key."}

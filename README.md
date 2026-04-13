@@ -14,6 +14,7 @@ EngiSphere is a professional software solution designed to bridge the gap betwee
 * **Security:** OAuth2 with JWT, CORS Middleware.
 
 ## 👥 Contributors
-* **Mujtaba Mohammed** - Lead Software Engineer
-* **Ahmedmutasim7** - Collaborator
-* **Azzam-249** - Collaborator
+* **Mujtaba Mohammed** - Lead Software Engineer & CEO
+* **Ahmedmutasim7** - Chief Technology Officer (CTO)
+* **Azzam-249** - Head of Operations
+* **AliMohammed49** - Lead Data Scientist

@@ -3,28 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EngiSphere - Our Services</title>
+    <title>Our Services - EngiSphere</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --primary: #124d77; --text-dark: #333; --bg: #f9f9f9; }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); }
+        :root {
+            --primary: #2563eb; --primary-dark: #1e40af; --text-dark: #0f172a; --text-muted: #64748b;
+            --bg-light: #f8fafc; --card-bg: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05); --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
 
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .logo { font-size: 26px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; text-decoration: none;}
-        .nav-links { display: flex; gap: 30px; list-style: none; margin: 0; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; }
-        .nav-links a:hover { color: var(--primary); }
-        .btn-login { background: var(--primary); color: white !important; padding: 10px 25px; border-radius: 5px; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-light); color: var(--text-dark); -webkit-font-smoothing: antialiased; }
 
-        .header-title { background: var(--primary); color: white; text-align: center; padding: 60px 20px; }
-        .header-title h1 { margin: 0; font-size: 36px; }
+        /* Navbar */
+        .navbar { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 15px 5%; display: flex; justify-content: space-between; align-items: center; position: fixed; top: 0; width: 90%; z-index: 1000; box-shadow: var(--shadow-sm); }
+        .navbar .logo { font-size: 24px; font-weight: 700; color: var(--primary-dark); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .nav-links { list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; }
+        .nav-links li a { text-decoration: none; color: var(--text-muted); font-weight: 500; font-size: 15px; transition: 0.3s ease; }
+        .nav-links li a:hover, .nav-links li a.active { color: var(--primary); }
+        .btn { background: var(--primary); color: white; padding: 10px 24px; border: none; border-radius: 8px; font-weight: 600; text-decoration: none; transition: 0.3s; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3); cursor: pointer; }
+        .btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        /* Page Content */
+        .page-container { padding: 140px 5% 80px; max-width: 1200px; margin: 0 auto; }
+        .header-text { text-align: center; margin-bottom: 60px; }
+        .header-text h1 { font-size: 38px; color: var(--text-dark); margin-bottom: 15px; font-weight: 800; }
+        .header-text p { color: var(--text-muted); font-size: 18px; max-width: 600px; margin: 0 auto; }
+
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
         
-        .services-grid { max-width: 1200px; margin: 50px auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; padding: 0 20px; }
-        .service-card { background: white; padding: 40px 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: center; transition: 0.3s; border-bottom: 4px solid transparent; }
-        .service-card:hover { transform: translateY(-10px); border-bottom: 4px solid var(--primary); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .service-card i { font-size: 40px; color: var(--primary); margin-bottom: 20px; }
-        .service-card h3 { color: var(--text-dark); margin-bottom: 15px; font-size: 22px; }
-        .service-card p { color: #666; line-height: 1.6; }
+        .service-card {
+            background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center;
+            box-shadow: var(--shadow-md); transition: all 0.3s ease; cursor: pointer;
+            border: 1px solid rgba(0,0,0,0.03); display: block;
+        }
+        .service-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-lg); border-color: var(--primary); }
+        .service-icon { font-size: 45px; color: var(--primary); margin-bottom: 25px; transition: 0.3s; }
+        .service-card:hover .service-icon { transform: scale(1.1); }
+        .service-card h3 { color: var(--text-dark); font-size: 22px; margin-bottom: 15px; }
+        .service-card p { color: var(--text-muted); line-height: 1.6; font-size: 15px; margin: 0; }
+
+        /* Modals (النوافذ المنبثقة) */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 2000;
+            align-items: center; justify-content: center; opacity: 0; transition: 0.3s;
+        }
+        .modal-overlay.active { display: flex; opacity: 1; }
+        .modal-box {
+            background: white; padding: 50px; border-radius: 20px; max-width: 600px; width: 90%;
+            position: relative; box-shadow: var(--shadow-lg); transform: translateY(50px); transition: 0.4s ease; text-align: center;
+        }
+        .modal-overlay.active .modal-box { transform: translateY(0); }
+        .close-btn { position: absolute; top: 20px; right: 25px; font-size: 28px; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+        .close-btn:hover { color: var(--text-dark); transform: rotate(90deg); }
+        .modal-box i.main-icon { font-size: 60px; color: var(--primary); margin-bottom: 20px; }
+        .modal-box h2 { color: var(--text-dark); margin-bottom: 15px; font-size: 28px; }
+        .modal-box p { color: var(--text-muted); line-height: 1.8; margin-bottom: 30px; font-size: 16px; text-align: left;}
+        .modal-box ul { text-align: left; color: var(--text-muted); line-height: 1.8; margin-bottom: 30px; }
     </style>
 </head>
 <body>
@@ -33,41 +70,105 @@
         <a href="home.html" class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</a>
         <ul class="nav-links">
             <li><a href="home.html">Home</a></li>
-            <li><a href="services.html" style="border-bottom: 2px solid var(--primary); padding-bottom: 5px;">Services</a></li>
-            <li><a href="projects.html">Projects</a></li>
+            <li><a href="services.html" class="active">Services</a></li>
             <li><a href="about.html">About Us</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="login.html" class="btn-login">Client Login</a></li>
+            <li><a href="#" onclick="alert('Contact form will be active in Phase 2')">Contact</a></li>
         </ul>
+        <a href="login.html" class="btn">Client Login</a>
     </nav>
 
-    <div class="header-title">
-        <h1>Engineering & Tech Solutions</h1>
-        <p>Bridging traditional engineering with cutting-edge software systems.</p>
-    </div>
+    <div class="page-container">
+        <div class="header-text">
+            <h1>Engineering & Tech Solutions</h1>
+            <p>Bridging traditional engineering with cutting-edge software systems for unparalleled results.</p>
+        </div>
 
-    <div class="services-grid">
-        <div class="service-card">
-            <i class="fas fa-building"></i>
-            <h3>Structural Design</h3>
-            <p>Comprehensive structural analysis and design for residential, commercial, and industrial facilities ensuring safety and durability.</p>
-        </div>
-        <div class="service-card">
-            <i class="fas fa-code"></i>
-            <h3>Custom Software Engineering</h3>
-            <p>Developing scalable backend systems and intelligent project management dashboards tailored for modern engineering firms.</p>
-        </div>
-        <div class="service-card">
-            <i class="fas fa-chart-line"></i>
-            <h3>Data Science & AI</h3>
-            <p>Integrating predictive analytics and machine learning models to optimize construction timelines and resource allocation.</p>
-        </div>
-        <div class="service-card">
-            <i class="fas fa-tasks"></i>
-            <h3>Project Management</h3>
-            <p>End-to-end oversight using agile methodologies to deliver engineering projects on time and within budget parameters.</p>
+        <div class="services-grid">
+            <div class="service-card" onclick="openModal('modal-structural')">
+                <div class="service-icon"><i class="fas fa-building"></i></div>
+                <h3>Structural Design</h3>
+                <p>Comprehensive structural analysis and design ensuring safety, durability, and compliance.</p>
+            </div>
+            <div class="service-card" onclick="openModal('modal-software')">
+                <div class="service-icon"><i class="fas fa-code"></i></div>
+                <h3>Custom Software</h3>
+                <p>Developing scalable backend systems and intelligent project management dashboards.</p>
+            </div>
+            <div class="service-card" onclick="openModal('modal-data')">
+                <div class="service-icon"><i class="fas fa-chart-line"></i></div>
+                <h3>Data Science & AI</h3>
+                <p>Integrating predictive analytics and machine learning to optimize project timelines.</p>
+            </div>
         </div>
     </div>
 
+    <div class="modal-overlay" id="modal-structural">
+        <div class="modal-box">
+            <i class="fas fa-times close-btn" onclick="closeModal('modal-structural')"></i>
+            <i class="fas fa-building main-icon"></i>
+            <h2>Structural Design</h2>
+            <p>Our structural engineering team provides top-tier analysis and design for complex buildings. We ensure that every project meets the highest safety standards.</p>
+            <ul>
+                <li>Advanced 3D Modeling</li>
+                <li>Seismic Analysis & Retrofitting</li>
+                <li>Material Optimization</li>
+            </ul>
+            <button class="btn" style="width: 100%;" onclick="alert('Consultation request sent!')">Request Consultation</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-software">
+        <div class="modal-box">
+            <i class="fas fa-times close-btn" onclick="closeModal('modal-software')"></i>
+            <i class="fas fa-code main-icon"></i>
+            <h2>Custom Software</h2>
+            <p>We build robust, scalable platforms tailored for engineering workflows. Utilizing modern technologies like Python, FastAPI, and secure JWT authentication.</p>
+            <ul>
+                <li>Custom Client Dashboards</li>
+                <li>Real-time Task Tracking</li>
+                <li>Secure Document Vaults</li>
+            </ul>
+            <button class="btn" style="width: 100%;" onclick="alert('Consultation request sent!')">Request Consultation</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-data">
+        <div class="modal-box">
+            <i class="fas fa-times close-btn" onclick="closeModal('modal-data')"></i>
+            <i class="fas fa-chart-line main-icon"></i>
+            <h2>Data Science & AI</h2>
+            <p>Transforming raw construction data into actionable insights. We use AI and predictive analytics to optimize resource allocation.</p>
+            <ul>
+                <li>Predictive Cost Analysis</li>
+                <li>Automated Progress Reports</li>
+                <li>Risk Management Algorithms</li>
+            </ul>
+            <button class="btn" style="width: 100%;" onclick="alert('Consultation request sent!')">Request Consultation</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+        // إغلاق النافذة عند الضغط خارجها
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        }
+    </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if (localStorage.getItem("isLoggedIn") === "true") {
+            let loginBtn = document.querySelector('.navbar .btn');
+            loginBtn.innerHTML = "Go to Dashboard";
+            loginBtn.href = "index.html"; // ينقله للوحة بدلاً من صفحة تسجيل الدخول
+        }
+    });
+</script>
 </body>
 </html>

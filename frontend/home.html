@@ -3,112 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EngiSphere - Building the Future</title>
+    <title>EngiSphere - Modern Engineering Ecosystem</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
-        :root { --primary: #124d77; --text-dark: #333; }
-        body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; overflow-x: hidden; background: #f9f9f9; }
-
-       
-        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 15px 50px; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 100; }
-        .logo { font-size: 26px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .nav-links { display: flex; gap: 30px; list-style: none; margin: 0; align-items: center; }
-        .nav-links a { text-decoration: none; color: var(--text-dark); font-weight: 500; transition: color 0.3s; }
-        .nav-links a:hover { color: var(--primary); }
-        .btn-login { background: var(--primary); color: white !important; padding: 10px 25px; border-radius: 5px; font-weight: bold; }
-        .btn-login:hover { background: #0e3b5c; }
-
-        
-        .hero {
-            
-            background: linear-gradient(rgba(18, 77, 119, 0.5), rgba(18, 77, 119, 0.7)), url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop') center/cover;
-            height: 75vh;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: white; text-align: center; padding: 0 20px;
+        /* الألوان والظلال (نفس هوية لوحة التحكم لضمان التناسق) */
+        :root {
+            --primary: #2563eb;       
+            --primary-dark: #1e40af;  
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --bg-light: #f8fafc;      
+            --card-bg: #ffffff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
         }
-        .hero h1 { font-size: 3.5rem; max-width: 900px; margin-bottom: 30px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .btn-start { background: rgba(255,255,255,0.1); border: 2px solid white; color: white; padding: 12px 35px; font-size: 1.1rem; border-radius: 5px; cursor: pointer; backdrop-filter: blur(5px); transition: 0.3s; text-decoration: none;}
-        .btn-start:hover { background: white; color: var(--primary); }
 
-        
-        .content-section { display: flex; padding: 60px 50px; gap: 50px; flex-wrap: wrap; max-width: 1200px; margin: auto; }
-        
-        .expertise { flex: 1; min-width: 300px; }
-        .expertise h2 { color: var(--text-dark); margin-bottom: 40px; font-size: 28px; }
-        .icons-row { display: flex; gap: 20px; justify-content: space-between;}
-        .icon-box { text-align: center; }
-        .icon-circle { width: 80px; height: 80px; background: white; color: var(--primary); border: 2px solid var(--primary); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 30px; margin: 0 auto 15px auto; transition: 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .icon-box:hover .icon-circle { background: var(--primary); color: white; transform: translateY(-5px); }
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
 
-        .why-choose-us { flex: 1; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 5px 25px rgba(0,0,0,0.08); min-width: 300px;}
-        .why-choose-us h3 { margin-top: 0; color: var(--text-dark); font-size: 26px; margin-bottom: 25px; }
-        .list-item { display: flex; gap: 15px; margin-bottom: 20px; color: #555; line-height: 1.6; }
-        .list-item i { color: var(--primary); margin-top: 5px; font-size: 18px; }
+        /* شريط التنقل (Navbar) */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; width: 90%; z-index: 1000;
+            box-shadow: var(--shadow-sm);
+        }
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+            margin: 0; padding: 0;
+        }
+        .nav-links li a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.3s ease;
+        }
+        .nav-links li a:hover, .nav-links li a.active {
+            color: var(--primary);
+        }
+
+        /* الأزرار العصرية */
+        .btn {
+            background: var(--primary);
+            color: white;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px 0 rgba(37, 99, 235, 0.39);
+        }
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: none;
+        }
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* القسم الرئيسي (Hero Section) */
+        .hero {
+            padding: 160px 5% 100px;
+            background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 60vh;
+            position: relative;
+        }
+        /* شكل هندسي للخلفية لإعطاء طابع تقني */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px; right: -100px;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(37,99,235,0.05) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            z-index: 0;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-content h1 {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+        }
+        .hero-content h1 span {
+            color: var(--primary);
+        }
+        .hero-content p {
+            font-size: 18px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        /* صورة الـ Hero (يمكن استبدالها لاحقاً بصورة النظام) */
+        .hero-image {
+            width: 500px;
+            height: 400px;
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* قسم الميزات السريعة */
+        .features {
+            padding: 80px 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            background: white;
+        }
+        .feature-card {
+            padding: 40px 30px;
+            background: var(--bg-light);
+            border-radius: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-md);
+            background: white;
+        }
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--primary);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 20px;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover .feature-icon {
+            background: var(--primary);
+            color: white;
+        }
+        .feature-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+        .feature-card p {
+            color: var(--text-muted);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <div class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
-       <ul class="nav-links">
-            <li><a href="home.html">Home</a></li>
+        <a href="home.html" class="logo">
+            <i class="fas fa-drafting-compass"></i> EngiSphere
+        </a>
+        <ul class="nav-links">
+            <li><a href="home.html" class="active">Home</a></li>
             <li><a href="services.html">Services</a></li>
-            <li><a href="projects.html">Projects</a></li>
             <li><a href="about.html">About Us</a></li>
-            <li><a href="contact.html">Contact</a></li>
-            <li><a href="login.html" class="btn-login">Client Login</a></li>
+            <li><a href="#" onclick="alert('Contact form will be active in Phase 2')">Contact</a></li>
         </ul>
+        <a href="login.html" class="btn">Client Login</a>
     </nav>
 
-    <div class="hero">
-        <h1>EngiSphere: Building the Future with Innovation & Integrity</h1>
-        <a href="#" onclick="checkLoginAndRedirect()" class="btn-start">Start Your Project</a>
-    </div>
-
-    <div class="content-section">
-        <div class="expertise">
-            <h2>Our Expertise</h2>
-            <div class="icons-row">
-                <div class="icon-box">
-                    <div class="icon-circle"><i class="fas fa-city"></i></div>
-                    <strong>Structural</strong>
-                </div>
-                <div class="icon-box">
-                    <div class="icon-circle"><i class="fas fa-hard-hat"></i></div>
-                    <strong>Civil</strong>
-                </div>
-                <div class="icon-box">
-                    <div class="icon-circle"><i class="fas fa-leaf"></i></div>
-                    <strong>Environmental</strong>
-                </div>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Bridging Traditional Engineering with <span>Modern Tech</span></h1>
+            <p>A centralized digital ecosystem that connects engineering firms with clients. Experience real-time project tracking, seamless communication, and AI-driven insights all in one place.</p>
+            <div class="hero-buttons">
+                <a href="login.html" class="btn">Get Started</a>
+                <a href="services.html" class="btn btn-outline">Explore Services</a>
             </div>
         </div>
-
-        <div class="why-choose-us">
-            <h3>Why Choose Us</h3>
-            <div class="list-item">
-                <i class="fas fa-check-circle"></i>
-                <div>We provide professional engineering consultancy to streamline your processes and increase efficiency.</div>
-            </div>
-            <div class="list-item">
-                <i class="fas fa-check-circle"></i>
-                <div>Deep experience in managing complex infrastructural projects from concept to final handover.</div>
-            </div>
-            <div class="list-item">
-                <i class="fas fa-check-circle"></i>
-                <div>Integration of modern AI tools with traditional, solid engineering principles.</div>
-            </div>
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&q=80&w=800" alt="Modern Engineering">
         </div>
-    </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-eye"></i></div>
+            <h3>Real-Time Transparency</h3>
+            <p>Clients can track construction progress, view daily site reports, and monitor task completion dynamically from their custom dashboard.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+            <h3>Secure Ecosystem</h3>
+            <p>Built with robust FastAPI and stateless JWT authentication, ensuring all architectural documents and client data remain strictly confidential.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-robot"></i></div>
+            <h3>AI-Powered Insights</h3>
+            <p>Future-ready infrastructure designed to integrate predictive analytics to optimize resource allocation and project timelines.</p>
+        </div>
+    </section>
 <script>
-        function checkLoginAndRedirect() {
-            const userName = localStorage.getItem("user_name");
-            if (userName) {
-                window.location.href = "index.html"; 
-            } else {
-                window.location.href = "login.html";
-            }
+    document.addEventListener("DOMContentLoaded", function() {
+        if (localStorage.getItem("isLoggedIn") === "true") {
+            let loginBtn = document.querySelector('.navbar .btn');
+            loginBtn.innerHTML = "Go to Dashboard";
+            loginBtn.href = "index.html"; // ينقله للوحة بدلاً من صفحة تسجيل الدخول
         }
-    </script>
+    });
+</script>
 </body>
 </html>
