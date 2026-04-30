@@ -3,123 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manage Projects - EngiSphere</title>
+    <title>My Projects | EngiSphere</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* نفس الهوية البصرية للوحة التحكم */
-        :root {
-            --primary: #2563eb;       
-            --primary-dark: #1e40af;  
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --bg-light: #f8fafc;      
-            --card-bg: #ffffff;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-        }
-
-        body {
-            margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; height: 100vh; -webkit-font-smoothing: antialiased;
-        }
-
-        /* القائمة الجانبية المتطابقة */
-        .sidebar { width: 260px; background: var(--primary-dark); color: white; display: flex; flex-direction: column; padding-top: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 10; }
-        .sidebar .logo { font-size: 24px; font-weight: 700; padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar li { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; font-weight: 400; opacity: 0.8; }
-        .sidebar li:hover, .sidebar li.active { background: rgba(255,255,255,0.1); opacity: 1; border-left: 4px solid white; }
+        :root { --p: #3b82f6; --dark: #020617; --sidebar: #01040f; --card: rgba(15, 23, 42, 0.7); --border: rgba(255, 255, 255, 0.08); }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background: var(--dark); color: #fff; display: flex; height: 100vh; overflow: hidden; }
         
-        /* المحتوى الرئيسي */
-        .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding-top: 20px; }
+        .sidebar .logo { font-size: 22px; font-weight: 800; padding: 0 25px 25px; cursor: pointer; }
+        .sidebar li { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: #94a3b8; transition: 0.3s; }
+        .sidebar li.active { color: #fff; background: rgba(59, 130, 246, 0.1); border-left: 4px solid var(--p); }
 
-        /* الشريط العلوي */
-        .header { background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); z-index: 5; }
-        .header h2 { margin: 0; font-size: 22px; font-weight: 600; color: var(--text-dark); }
-        .header-icons { display: flex; align-items: center; gap: 20px; font-size: 18px; color: var(--text-muted); }
-        .user-avatar { background: var(--primary); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; }
-
-        /* جسم الصفحة ونموذج الإضافة */
-        .dashboard-body { padding: 40px; flex: 1; display: flex; justify-content: center; align-items: flex-start; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; background-image: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05), transparent 80%); }
+        .container { padding: 50px; max-width: 1100px; margin: 0 auto; width: 100%; box-sizing: border-box; }
         
-        .form-card {
-            background: var(--card-bg); border-radius: 16px; padding: 40px; width: 100%; max-width: 600px;
-            box-shadow: var(--shadow-md); border: 1px solid rgba(0,0,0,0.03); margin-top: 20px;
+        .project-card { 
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px; 
+            padding: 25px; margin-bottom: 20px; display: flex; justify-content: space-between; 
+            align-items: center; transition: 0.4s; backdrop-filter: blur(10px);
         }
-        .form-card h3 { margin-top: 0; margin-bottom: 30px; color: var(--primary-dark); font-size: 24px; display: flex; align-items: center; gap: 10px; }
+        .project-card:hover { transform: scale(1.02); border-color: var(--p); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
         
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-dark); font-size: 14px; }
-        .form-control {
-            width: 100%; padding: 12px 15px; border: 1px solid #cbd5e1; border-radius: 8px;
-            font-family: 'Poppins', sans-serif; font-size: 14px; color: var(--text-dark); box-sizing: border-box; transition: 0.3s;
-        }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
-        textarea.form-control { resize: vertical; min-height: 120px; }
-        
-        .btn-submit {
-            width: 100%; background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px;
-            font-family: 'Poppins', sans-serif; font-weight: 600; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 15px; box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
-        }
-        .btn-submit:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .status-badge { padding: 6px 14px; border-radius: 100px; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+        .btn-view { background: var(--p); color: white; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
-        <div class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
+        <div class="logo" onclick="window.location.href='home.html'"><i class="fas fa-drafting-compass" style="color: var(--p);"></i> ENGISPHERE</div>
         <ul>
-            <li onclick="window.location.href='index.html'"><i class="fas fa-chart-pie"></i> Dashboard</li>
-            <li class="active"><i class="fas fa-folder-open"></i> Projects</li>
-            <li onclick="window.location.href='client_dashboard.html'"><i class="fas fa-users"></i> Client Portal</li>
-            <li onclick="alert('Tasks module coming soon.')"><i class="fas fa-tasks"></i> Tasks</li>
-            <li onclick="window.location.href='home.html'"><i class="fas fa-globe"></i> Main Website</li>
-            <li onclick="window.location.href='login.html'" style="margin-top: auto; margin-bottom: 20px;"><i class="fas fa-sign-out-alt"></i> Logout</li>
+            <li onclick="window.location.href='home.html'"><i class="fas fa-home"></i> Home</li>
+            <li onclick="window.location.href='index.html'"><i class="fas fa-th-large"></i> Command Center</li>
+            <li class="active"><i class="fas fa-project-diagram"></i> My Projects</li>
+            <li onclick="window.location.href='ai_chat.html'"><i class="fas fa-robot"></i> AI EngiBot</li>
+            <li onclick="logout()" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</li>
         </ul>
     </div>
 
     <div class="main-content">
-        <div class="header">
-            <h2>Project Management</h2>
-            <div class="header-icons">
-                <i class="far fa-bell" style="cursor: pointer;"></i>
-                <i class="far fa-envelope" style="cursor: pointer;"></i>
-                <div class="user-avatar">M</div>
-            </div>
-        </div>
-
-        <div class="dashboard-body">
-            
-            <div class="form-card">
-                <h3><i class="fas fa-plus-circle"></i> Create New Project</h3>
-                
-                <div class="form-group">
-                    <label>Project Title</label>
-                    <input type="text" class="form-control" placeholder="e.g., Dubai Villa Construction">
+        <div class="container">
+            <h1 style="font-size: 40px; font-weight: 800; margin-bottom: 40px;">Project Portfolio</h1>
+            <div id="projectList">
                 </div>
-                
-                <div class="form-group">
-                    <label>Project Description</label>
-                    <textarea class="form-control" placeholder="Brief description of the scope of work..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Initial Status</label>
-                    <select class="form-control">
-                        <option>Pending Approval</option>
-                        <option>Active / In Progress</option>
-                        <option>On Hold</option>
-                    </select>
-                </div>
-
-                <button class="btn-submit" onclick="alert('In the next phase, this will connect to the FastAPI backend to save the project!')">
-                    Initialize Project
-                </button>
-            </div>
-
         </div>
     </div>
 
+    <script>
+        const token = localStorage.getItem("access_token");
+        async function loadProjects() {
+            const res = await fetch("http://127.0.0.1:8000/projects/", { headers: { "Authorization": `Bearer ${token}` } });
+            const projects = await res.json();
+            const container = document.getElementById('projectList');
+            container.innerHTML = projects.map(p => `
+                <div class="project-card">
+                    <div style="display:flex; align-items:center; gap:20px;">
+                        <div style="width:50px; height:50px; background:rgba(59,130,246,0.1); border-radius:12px; display:flex; justify-content:center; align-items:center; color:var(--p);">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin:0;">${p.title}</h3>
+                            <p style="margin:0; color:#94a3b8; font-size:12px;">${p.location} | ${p.project_type}</p>
+                        </div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:20px;">
+                        <span class="status-badge" style="background:rgba(16,185,129,0.1); color:#10b981;">${p.status}</span>
+                        <button class="btn-view" onclick="window.location.href='project_details.html?id=${p.id}'">Open Intel</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        function logout() { localStorage.clear(); window.location.href = "login.html"; }
+        window.onload = loadProjects;
+    </script>
 </body>
 </html>

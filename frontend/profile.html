@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commander Profile | EngiSphere</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3b82f6; --bg: #020617; --sidebar: #0f172a; 
+            --card: rgba(30, 41, 59, 0.6); --border: rgba(255, 255, 255, 0.08); 
+            --text: #f8fafc; --muted: #94a3b8; --success: #10b981; --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+
+        /* --- 🛰️ Sidebar --- */
+        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); padding: 30px 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; }
+        .logo { font-size: 24px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 12px; margin-bottom: 50px; letter-spacing: -1.5px; }
+        .nav-link { display: flex; align-items: center; gap: 14px; padding: 14px 18px; text-decoration: none; color: var(--muted); border-radius: 14px; font-weight: 600; transition: 0.3s; }
+        .nav-link:hover { color: var(--primary); background: rgba(59, 130, 246, 0.1); }
+
+        /* --- 🖥️ Main Profile Area --- */
+        .main-profile { flex: 1; margin-left: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #0f172a, #020617); }
+
+        .profile-card { background: var(--card); backdrop-filter: blur(20px); width: 500px; padding: 40px; border-radius: 35px; border: 1px solid var(--border); text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.4); }
+
+        .avatar-circle { width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary), #8b5cf6); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 800; color: white; border: 5px solid rgba(59, 130, 246, 0.1); }
+
+        .info-field { background: rgba(0,0,0,0.2); padding: 15px 25px; border-radius: 18px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .field-label { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+        .field-value { font-size: 14px; font-weight: 700; color: white; }
+
+        /* --- 🔒 Password Modal --- */
+        #passwordModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-body { background: #0f172a; width: 400px; padding: 35px; border-radius: 30px; border: 1px solid var(--primary); box-shadow: 0 0 40px rgba(59, 130, 246, 0.2); }
+        input { width: 100%; padding: 14px; background: #1e293b; border: 1px solid var(--border); border-radius: 12px; color: white; margin-bottom: 15px; outline: none; }
+        input:focus { border-color: var(--primary); }
+
+        /* --- 🚀 Buttons --- */
+        .btn { width: 100%; padding: 15px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: 0.3s; border: none; font-size: 13px; }
+        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
+        .btn-outline { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); margin-top: 25px; }
+        .btn-outline:hover { background: white; color: var(--bg); }
+        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); margin-top: 10px; border: 1px solid rgba(239, 68, 68, 0.2); }
+        .btn-danger:hover { background: var(--danger); color: white; }
+
+        /* --- 🔔 Toasts (الإشعارات الفخمة) --- */
+        .toast-container { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 16px 30px; border-radius: 16px; font-weight: 800; font-size: 13px; color: white; z-index: 5000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(10px); }
+        .toast-success { background: rgba(16, 185, 129, 0.9); border: 1px solid #10b981; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); }
+        .toast-error { background: rgba(239, 68, 68, 0.9); border: 1px solid #ef4444; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); }
+        .toast-container.show { top: 30px; }
+    </style>
+</head>
+<body>
+
+    <div id="successToast" class="toast-container toast-success">
+        <i class="fas fa-shield-check" style="font-size: 16px;"></i>
+        <span>SECURITY PROTOCOL: CREDENTIALS UPDATED</span>
+    </div>
+    
+    <div id="errorToast" class="toast-container toast-error">
+        <i class="fas fa-triangle-exclamation" style="font-size: 16px;"></i>
+        <span>ERROR: PASSWORDS DO NOT MATCH!</span>
+    </div>
+
+    <div class="sidebar">
+        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
+        <nav style="flex: 1;">
+            <a href="index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+        </nav>
+    </div>
+
+    <div class="main-profile">
+        <div class="profile-card">
+            <div class="avatar-circle" id="uInit">M</div>
+            <h2 id="uName" style="font-weight: 800; margin-bottom: 30px;">Commander</h2>
+
+            <div class="info-field">
+                <span class="field-label">Full Name</span>
+                <span class="field-value" id="dispName">Loading...</span>
+            </div>
+            <div class="info-field">
+                <span class="field-label">Email Access</span>
+                <span class="field-value" id="dispEmail">Loading...</span>
+            </div>
+
+            <button class="btn btn-outline" onclick="openPasswordModal()">
+                <i class="fas fa-key"></i> Update Access Credentials
+            </button>
+            <button class="btn btn-danger" onclick="logout()">
+                <i class="fas fa-power-off"></i> Terminate Session
+            </button>
+        </div>
+    </div>
+
+    <div id="passwordModal">
+        <div class="modal-body">
+            <h3 style="margin-bottom: 20px; font-weight: 800;"><i class="fas fa-lock" style="color: var(--primary);"></i> SECURE VAULT</h3>
+            <p style="font-size: 12px; color: var(--muted); margin-bottom: 25px;">Update your system access password.</p>
+            
+            <input type="password" id="oldPass" placeholder="Current Password">
+            <input type="password" id="newPass" placeholder="New Password">
+            <input type="password" id="confirmPass" placeholder="Confirm New Password">
+            
+            <button class="btn btn-primary" onclick="updatePassword()">AUTHORIZE CHANGE</button>
+            <p onclick="closePasswordModal()" style="text-align: center; margin-top: 15px; font-size: 11px; cursor: pointer; color: var(--muted); font-weight: 600;">[ CANCEL ACCESS ]</p>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("access_token");
+        if (!token) window.location.href = "login.html";
+
+        function openPasswordModal() { document.getElementById('passwordModal').style.display = 'flex'; }
+        
+        function closePasswordModal() { 
+            document.getElementById('passwordModal').style.display = 'none'; 
+            document.getElementById('oldPass').value = '';
+            document.getElementById('newPass').value = '';
+            document.getElementById('confirmPass').value = '';
+        }
+
+        function showToast(id) {
+            const toast = document.getElementById(id);
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+     async function updatePassword() {
+            const oldP = document.getElementById('oldPass').value;
+            const newP = document.getElementById('newPass').value;
+            const confP = document.getElementById('confirmPass').value;
+
+            if(!oldP || !newP || !confP) return;
+
+            if(newP !== confP) {
+                document.querySelector('#errorToast span').innerText = "ERROR: PASSWORDS DO NOT MATCH!";
+                showToast('errorToast');
+                return;
+            }
+
+            try {
+                const res = await fetch("http://127.0.0.1:8000/users/update-password", {
+                    method: "PUT",
+                    headers: { 
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json" 
+                    },
+                    body: JSON.stringify({ old_password: oldP, new_password: newP })
+                });
+
+                if(res.ok) {
+                    showToast('successToast'); // الإشعار الأخضر
+                    closePasswordModal();
+                } else {
+                    const data = await res.json();
+                    // استخدام الإشعار الأحمر بدلاً من الـ alert
+                    document.querySelector('#errorToast span').innerText = "SERVER ERROR: " + (data.detail || "Not Found");
+                    showToast('errorToast');
+                }
+            } catch (e) {
+                document.querySelector('#errorToast span').innerText = "SYSTEM ERROR: Backend is offline!";
+                showToast('errorToast');
+            }
+        }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/users/me", { headers: { "Authorization": `Bearer ${token}` } });
+                const user = await res.json();
+                document.getElementById('uName').innerText = user.full_name;
+                document.getElementById('dispName').innerText = user.full_name;
+                document.getElementById('dispEmail').innerText = user.email;
+                document.getElementById('uInit').innerText = user.full_name.charAt(0).toUpperCase();
+            } catch (e) { console.error(e); }
+        }
+
+        function logout() { localStorage.removeItem("access_token"); window.location.href = "login.html"; }
+        
+        loadProfile();
+    </script>
+</body>
+</html>

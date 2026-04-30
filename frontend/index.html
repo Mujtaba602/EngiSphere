@@ -1,224 +1,1266 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Engineer Dashboard - EngiSphere</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EngiSphere | Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
     <style>
-        /* توحيد الهوية البصرية مع باقي الموقع */
         :root {
-            --primary: #2563eb;       
-            --primary-dark: #1e40af;  
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --bg-light: #f8fafc;      
-            --card-bg: #ffffff;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05);
+            --primary: #3b82f6;
+            --primary-soft: rgba(59, 130, 246, 0.14);
+            --bg: #020617;
+            --sidebar: #0f172a;
+            --panel: rgba(15, 23, 42, 0.68);
+            --panel-2: rgba(30, 41, 59, 0.45);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif; /* الخط الجديد الموحد */
-            background: var(--bg-light);
-            color: var(--text-dark);
+            font-family: "Plus Jakarta Sans", sans-serif;
+            background: var(--bg);
+            color: var(--text);
             display: flex;
-            height: 100vh;
-            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
         }
 
-        /* القائمة الجانبية الموحدة */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
         .sidebar {
             width: 260px;
-            background: var(--primary-dark);
-            color: white;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            padding-top: 20px;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-            z-index: 10;
+            padding: 28px 18px;
+            transition: background 0.3s;
+            z-index: 100;
         }
-        .sidebar .logo { font-size: 24px; font-weight: 700; padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar li { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; font-weight: 400; opacity: 0.8; }
-        .sidebar li:hover, .sidebar li.active { background: rgba(255,255,255,0.1); opacity: 1; border-left: 4px solid white; }
-        .sidebar li a { color: white; text-decoration: none; display: flex; align-items: center; gap: 15px; width: 100%; }
 
-        /* المحتوى الرئيسي */
-        .main-content { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
-
-        /* الشريط العلوي */
-        .header {
-            background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); z-index: 5;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 34px;
+            letter-spacing: -1px;
+            text-shadow: 0 0 18px rgba(59, 130, 246, 0.22);
         }
-        .header h2 { margin: 0; font-size: 22px; font-weight: 600; color: var(--text-dark); }
-        .header-icons { display: flex; align-items: center; gap: 20px; font-size: 18px; color: var(--text-muted); }
-        .user-avatar { background: var(--primary); color: white; width: 35px; height: 35px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 14px; }
 
-        /* جسم اللوحة */
-        .dashboard-body { padding: 40px; flex: 1; }
-        
-        .top-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-        .top-section h3 { margin: 0; font-size: 24px; font-weight: 600; }
-        .btn-add { background: var(--primary); color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Poppins', sans-serif; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: 0.3s; box-shadow: var(--shadow-sm); }
-        .btn-add:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .nav-section {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin: 14px 0 6px 14px;
+            letter-spacing: 1px;
+        }
 
-        /* شبكة الرسوم البيانية */
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin-bottom: 30px; }
-        
-        /* البطاقات الحديثة */
-        .card { background: var(--card-bg); border-radius: 16px; padding: 25px; box-shadow: var(--shadow-md); border: 1px solid rgba(0,0,0,0.03); }
-        .card h4 { margin: 0 0 20px 0; color: var(--text-dark); font-size: 16px; font-weight: 600; }
-        
-        /* حاويات الرسوم البيانية */
-        .chart-container { position: relative; height: 250px; width: 100%; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.25s;
+            margin-bottom: 4px;
+        }
 
-        /* جدول المشاريع */
-        .table-card { background: var(--card-bg); border-radius: 16px; padding: 25px; box-shadow: var(--shadow-md); border: 1px solid rgba(0,0,0,0.03); }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th { text-align: left; padding: 12px 15px; color: var(--text-muted); font-weight: 500; font-size: 14px; border-bottom: 2px solid #f1f5f9; }
-        td { padding: 15px; border-bottom: 1px solid #f1f5f9; color: var(--text-dark); font-size: 14px; }
-        .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; }
-        .status-active { background: #dcfce7; color: #166534; }
-        .status-pending { background: #fef08a; color: #854d0e; }
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            box-shadow: inset 4px 0 0 var(--primary);
+        }
+
+        .exit-link {
+            margin-top: auto;
+            color: var(--danger) !important;
+        }
+
+        .exit-link:hover {
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: inset 4px 0 0 var(--danger);
+            color: var(--danger) !important;
+        }
+
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 34px 34px;
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.09), transparent 30%),
+                radial-gradient(circle at top right, rgba(99,102,241,0.06), transparent 24%),
+                linear-gradient(180deg, #071225 0%, #020617 100%);
+            transition: background 0.3s;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-left h1 {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .topbar-left p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .top-btn,
+        .theme-toggle,
+        .new-project-btn {
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            height: 42px;
+            padding: 0 14px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 700;
+            font-size: 12px;
+            transition: 0.25s;
+            text-decoration: none;
+        }
+
+        .theme-toggle {
+            width: 42px;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .top-btn:hover,
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .new-project-btn {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 10px 24px rgba(59,130,246,0.24);
+        }
+
+        .new-project-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: 2.2fr 1.2fr;
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .hero-card,
+        .mini-grid .mini-card,
+        .card,
+        .modal-content {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+        }
+
+        .hero-card {
+            padding: 28px;
+        }
+
+        .hero-card h2 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .hero-card p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 760px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .hero-action {
+            padding: 12px 18px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid var(--border);
+            color: white;
+            background: rgba(255,255,255,0.05);
+            transition: 0.25s;
+        }
+
+        .hero-action.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .hero-action:hover {
+            transform: translateY(-1px);
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .mini-card {
+            padding: 18px;
+            min-height: 105px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .mini-card .label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .mini-card .value {
+            font-size: 15px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: var(--shadow);
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.65fr 1fr;
+            gap: 20px;
+        }
+
+        .card {
+            padding: 24px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chip {
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            background: rgba(59,130,246,0.12);
+            color: var(--primary);
+            border: 1px solid rgba(59,130,246,0.18);
+        }
+
+        .operations-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .operations-table th {
+            text-align: left;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 12px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .operations-table td {
+            padding: 16px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+            font-size: 13px;
+        }
+
+        .project-name {
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .project-id {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status-active {
+            background: rgba(16,185,129,0.12);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(245,158,11,0.12);
+            color: var(--warning);
+        }
+
+        .status-completed {
+            background: rgba(148,163,184,0.12);
+            color: #cbd5e1;
+        }
+
+        .progress-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 90px;
+        }
+
+        .progress-bar-bg {
+            width: 84px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 999px;
+            background: var(--primary);
+        }
+
+        .table-btns {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .table-btn {
+            padding: 9px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: white;
+            cursor: pointer;
+        }
+
+        .table-btn.primary {
+            background: rgba(59,130,246,0.14);
+            border-color: rgba(59,130,246,0.22);
+            color: #bfdbfe;
+        }
+
+        .table-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .distribution-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .ratio-item {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .ratio-label {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .ratio-bar {
+            height: 7px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.06);
+            overflow: hidden;
+        }
+
+        .ratio-fill {
+            height: 100%;
+            border-radius: 999px;
+        }
+
+        .chart-holder {
+            margin-top: 10px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        .chart-holder canvas {
+            max-width: 320px;
+            max-height: 320px;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 3000;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            width: 100%;
+            max-width: 620px;
+            padding: 26px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h3 {
+            font-size: 20px;
+            font-weight: 800;
+        }
+
+        .close-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            padding: 12px 14px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        .field textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .field input:focus,
+        .field select:focus,
+        .field textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            z-index: 4000;
+            transition: 0.35s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(12px);
+        }
+
+        .toast.show {
+            top: 24px;
+        }
+
+        .toast.success {
+            background: rgba(16,185,129,0.96);
+            border: 1px solid #10b981;
+            box-shadow: 0 10px 30px rgba(16,185,129,0.25);
+        }
+
+        .toast.error {
+            background: rgba(239,68,68,0.96);
+            border: 1px solid #ef4444;
+            box-shadow: 0 10px 30px rgba(239,68,68,0.25);
+        }
+
+        body.light-mode {
+            --bg: #f3f7fc;
+            --sidebar: #ffffff;
+            --panel: rgba(255,255,255,0.92);
+            --panel-2: rgba(255,255,255,0.88);
+            --border: rgba(15, 23, 42, 0.08);
+            --text: #0f172a;
+            --muted: #64748b;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+            background: #f3f7fc;
+            color: #0f172a;
+        }
+
+        body.light-mode .sidebar {
+            background: #ffffff;
+            border-right: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        body.light-mode .main {
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.07), transparent 26%),
+                linear-gradient(180deg, #ffffff 0%, #eef4fb 100%);
+        }
+
+        body.light-mode .hero-card,
+        body.light-mode .mini-card,
+        body.light-mode .stat-card,
+        body.light-mode .card,
+        body.light-mode .modal-content {
+            background: rgba(255,255,255,0.94);
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: var(--shadow);
+        }
+
+        body.light-mode .project-name,
+        body.light-mode .hero-card h2,
+        body.light-mode .topbar-left h1,
+        body.light-mode .mini-card .value {
+            color: #0f172a;
+        }
+
+        body.light-mode .top-btn,
+        body.light-mode .theme-toggle,
+        body.light-mode .table-btn,
+        body.light-mode .hero-action:not(.primary),
+        body.light-mode .back-btn {
+            background: rgba(15,23,42,0.04);
+            color: #0f172a;
+        }
+
+        body.light-mode .field input,
+        body.light-mode .field select,
+        body.light-mode .field textarea {
+            background: rgba(15,23,42,0.03);
+            color: #0f172a;
+        }
+
+        body.light-mode .operations-table th,
+        body.light-mode .operations-table td,
+        body.light-mode .project-id,
+        body.light-mode .ratio-label,
+        body.light-mode .hero-card p,
+        body.light-mode .topbar-left p {
+            color: #64748b;
+        }
+
+        @media (max-width: 1200px) {
+            .hero,
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 820px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                padding: 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mini-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-
-    <div class="sidebar">
-        <div class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
-        <ul>
-            <li class="active"><i class="fas fa-chart-pie"></i> Dashboard</li>
-            <li onclick="window.location.href='projects.html'"><i class="fas fa-folder-open"></i> Projects</li>
-            <li onclick="window.location.href='client_dashboard.html'"><i class="fas fa-users"></i> Client Portal</li>
-            <li onclick="alert('Tasks module coming soon.')"><i class="fas fa-tasks"></i> Tasks</li>
-            <li onclick="window.location.href='home.html'"><i class="fas fa-globe"></i> Main Website</li>
-            <li onclick="window.location.href='login.html'" style="margin-top: auto; margin-bottom: 20px;"><i class="fas fa-sign-out-alt"></i> Logout</li>
-        </ul>
+    <div id="toast" class="toast success">
+        <i class="fas fa-circle-check"></i>
+        <span id="toastMessage">Done.</span>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h2>Engineer Dashboard</h2>
-            <div class="header-icons">
-                <i class="far fa-bell" style="cursor: pointer;"></i>
-                <i class="far fa-envelope" style="cursor: pointer;"></i>
-                <div class="user-avatar">M</div>
+    <aside class="sidebar">
+        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
+
+        <nav style="flex:1;">
+            <div class="nav-section">Core Systems</div>
+            <a href="index.html" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i> Geospatial Radar</a>
+            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i> AI EngiBot</a>
+
+            <div class="nav-section">Management</div>
+            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
+            <a href="#" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
+            <a href="#" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+        </nav>
+
+        <a href="#" onclick="logout()" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i> Exit System
+        </a>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Engineering Command Center</h1>
+                <p>Welcome back, <strong id="userWelcome">Engineer</strong></p>
+            </div>
+
+            <div class="topbar-right">
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="ai_chat.html" class="top-btn"><i class="fas fa-brain"></i> Open EngiBot</a>
+                <button class="new-project-btn" onclick="openModal()">
+                    <i class="fas fa-plus"></i> New Project
+                </button>
             </div>
         </div>
 
-        <div class="dashboard-body">
-            
-            <div class="top-section">
-                <h3>Project Overview: Q4 2026</h3>
-                <button class="btn-add" onclick="alert('Add Project Modal will open here.')"><i class="fas fa-plus"></i> Add New Project</button>
-            </div>
+        <section class="hero">
+            <div class="hero-card">
+                <h2>Project Operations Overview</h2>
+                <p>
+                    Manage your engineering projects, monitor operational status,
+                    and launch AI-assisted project analysis from one unified workspace.
+                </p>
 
-            <div class="charts-grid">
-                <div class="card">
-                    <h4>Project Status</h4>
-                    <div class="chart-container">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                </div>
-                <div class="card">
-                    <h4>Tasks by Priority</h4>
-                    <div class="chart-container">
-                        <canvas id="tasksChart"></canvas>
-                    </div>
-                </div>
-                <div class="card">
-                    <h4>Hours Logged This Week</h4>
-                    <div class="chart-container">
-                        <canvas id="hoursChart"></canvas>
-                    </div>
+                <div class="hero-actions">
+                    <button class="hero-action primary" onclick="openModal()">Create Project</button>
+                    <a class="hero-action" href="ai_chat.html">Open EngiBot</a>
+                    <a class="hero-action" href="solutions.html">View Project Map</a>
                 </div>
             </div>
 
-            <div class="table-card">
-                <h4>Recent Activities & Projects</h4>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Project Title</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Villa Construction - Dubai</strong></td>
-                            <td>Initial architectural design and client approval phase.</td>
-                            <td><span class="status-badge status-active">Active</span></td>
-                        </tr>
-                        <tr>
-                            <td><strong>Commercial Plaza - Riyadh</strong></td>
-                            <td>Awaiting municipal permits and soil testing results.</td>
-                            <td><span class="status-badge status-pending">Pending</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="mini-grid">
+                <div class="mini-card">
+                    <div class="label">AI Status</div>
+                    <div class="value">Online</div>
+                </div>
+                <div class="mini-card">
+                    <div class="label">Auth Security</div>
+                    <div class="value">JWT Active</div>
+                </div>
+                <div class="mini-card">
+                    <div class="label">Last Sync</div>
+                    <div class="value" id="lastSyncText">--:--</div>
+                </div>
+                <div class="mini-card">
+                    <div class="label">Project Portfolio</div>
+                    <div class="value" id="latestProjectText">None</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Projects</div>
+                <div class="stat-value" id="totalProjects">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Projects</div>
+                <div class="stat-value" id="activeProjects">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending Projects</div>
+                <div class="stat-value" id="pendingProjects">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Completed Projects</div>
+                <div class="stat-value" id="completedProjects">0</div>
+            </div>
+        </section>
+
+        <section class="content-grid">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-server" style="color:var(--primary);"></i>
+                        Project Operations
+                    </div>
+                    <div class="chip">Live Project Data</div>
+                </div>
+
+                <div style="overflow-x:auto;">
+                    <table class="operations-table">
+                        <thead>
+                            <tr>
+                                <th>Project</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Type</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align:center; color:var(--muted); padding:26px;">
+                                    Loading projects...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-chart-pie" style="color:var(--primary);"></i>
+                        Project Distribution
+                    </div>
+                    <div class="chip">Data Linked</div>
+                </div>
+
+                <div class="distribution-wrap">
+                    <div class="ratio-item">
+                        <div class="ratio-label">
+                            <span>Active Project Ratio</span>
+                            <span id="activeRatioText">0%</span>
+                        </div>
+                        <div class="ratio-bar">
+                            <div class="ratio-fill" id="activeRatioBar" style="width:0%; background:var(--success);"></div>
+                        </div>
+                    </div>
+
+                    <div class="ratio-item">
+                        <div class="ratio-label">
+                            <span>Pending Project Ratio</span>
+                            <span id="pendingRatioText">0%</span>
+                        </div>
+                        <div class="ratio-bar">
+                            <div class="ratio-fill" id="pendingRatioBar" style="width:0%; background:linear-gradient(90deg, var(--warning), #fb7185);"></div>
+                        </div>
+                    </div>
+
+                    <div class="chart-holder">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create New Project</h3>
+                <button class="close-btn" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+            </div>
+
+            <div class="form-grid">
+                <div class="field">
+                    <label>Project Title</label>
+                    <input type="text" id="projectTitle" placeholder="e.g. Taiger Towers" />
+                </div>
+
+                <div class="field">
+                    <label>Location</label>
+                    <input type="text" id="projectLocation" placeholder="e.g. Dubai" />
+                </div>
+
+                <div class="field">
+                    <label>Status</label>
+                    <select id="projectStatus">
+                        <option value="Pending">Pending</option>
+                        <option value="Active">Active</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Project Type</label>
+                    <select id="projectType">
+                        <option value="Residential">Residential</option>
+                        <option value="Commercial">Commercial</option>
+                        <option value="Industrial">Industrial</option>
+                        <option value="Infrastructure">Infrastructure</option>
+                        <option value="Software">Software</option>
+                        <option value="General">General</option>
+                    </select>
+                </div>
+
+                <div class="field full">
+                    <label>Description</label>
+                    <textarea id="projectDescription" placeholder="Write a short project description..."></textarea>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="top-btn" onclick="closeModal()">Cancel</button>
+                <button class="new-project-btn" onclick="addProject()" id="createProjectBtn">
+                    <i class="fas fa-plus"></i> Create Project
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        // Project Status Chart (Pie)
-        const ctxStatus = document.getElementById('statusChart').getContext('2d');
-        new Chart(ctxStatus, {
-            type: 'pie',
-            data: {
-                labels: ['Active', 'Pending', 'Completed'],
-                datasets: [{
-                    data: [12, 5, 3],
-                    backgroundColor: ['#2563eb', '#f59e0b', '#22c55e'],
-                    borderWidth: 2,
-                    borderColor: '#ffffff'
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: {font: {family: 'Poppins'}} } } }
-        });
+        const API_BASE_URL = "http://127.0.0.1:8000";
+        const token = localStorage.getItem("access_token");
 
-        // Tasks by Priority (Bar)
-        const ctxTasks = document.getElementById('tasksChart').getContext('2d');
-        new Chart(ctxTasks, {
-            type: 'bar',
-            data: {
-                labels: ['High', 'Medium', 'Low'],
-                datasets: [{
-                    label: 'Tasks',
-                    data: [8, 15, 4],
-                    backgroundColor: '#1e40af',
-                    borderRadius: 4
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { labels: {font: {family: 'Poppins'}} } } }
-        });
+        if (!token) {
+            window.location.href = "login.html";
+        }
 
-        // Hours Logged (Line)
-        const ctxHours = document.getElementById('hoursChart').getContext('2d');
-        new Chart(ctxHours, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-                datasets: [{
-                    label: 'Hours',
-                    data: [8, 9, 7, 10, 6],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
-                }]
-            },
-            options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { labels: {font: {family: 'Poppins'}} } } }
-        });
+        let distributionChart = null;
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toastMessage");
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
+            const btn = document.getElementById("themeToggleBtn");
+
+            if (savedTheme === "light") {
+                document.body.classList.add("light-mode");
+                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove("light-mode");
+                if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle("light-mode");
+            localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+
+            const btn = document.getElementById("themeToggleBtn");
+            if (btn) {
+                btn.innerHTML = isLight
+                    ? '<i class="fas fa-sun"></i>'
+                    : '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html";
+        }
+
+        function openModal() {
+            document.getElementById("projectModal").classList.add("show");
+        }
+
+        function closeModal() {
+            document.getElementById("projectModal").classList.remove("show");
+        }
+
+        function formatProjectId(id) {
+            return `PRJ-${String(id).padStart(4, "0")}`;
+        }
+
+        function getProgressFromStatus(status) {
+            if (status === "Completed") return 100;
+            if (status === "Active") return 65;
+            return 25;
+        }
+
+        function getStatusBadge(status) {
+            if (status === "Active") {
+                return `<span class="status-badge status-active"><i class="fas fa-circle"></i> Active</span>`;
+            }
+            if (status === "Completed") {
+                return `<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> Completed</span>`;
+            }
+            return `<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>`;
+        }
+
+        function updateLastSync() {
+            const now = new Date();
+            const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+            document.getElementById("lastSyncText").innerText = time;
+        }
+
+        async function addProject() {
+            const title = document.getElementById("projectTitle").value.trim();
+            const location = document.getElementById("projectLocation").value.trim();
+            const status = document.getElementById("projectStatus").value;
+            const projectType = document.getElementById("projectType").value;
+            const description = document.getElementById("projectDescription").value.trim() || "No description";
+
+            if (!title || !location) {
+                showToast("Please fill in project title and location.", "error");
+                return;
+            }
+
+            const btn = document.getElementById("createProjectBtn");
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        title,
+                        location,
+                        status,
+                        description,
+                        project_type: projectType
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showToast(data.detail || "Failed to create project.", "error");
+                    return;
+                }
+
+                showToast("Project created successfully.", "success");
+                closeModal();
+
+                document.getElementById("projectTitle").value = "";
+                document.getElementById("projectLocation").value = "";
+                document.getElementById("projectDescription").value = "";
+                document.getElementById("projectStatus").value = "Pending";
+                document.getElementById("projectType").value = "Residential";
+
+                await init();
+
+            } catch (error) {
+                console.error(error);
+                showToast("Unable to connect to server.", "error");
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus"></i> Create Project';
+            }
+        }
+
+        function renderProjects(projects) {
+            const tbody = document.getElementById("projectsTableBody");
+
+            if (!projects.length) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align:center; color:var(--muted); padding:26px;">
+                            No projects found. Create your first project.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = projects.map(project => {
+                const progress = getProgressFromStatus(project.status);
+
+                return `
+                    <tr>
+                        <td>
+                            <div class="project-name">${project.title}</div>
+                            <div class="project-id">ID: ${formatProjectId(project.id)}</div>
+                        </td>
+                        <td>${project.location || "Unknown"}</td>
+                        <td>
+                            <div class="progress-wrap">
+                                ${getStatusBadge(project.status)}
+                                <div class="progress-bar-bg">
+                                    <div class="progress-bar-fill" style="width:${progress}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>${project.project_type || "General"}</td>
+                        <td>
+                            <div class="table-btns">
+                                <a class="table-btn primary" href="project_details.html?id=${project.id}">
+                                    View
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        function updateStats(stats) {
+            document.getElementById("totalProjects").innerText = stats.total ?? 0;
+            document.getElementById("activeProjects").innerText = stats.active ?? 0;
+            document.getElementById("pendingProjects").innerText = stats.pending ?? 0;
+            document.getElementById("completedProjects").innerText = stats.completed ?? 0;
+        }
+
+        function updatePortfolioText(projects) {
+            const el = document.getElementById("latestProjectText");
+
+            if (!projects.length) {
+                el.innerText = "None";
+            } else if (projects.length === 1) {
+                el.innerText = projects[0].title;
+            } else {
+                el.innerText = `${projects[projects.length - 1].title} + ${projects.length - 1} more`;
+            }
+        }
+
+        function updateDistribution(stats) {
+            const total = stats.total || 0;
+            const active = stats.active || 0;
+            const pending = stats.pending || 0;
+            const completed = stats.completed || 0;
+
+            const activeRatio = total ? Math.round((active / total) * 100) : 0;
+            const pendingRatio = total ? Math.round((pending / total) * 100) : 0;
+
+            document.getElementById("activeRatioText").innerText = `${activeRatio}%`;
+            document.getElementById("pendingRatioText").innerText = `${pendingRatio}%`;
+            document.getElementById("activeRatioBar").style.width = `${activeRatio}%`;
+            document.getElementById("pendingRatioBar").style.width = `${pendingRatio}%`;
+
+            const ctx = document.getElementById("distributionChart").getContext("2d");
+
+            if (distributionChart) {
+                distributionChart.destroy();
+            }
+
+            distributionChart = new Chart(ctx, {
+                type: "doughnut",
+                data: {
+                    labels: ["Active", "Pending", "Completed"],
+                    datasets: [{
+                        data: [active, pending, completed],
+                        backgroundColor: ["#10b981", "#f59e0b", "#64748b"],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                color: "#94a3b8",
+                                font: { size: 11, weight: "700" }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function init() {
+            try {
+                updateLastSync();
+
+                const [userRes, projectsRes, statsRes] = await Promise.all([
+                    fetch(`${API_BASE_URL}/users/me`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    }),
+                    fetch(`${API_BASE_URL}/projects/`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    }),
+                    fetch(`${API_BASE_URL}/projects/stats`, {
+                        headers: { "Authorization": `Bearer ${token}` }
+                    })
+                ]);
+
+                if (!userRes.ok || !projectsRes.ok || !statsRes.ok) {
+                    throw new Error("Failed to load dashboard data");
+                }
+
+                const user = await userRes.json();
+                const projects = await projectsRes.json();
+                const stats = await statsRes.json();
+
+                document.getElementById("userWelcome").innerText = user.full_name || "Engineer";
+
+                updateStats(stats);
+                renderProjects(projects);
+                updatePortfolioText(projects);
+                updateDistribution(stats);
+
+            } catch (error) {
+                console.error(error);
+                showToast("Failed to load dashboard data.", "error");
+            }
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("projectModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        applySavedTheme();
+        init();
     </script>
 </body>
 </html>

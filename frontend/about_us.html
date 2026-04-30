@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>About Us | EngiSphere</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --soft: #f8fafc;
+      --panel: #ffffff;
+      --line: #e2e8f0;
+      --shadow: 0 20px 55px rgba(15, 23, 42, 0.07);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      background: #ffffff;
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .nav {
+      height: 78px;
+      padding: 0 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, 0.95);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(18px);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.24);
+    }
+
+    .brand-text {
+      font-size: 22px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .brand-text span {
+      color: var(--primary);
+    }
+
+   .nav {
+  height: 78px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(18px);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-link {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+  padding: 0 8px;
+  transition: 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--primary);
+}
+
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--ink);
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.06);
+}
+
+.btn-outline {
+  background: #ffffff;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background: rgba(37, 99, 235, 0.08);
+  transform: translateY(-1px);
+}
+
+@media (max-width: 700px) {
+  .nav {
+    height: auto;
+    padding: 14px 22px;
+  }
+
+  .nav-actions {
+    gap: 8px;
+  }
+
+  .nav-link {
+    display: none;
+  }
+
+  .btn {
+    padding: 0 14px;
+    font-size: 13px;
+  }
+}
+
+    .btn {
+      min-height: 42px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 14px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+    }
+
+    .about-page {
+      min-height: calc(100vh - 78px);
+      padding: 88px 7% 70px;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(37, 99, 235, 0.08), transparent 30%),
+        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    }
+
+    .about-container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 54px;
+      align-items: center;
+      margin-bottom: 72px;
+    }
+
+    .kicker {
+      color: var(--primary);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-size: clamp(42px, 4vw, 62px);
+      line-height: 1.06;
+      letter-spacing: -2.4px;
+      margin-bottom: 22px;
+    }
+
+    .hero h1 span {
+      color: var(--primary);
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.85;
+      max-width: 640px;
+    }
+
+    .summary-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 34px;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-card h2 {
+      font-size: 26px;
+      letter-spacing: -0.9px;
+      margin-bottom: 14px;
+    }
+
+    .summary-card p {
+      color: var(--muted);
+      font-size: 15.5px;
+      line-height: 1.85;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 72px;
+    }
+
+    .info-card {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 26px;
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.05);
+    }
+
+    .info-card i {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: rgba(37, 99, 235, 0.10);
+      color: var(--primary);
+      font-size: 18px;
+      margin-bottom: 18px;
+    }
+
+    .info-card h3 {
+      font-size: 19px;
+      margin-bottom: 10px;
+      letter-spacing: -0.4px;
+    }
+
+    .info-card p {
+      color: var(--muted);
+      font-size: 14.5px;
+      line-height: 1.75;
+    }
+
+    .team-section {
+      text-align: center;
+    }
+
+    .team-section h2 {
+      font-size: clamp(32px, 3vw, 44px);
+      letter-spacing: -1.4px;
+      margin-bottom: 10px;
+    }
+
+    .team-section p {
+      color: var(--muted);
+      margin-bottom: 32px;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .team-card {
+      padding: 30px 18px;
+      border-radius: 22px;
+      background: #ffffff;
+      border: 1px solid var(--line);
+      box-shadow: 0 14px 36px rgba(15, 23, 42, 0.05);
+    }
+
+    .team-card h3 {
+      font-size: 19px;
+      letter-spacing: -0.4px;
+    }
+
+    .footer {
+      padding: 24px 7%;
+      background: #0f172a;
+      color: #94a3b8;
+      text-align: center;
+      font-size: 13px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    @media (max-width: 1000px) {
+      .hero {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .team-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 700px) {
+      .nav {
+        height: auto;
+        padding: 14px 22px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .about-page {
+        padding: 64px 22px 54px;
+      }
+
+      .hero h1 {
+        font-size: 38px;
+      }
+
+      .team-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="nav">
+  <a href="home.html" class="brand">
+    <span class="brand-icon">
+      <i class="fas fa-compass-drafting"></i>
+    </span>
+    <span class="brand-text">ENGI<span>SPHERE</span></span>
+  </a>
+
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <i class="fas fa-moon"></i>
+    </button>
+
+    <a href="home.html" class="nav-link">Home</a>
+    <a href="index.html" class="btn btn-outline">Workspace</a>
+    <a href="login.html" class="btn btn-primary">System Access</a>
+  </div>
+</nav>
+
+  <main class="about-page">
+    <div class="about-container">
+      <section class="hero">
+        <div>
+       <div class="kicker">About Us</div>
+
+<h1>
+  About <span>EngiSphere</span>
+</h1>
+
+<p>
+  EngiSphere is a system that helps users manage engineering projects in one place.
+  It includes project pages, secure login, maps, reports, and an AI assistant called EngiBot.
+</p>
+        </div>
+
+        <div class="summary-card">
+  <h2>Our Purpose</h2>
+  <p>
+    Our goal is to make project information easier to organize, view, and manage
+    instead of keeping everything scattered across different files and pages.
+  </p>
+</div>
+      </section>
+
+    <section class="info-grid">
+  <div class="info-card">
+    <i class="fas fa-diagram-project"></i>
+    <h3>Projects</h3>
+    <p>
+      Users can add projects, view project details, and follow their status.
+    </p>
+  </div>
+
+  <div class="info-card">
+    <i class="fas fa-shield-halved"></i>
+    <h3>Login System</h3>
+    <p>
+      The system uses login and registration to protect user access.
+    </p>
+  </div>
+
+  <div class="info-card">
+    <i class="fas fa-robot"></i>
+    <h3>EngiBot</h3>
+    <p>
+      Users can ask EngiBot questions related to engineering projects and planning.
+    </p>
+  </div>
+</section>
+
+     <section class="team-section">
+  <h2>Team Members</h2>
+  <p>EngiSphere was developed by our software engineering team.</p>
+
+  <div class="team-grid">
+    <div class="team-card">
+      <h3>Mujtaba Mohammed</h3>
+    </div>
+
+    <div class="team-card">
+      <h3>Ali</h3>
+    </div>
+
+    <div class="team-card">
+      <h3>Azzam</h3>
+    </div>
+
+    <div class="team-card">
+      <h3>Ahmed</h3>
+    </div>
+  </div>
+</section>
+    </div>
+  </main>
+
+ <footer class="footer">
+  © 2026 EngiSphere. Engineering Management System.
+</footer>
+</body>
+</html>

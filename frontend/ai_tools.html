@@ -10,7 +10,12 @@
         body { margin: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--bg-color); display: flex; height: 100vh; overflow: hidden; }
         
         
-        .sidebar { width: 250px; background-color: var(--primary); color: white; display: flex; flex-direction: column; }
+       /* --- التصميم الموحد للقائمة الجانبية --- */
+        .sidebar { width: 260px; background: #1e40af; color: white; display: flex; flex-direction: column; padding-top: 20px; z-index: 10; flex-shrink: 0; height: 100vh; }
+        .sidebar .logo { font-size: 24px; font-weight: 700; padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar li { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; opacity: 0.8; font-size: 15px; }
+        .sidebar li:hover, .sidebar li.active { background: rgba(255,255,255,0.1); opacity: 1; border-left: 4px solid white; }
         .logo-area { padding: 20px; font-size: 24px; font-weight: bold; display: flex; align-items: center; gap: 10px; background: #184c6e; cursor: pointer; }
         .nav-links { list-style: none; padding: 0; margin: 20px 0; }
         .nav-links li { padding: 15px 25px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 15px; }
@@ -53,18 +58,16 @@
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="logo-area" onclick="window.location.href='home.html'"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
-        <ul class="nav-links">
-            <li onclick="window.location.href='index.html'"><i class="fas fa-th-large"></i> Dashboard</li>
-            <li onclick="window.location.href='projects.html'"><i class="far fa-folder"></i> Projects</li>
-            <li onclick="window.location.href='client_dashboard.html'"><i class="fas fa-user-tie"></i> Client Portal</li>
-            <li><i class="fas fa-tasks"></i> Tasks</li>
-            <li class="active" onclick="window.location.href='ai_tools.html'"><i class="fas fa-robot"></i> AI & DevSpace</li>
-            <li style="margin-top: auto;" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</li>
+   <div class="sidebar">
+        <div class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
+        <ul>
+            <li onclick="window.location.href='index.html'"><i class="fas fa-th-large"></i> Command Center</li>
+            <li onclick="window.location.href='projects.html'"><i class="fas fa-project-diagram"></i> My Projects</li>
+            <li onclick="window.location.href='ai_chat.html'"><i class="fas fa-robot"></i> AI EngiBot</li>
+            <li onclick="window.location.href='profile.html'"><i class="fas fa-user-cog"></i> Profile Settings</li>
+            <li onclick="logout()" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i> Logout</li>
         </ul>
     </div>
-
     <div class="main-content">
         <div class="topbar">
             <h2>AI Assistant & Developer Tools</h2>

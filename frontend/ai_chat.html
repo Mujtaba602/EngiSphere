@@ -3,139 +3,800 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI EngiBot - EngiSphere</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <title>EngiSphere | AI EngiBot</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        /* الهوية البصرية الموحدة */
         :root {
-            --primary: #2563eb; --primary-dark: #1e40af; --text-dark: #0f172a; --text-muted: #64748b;
-            --bg-light: #f8fafc; --card-bg: #ffffff;
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05); --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --bg: #020617;
+            --sidebar: #0f172a;
+            --card: rgba(15, 23, 42, 0.65);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
-        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--bg-light); color: var(--text-dark); display: flex; height: 100vh; -webkit-font-smoothing: antialiased; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-        /* Sidebar المتطابق */
-        .sidebar { width: 260px; background: var(--primary-dark); color: white; display: flex; flex-direction: column; padding-top: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 10; }
-        .sidebar .logo { font-size: 24px; font-weight: 700; padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .sidebar ul { list-style: none; padding: 0; margin: 0; }
-        .sidebar li { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; font-weight: 400; opacity: 0.8; }
-        .sidebar li:hover, .sidebar li.active { background: rgba(255,255,255,0.1); opacity: 1; border-left: 4px solid white; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
 
-        /* المحتوى الرئيسي */
-        .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
 
-        /* الشريط العلوي */
-        .header { background: white; padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow-sm); z-index: 5; }
-        .header h2 { margin: 0; font-size: 22px; font-weight: 600; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
-        .header h2 i { color: var(--primary); }
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            z-index: 1000;
+            transition: background 0.3s;
+        }
 
-        /* منطقة المحادثة (Chat Area) */
-        .chat-container { flex: 1; padding: 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; background: var(--bg-light); }
-        
-        .message { display: flex; gap: 15px; max-width: 80%; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .message.bot { align-self: flex-start; }
-        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            letter-spacing: -1.5px;
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.35);
+        }
 
-        .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 18px; flex-shrink: 0; }
-        .bot .avatar { background: var(--primary); color: white; }
-        .user .avatar { background: var(--text-dark); color: white; }
+        .nav-section {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin: 15px 0 5px 15px;
+            letter-spacing: 1px;
+        }
 
-        .bubble { padding: 15px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; box-shadow: var(--shadow-sm); }
-        .bot .bubble { background: white; color: var(--text-dark); border-bottom-left-radius: 0; border: 1px solid rgba(0,0,0,0.03); }
-        .user .bubble { background: var(--primary); color: white; border-bottom-right-radius: 0; }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            text-decoration: none;
+            color: var(--muted);
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.3s;
+            margin-bottom: 4px;
+        }
 
-        /* منطقة الإدخال (Input Area) */
-        .input-area { background: white; padding: 20px 40px; box-shadow: 0 -4px 10px rgba(0,0,0,0.02); display: flex; gap: 15px; align-items: center; z-index: 5; }
-        .chat-input { flex: 1; padding: 15px 20px; border: 1px solid #cbd5e1; border-radius: 12px; font-family: 'Poppins', sans-serif; font-size: 15px; outline: none; transition: 0.3s; background: var(--bg-light); }
-        .chat-input:focus { border-color: var(--primary); background: white; }
-        
-        .send-btn { background: var(--primary); color: white; border: none; width: 50px; height: 50px; border-radius: 12px; font-size: 18px; cursor: pointer; transition: 0.3s; box-shadow: var(--shadow-sm); display: flex; justify-content: center; align-items: center; }
-        .send-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            box-shadow: inset 4px 0 0 var(--primary);
+        }
 
+        .exit-link {
+            color: var(--danger) !important;
+            margin-top: auto;
+        }
+
+        .exit-link:hover {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger) !important;
+            box-shadow: inset 4px 0 0 var(--danger);
+        }
+
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: var(--bg);
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            transition: background 0.3s;
+        }
+
+        .main-chat::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.05), transparent 60%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .chat-header {
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 15, 28, 0.85);
+            backdrop-filter: blur(20px);
+            z-index: 10;
+            gap: 20px;
+            flex-wrap: wrap;
+            transition: background 0.3s;
+        }
+
+        .bot-info h2 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--success);
+            background: rgba(16,185,129,0.1);
+            padding: 4px 10px;
+            border-radius: 50px;
+            margin-top: 6px;
+            border: 1px solid rgba(16,185,129,0.2);
+        }
+
+        .sys-metrics {
+            display: flex;
+            gap: 18px;
+            font-size: 11px;
+            font-family: 'Fira Code', monospace;
+            color: var(--muted);
+            flex-wrap: wrap;
+        }
+
+        .metric span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .mini-btn,
+        .theme-toggle {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .mini-btn:hover,
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 32px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+            scroll-behavior: smooth;
+            z-index: 1;
+        }
+
+        .quick-prompts {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: -4px;
+        }
+
+        .prompt-chip {
+            background: rgba(59,130,246,0.08);
+            color: #cbd5e1;
+            border: 1px solid rgba(59,130,246,0.15);
+            padding: 10px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .prompt-chip:hover {
+            color: white;
+            border-color: var(--primary);
+            background: rgba(59,130,246,0.14);
+        }
+
+        .msg-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .msg-row.user {
+            justify-content: flex-end;
+        }
+
+        .msg-bubble {
+            max-width: 78%;
+            padding: 20px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        .user .msg-bubble {
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: white;
+            border-bottom-right-radius: 4px;
+            box-shadow: 0 15px 35px rgba(59,130,246,0.25);
+            font-weight: 500;
+        }
+
+        .bot .msg-bubble {
+            background: rgba(15, 23, 42, 0.72);
+            color: var(--text);
+            border-bottom-left-radius: 4px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 3px solid var(--primary);
+            backdrop-filter: blur(15px);
+        }
+
+        .bot-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--muted);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+        }
+
+        .bot-header i {
+            color: var(--primary);
+            font-size: 14px;
+        }
+
+        .msg-content {
+            color: #e2e8f0;
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 6px;
+            padding: 5px 0;
+        }
+
+        .typing-indicator span {
+            width: 6px;
+            height: 6px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1.2); background: #fff; }
+        }
+
+        .chat-input-area {
+            padding: 0 32px 26px 32px;
+            z-index: 10;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(59,130,246,0.3);
+            border-radius: 24px;
+            padding: 10px 14px 10px 22px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+            backdrop-filter: blur(20px);
+            transition: 0.3s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 20px 40px rgba(59,130,246,0.18);
+            transform: translateY(-2px);
+        }
+
+        #userInput {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 15px;
+            outline: none;
+            padding: 10px 0;
+            font-family: inherit;
+        }
+
+        #userInput::placeholder {
+            color: var(--muted);
+        }
+
+        .send-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: var(--primary);
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 18px var(--primary-glow);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            background: #60a5fa;
+        }
+
+        .send-btn:disabled {
+            background: #1e293b;
+            box-shadow: none;
+            cursor: not-allowed;
+            color: var(--muted);
+        }
+
+        .input-footer {
+            text-align: center;
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .ai-response {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            color: #dbe4ef;
+            line-height: 1.9;
+            font-size: 14px;
+        }
+
+        .ai-response p {
+            margin: 0;
+        }
+
+        .ai-section-title {
+            margin: 18px 0 10px 0;
+            font-size: 16px;
+            font-weight: 800;
+            color: #ffffff;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .ai-list {
+            margin: 8px 0 14px 20px;
+            padding-left: 10px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .ai-list li {
+            color: #dbe4ef;
+        }
+
+        .ai-response strong {
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        body.light-mode {
+            --bg: #f3f7fc;
+            --sidebar: #ffffff;
+            --card: rgba(255,255,255,0.9);
+            --border: rgba(15, 23, 42, 0.08);
+            --text: #0f172a;
+            --muted: #64748b;
+            background: #f3f7fc;
+            color: #0f172a;
+        }
+
+        body.light-mode .sidebar {
+            background: #ffffff;
+            border-right: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        body.light-mode .main-chat {
+            background: radial-gradient(circle at top left, #ffffff, #eef4fb);
+            background-image:
+                linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
+        }
+
+        body.light-mode .chat-header {
+            background: rgba(255,255,255,0.8);
+        }
+
+        body.light-mode .msg-bubble.bot,
+        body.light-mode .input-wrapper {
+            background: rgba(255,255,255,0.9);
+            color: #0f172a;
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: 0 12px 30px rgba(15,23,42,0.07);
+        }
+
+        body.light-mode .msg-content,
+        body.light-mode .ai-response,
+        body.light-mode .bot-info h2,
+        body.light-mode #userInput,
+        body.light-mode .ai-section-title,
+        body.light-mode .ai-response strong {
+            color: #0f172a;
+        }
+
+        body.light-mode .prompt-chip {
+            color: #334155;
+            background: rgba(37,99,235,0.06);
+        }
+
+        body.light-mode .prompt-chip:hover {
+            color: #0f172a;
+        }
+
+        @media (max-width: 900px) {
+            .sidebar { display: none; }
+            .msg-bubble { max-width: 90%; }
+            .chat-header, .chat-box, .chat-input-area {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+        }
     </style>
 </head>
 <body>
-
     <div class="sidebar">
-        <div class="logo"><i class="fas fa-drafting-compass"></i> EngiSphere</div>
-        <ul>
-            <li onclick="window.location.href='index.html'"><i class="fas fa-chart-pie"></i> Dashboard</li>
-            <li onclick="window.location.href='projects.html'"><i class="fas fa-folder-open"></i> Projects</li>
-            <li onclick="window.location.href='client_dashboard.html'"><i class="fas fa-users"></i> Client Portal</li>
-            <li class="active"><i class="fas fa-robot"></i> AI EngiBot</li>
-            <li onclick="window.location.href='home.html'"><i class="fas fa-globe"></i> Main Website</li>
-            <li onclick="localStorage.removeItem('isLoggedIn'); window.location.href='login.html';" style="margin-top: auto; margin-bottom: 20px;"><i class="fas fa-sign-out-alt"></i> Logout</li>
-        </ul>
+        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
+
+        <nav style="flex: 1;">
+            <div class="nav-section">Core Systems</div>
+            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i> Geospatial Radar</a>
+            <a href="ai_chat.html" class="nav-link active"><i class="fas fa-brain"></i> AI EngiBot</a>
+
+            <div class="nav-section">Management</div>
+            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
+            <a href="#" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
+            <a href="#" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+        </nav>
+
+        <a href="#" onclick="logout()" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i> Exit System
+        </a>
     </div>
 
-    <div class="main-content">
-        <div class="header">
-            <h2><i class="fas fa-robot"></i> EngiBot Assistant</h2>
-            <div style="font-size: 14px; color: var(--text-muted); background: #f1f5f9; padding: 5px 12px; border-radius: 20px;">
-                <i class="fas fa-circle" style="color: #22c55e; font-size: 10px; margin-right: 5px;"></i> Online
-            </div>
-        </div>
-
-        <div class="chat-container" id="chatBox">
-            <div class="message bot">
-                <div class="avatar"><i class="fas fa-robot"></i></div>
-                <div class="bubble">
-                    Hello! I am <strong>EngiBot</strong>, your engineering AI assistant. I can help you with structural calculations, material specifications, or project management queries. How can I assist you today?
+    <div class="main-chat">
+        <div class="chat-header">
+            <div class="bot-info">
+                <h2><i class="fas fa-microchip" style="color: var(--primary);"></i> ENGIBOT INTELLIGENCE</h2>
+                <div class="status-pill">
+                    <i class="fas fa-circle" style="font-size:6px;"></i> NEURAL CORE SECURE
                 </div>
             </div>
+
+            <div class="sys-metrics">
+                <div class="metric">Model: <span>Gemini Core</span></div>
+                <div class="metric">Latency: <span id="latency">12ms</span></div>
+                <div class="metric">Mode: <span>Engineering Assist</span></div>
+            </div>
+
+            <div class="header-actions">
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="mini-btn" onclick="clearChat()">
+                    <i class="fas fa-broom"></i> Clear
+                </button>
+            </div>
         </div>
 
-        <div class="input-area">
-            <input type="text" id="userInput" class="chat-input" placeholder="Ask about concrete mixing, load-bearing walls, or project timelines..." onkeypress="handleKeyPress(event)">
-            <button class="send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+        <div class="chat-box" id="chatBox">
+            <div class="msg-row bot">
+                <div class="msg-bubble">
+                    <div class="bot-header"><i class="fas fa-terminal"></i> PROTOCOL INITIALIZED</div>
+                    <div class="msg-content">
+                        <div class="ai-response">
+                            <p><strong>Handshake successful.</strong> EngiBot is online.</p>
+                            <p>Welcome to <strong>EngiSphere AI EngiBot</strong>. I can help you with:</p>
+                            <ul class="ai-list">
+                                <li>Project risk analysis</li>
+                                <li>Software architecture suggestions</li>
+                                <li>Feasibility discussions</li>
+                                <li>Engineering planning and documentation</li>
+                            </ul>
+                            <p>Enter your question below or use one of the quick prompts.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-prompts">
+                <button class="prompt-chip" onclick="usePrompt('Give me a short risk analysis for my current projects.')">Risk Analysis</button>
+                <button class="prompt-chip" onclick="usePrompt('Suggest a software architecture for an AI-driven engineering management platform.')">Architecture Suggestion</button>
+                <button class="prompt-chip" onclick="usePrompt('How can I improve my graduation project presentation?')">Presentation Help</button>
+                <button class="prompt-chip" onclick="usePrompt('What are the main risks in a software engineering graduation project?')">Graduation Risks</button>
+            </div>
+        </div>
+
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <input
+                    type="text"
+                    id="userInput"
+                    placeholder="Ask EngiBot about your project, risks, architecture, or planning..."
+                    onkeypress="handleEnter(event)"
+                >
+                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+
+            <div class="input-footer">
+                <i class="fas fa-lock" style="font-size: 9px; margin-right: 5px;"></i>
+                Secure API-connected engineering assistant session.
+            </div>
         </div>
     </div>
 
     <script>
-        // التأكد من تسجيل الدخول
-        if (localStorage.getItem("isLoggedIn") !== "true") { window.location.href = "login.html"; }
+        const API_BASE_URL = "http://127.0.0.1:8000";
+        const token = localStorage.getItem("access_token");
 
-        function handleKeyPress(event) {
-            if (event.key === 'Enter') { sendMessage(); }
+        if (!token) {
+            window.location.href = "login.html";
         }
 
-        function sendMessage() {
-            const inputField = document.getElementById('userInput');
-            const messageText = inputField.value.trim();
-            if (messageText === '') return;
+        const chatBox = document.getElementById("chatBox");
+        const userInput = document.getElementById("userInput");
+        const sendBtn = document.getElementById("sendBtn");
 
-            const chatBox = document.getElementById('chatBox');
+        setInterval(() => {
+            document.getElementById("latency").innerText =
+                Math.floor(Math.random() * 15 + 8) + "ms";
+        }, 3000);
 
-            // 1. إضافة رسالة المستخدم للشاشة
-            const userMsgHTML = `
-                <div class="message user">
-                    <div class="avatar"><i class="fas fa-user"></i></div>
-                    <div class="bubble">${messageText}</div>
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
+            const btn = document.getElementById("themeToggleBtn");
+
+            if (savedTheme === "light") {
+                document.body.classList.add("light-mode");
+                btn.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove("light-mode");
+                btn.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle("light-mode");
+            localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+
+            const btn = document.getElementById("themeToggleBtn");
+            btn.innerHTML = isLight
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+        }
+
+        function handleEnter(e) {
+            if (e.key === "Enter") sendMessage();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatAIResponse(text) {
+            if (!text) return "<p>No response returned.</p>";
+
+            let safe = text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+
+            safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            safe = safe.replace(/^###\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
+            safe = safe.replace(/^##\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
+            safe = safe.replace(/^#\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
+            safe = safe.replace(/^\s*[-*]\s+(.*)$/gm, "<li>$1</li>");
+            safe = safe.replace(/(<li>.*<\/li>)/gs, '<ul class="ai-list">$1</ul>');
+            safe = safe.replace(/\n\n/g, "</p><p>");
+            safe = `<div class="ai-response"><p>${safe}</p></div>`;
+
+            safe = safe.replace(/<p>\s*<\/p>/g, "");
+            safe = safe.replace(/<\/ul>\s*<ul class="ai-list">/g, "");
+            safe = safe.replace(/<p>(\s*<h3 class="ai-section-title">)/g, "$1");
+            safe = safe.replace(/(<\/h3>)<\/p>/g, "$1");
+            safe = safe.replace(/<p>(\s*<ul class="ai-list">)/g, "$1");
+            safe = safe.replace(/(<\/ul>)<\/p>/g, "$1");
+
+            return safe;
+        }
+
+        function scrollToBottom() {
+            chatBox.scrollTo({
+                top: chatBox.scrollHeight,
+                behavior: "smooth"
+            });
+        }
+
+        function appendUserMessage(text) {
+            const msgHtml = `
+                <div class="msg-row user">
+                    <div class="msg-bubble">${escapeHtml(text)}</div>
                 </div>
             `;
-            chatBox.innerHTML += userMsgHTML;
-            inputField.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
+            chatBox.insertAdjacentHTML("beforeend", msgHtml);
+            scrollToBottom();
+        }
 
-            // 2. إظهار رسالة "قيد الكتابة..." مؤقتاً
-            setTimeout(() => {
-                const botMsgHTML = `
-                    <div class="message bot">
-                        <div class="avatar"><i class="fas fa-robot"></i></div>
-                        <div class="bubble" style="color: var(--text-muted);">
-                            <i class="fas fa-spinner fa-spin"></i> Connecting to Backend (FastAPI)...
+        function appendTypingIndicator() {
+            const id = "typing-" + Date.now();
+            const msgHtml = `
+                <div class="msg-row bot" id="${id}">
+                    <div class="msg-bubble" style="padding: 15px 25px;">
+                        <div class="typing-indicator"><span></span><span></span><span></span></div>
+                    </div>
+                </div>
+            `;
+            chatBox.insertAdjacentHTML("beforeend", msgHtml);
+            scrollToBottom();
+            return id;
+        }
+
+        function replaceTypingWithBotMessage(typingElement, text, status = "DATA PROCESSED") {
+            typingElement.outerHTML = `
+                <div class="msg-row bot">
+                    <div class="msg-bubble">
+                        <div class="bot-header">
+                            <i class="fas fa-radar"></i> ${status}
+                        </div>
+                        <div class="msg-content">
+                            ${formatAIResponse(text)}
                         </div>
                     </div>
-                `;
-                chatBox.innerHTML += botMsgHTML;
-                chatBox.scrollTop = chatBox.scrollHeight;
-            }, 500);
+                </div>
+            `;
+            scrollToBottom();
         }
+
+        function clearChat() {
+            chatBox.innerHTML = `
+                <div class="msg-row bot">
+                    <div class="msg-bubble">
+                        <div class="bot-header"><i class="fas fa-terminal"></i> SESSION RESET</div>
+                        <div class="msg-content">
+                            <div class="ai-response">
+                                <p>Chat session cleared. You can start a new engineering query now.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-prompts">
+                    <button class="prompt-chip" onclick="usePrompt('Give me a short risk analysis for my current projects.')">Risk Analysis</button>
+                    <button class="prompt-chip" onclick="usePrompt('Suggest a software architecture for an AI-driven engineering management platform.')">Architecture Suggestion</button>
+                    <button class="prompt-chip" onclick="usePrompt('How can I improve my graduation project presentation?')">Presentation Help</button>
+                    <button class="prompt-chip" onclick="usePrompt('What are the main risks in a software engineering graduation project?')">Graduation Risks</button>
+                </div>
+            `;
+            userInput.focus();
+        }
+
+        function usePrompt(text) {
+            userInput.value = text;
+            userInput.focus();
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            appendUserMessage(text);
+            userInput.value = "";
+            sendBtn.disabled = true;
+
+            const typingId = appendTypingIndicator();
+            const typingElement = document.getElementById(typingId);
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/chat`, {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: text
+                    })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    replaceTypingWithBotMessage(
+                        typingElement,
+                        data.detail || "AI service error. Please try again.",
+                        "SYSTEM ERROR"
+                    );
+                    return;
+                }
+
+                const reply = data.reply || "No response returned from AI service.";
+                replaceTypingWithBotMessage(typingElement, reply, "DATA PROCESSED");
+
+            } catch (error) {
+                replaceTypingWithBotMessage(
+                    typingElement,
+                    "Unable to reach the AI service. Check backend server or network connection.",
+                    "CONNECTION ERROR"
+                );
+            } finally {
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html";
+        }
+
+        applySavedTheme();
     </script>
 </body>
 </html>

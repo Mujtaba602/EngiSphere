@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EngiSphere | Geospatial Radar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-soft: rgba(59, 130, 246, 0.14);
+            --bg: #020617;
+            --sidebar: #0f172a;
+            --panel: rgba(15, 23, 42, 0.76);
+            --panel-2: rgba(30, 41, 59, 0.45);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 28px 18px;
+            transition: background 0.3s;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 34px;
+            letter-spacing: -1px;
+            text-shadow: 0 0 18px rgba(59, 130, 246, 0.22);
+        }
+
+        .nav-section {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin: 14px 0 6px 14px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.25s;
+            margin-bottom: 4px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            box-shadow: inset 4px 0 0 var(--primary);
+        }
+
+        .exit-link {
+            margin-top: auto;
+            color: var(--danger) !important;
+        }
+
+        .exit-link:hover {
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: inset 4px 0 0 var(--danger);
+            color: var(--danger) !important;
+        }
+
+        .main-radar {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.08), transparent 26%),
+                linear-gradient(180deg, #071225 0%, #020617 100%);
+            transition: background 0.3s;
+        }
+
+        #map {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .top-floating {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 1200;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .theme-toggle,
+        .floating-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(14px);
+        }
+
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            display: grid;
+            place-items: center;
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .stats-floating {
+            display: flex;
+            gap: 12px;
+        }
+
+        .floating-card {
+            min-width: 128px;
+            padding: 14px 16px;
+        }
+
+        .floating-card .label {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .floating-card .value {
+            font-size: 16px;
+            font-weight: 800;
+            color: white;
+        }
+
+        .left-panel {
+            position: absolute;
+            top: 18px;
+            left: 22px;
+            bottom: 18px;
+            width: 370px;
+            z-index: 1200;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: 0.3s ease;
+        }
+
+        .left-panel.collapsed {
+            transform: translateX(calc(-100% + 46px));
+        }
+
+        .collapse-btn {
+            position: absolute;
+            top: 50%;
+            right: -18px;
+            transform: translateY(-50%);
+            width: 36px;
+            height: 58px;
+            border-radius: 0 14px 14px 0;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text);
+            cursor: pointer;
+            z-index: 1300;
+            box-shadow: var(--shadow);
+        }
+
+        .collapse-btn:hover {
+            color: var(--primary);
+        }
+
+        .panel-header {
+            padding: 24px 22px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .panel-header h2 {
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .panel-header p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.7;
+        }
+
+        .search-wrap {
+            padding: 16px 22px 14px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-box input {
+            width: 100%;
+            height: 46px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            padding: 0 14px 0 42px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.25s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+        }
+
+        .list-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px 14px 16px 14px;
+        }
+
+        .project-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .project-card:hover,
+        .project-card.active {
+            border-color: rgba(59,130,246,0.25);
+            background: rgba(59,130,246,0.08);
+            transform: translateY(-1px);
+        }
+
+        .project-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .project-card-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .project-card-sub {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 12px currentColor;
+            flex-shrink: 0;
+        }
+
+        .project-meta {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .project-meta-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--muted);
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .project-meta-row strong {
+            color: #e2e8f0;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            height: 38px;
+            padding: 0 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .action-btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .status-badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .status-active {
+            background: rgba(16,185,129,0.12);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(245,158,11,0.12);
+            color: var(--warning);
+        }
+
+        .status-completed {
+            background: rgba(148,163,184,0.12);
+            color: #cbd5e1;
+        }
+
+        .panel-footer {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-state {
+            background: rgba(255,255,255,0.03);
+            border: 1px dashed rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 26px 18px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .empty-state i {
+            font-size: 26px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            z-index: 4000;
+            transition: 0.35s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(12px);
+        }
+
+        .toast.show {
+            top: 24px;
+        }
+
+        .toast.success {
+            background: rgba(16,185,129,0.96);
+            border: 1px solid #10b981;
+            box-shadow: 0 10px 30px rgba(16,185,129,0.25);
+        }
+
+        .toast.error {
+            background: rgba(239,68,68,0.96);
+            border: 1px solid #ef4444;
+            box-shadow: 0 10px 30px rgba(239,68,68,0.25);
+        }
+
+        body.light-mode {
+            --bg: #f3f7fc;
+            --sidebar: #ffffff;
+            --panel: rgba(255,255,255,0.92);
+            --panel-2: rgba(255,255,255,0.88);
+            --border: rgba(15, 23, 42, 0.08);
+            --text: #0f172a;
+            --muted: #64748b;
+            --shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+            background: #f3f7fc;
+            color: #0f172a;
+        }
+
+        body.light-mode .sidebar {
+            background: #ffffff;
+            border-right: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        body.light-mode .main-radar {
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.07), transparent 26%),
+                linear-gradient(180deg, #ffffff 0%, #eef4fb 100%);
+        }
+
+        body.light-mode .left-panel,
+        body.light-mode .floating-card,
+        body.light-mode .theme-toggle,
+        body.light-mode .collapse-btn {
+            background: rgba(255,255,255,0.94);
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: var(--shadow);
+        }
+
+        body.light-mode .project-card {
+            background: rgba(15,23,42,0.02);
+            border-color: rgba(15,23,42,0.05);
+        }
+
+        body.light-mode .project-card:hover,
+        body.light-mode .project-card.active {
+            background: rgba(59,130,246,0.08);
+        }
+
+        body.light-mode .project-card-title,
+        body.light-mode .floating-card .value,
+        body.light-mode .panel-header h2,
+        body.light-mode .project-meta-row strong,
+        body.light-mode .action-btn,
+        body.light-mode .theme-toggle,
+        body.light-mode .collapse-btn {
+            color: #0f172a;
+        }
+
+        body.light-mode .search-box input {
+            background: rgba(15,23,42,0.03);
+            color: #0f172a;
+        }
+
+        body.light-mode .action-btn {
+            background: rgba(15,23,42,0.04);
+        }
+
+        body.light-mode .action-btn.primary {
+            color: white;
+        }
+
+        @media (max-width: 980px) {
+            .sidebar {
+                display: none;
+            }
+
+            .left-panel {
+                width: 340px;
+                left: 16px;
+                top: 16px;
+                bottom: 16px;
+            }
+
+            .top-floating {
+                top: 16px;
+                right: 16px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .left-panel {
+                width: calc(100% - 32px);
+                right: 16px;
+            }
+
+            .stats-floating {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast success">
+        <i class="fas fa-circle-check"></i>
+        <span id="toastMessage">Done.</span>
+    </div>
+
+    <aside class="sidebar">
+        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
+
+        <nav style="flex:1;">
+            <div class="nav-section">Core Systems</div>
+            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="solutions.html" class="nav-link active"><i class="fas fa-satellite"></i> Geospatial Radar</a>
+            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i> AI EngiBot</a>
+
+            <div class="nav-section">Management</div>
+            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
+            <a href="#" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
+            <a href="#" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+        </nav>
+
+        <a href="#" onclick="logout()" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i> Exit System
+        </a>
+    </aside>
+
+    <main class="main-radar">
+        <div id="map"></div>
+
+        <div class="top-floating">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="stats-floating">
+                <div class="floating-card">
+                    <div class="label">Tracked Projects</div>
+                    <div class="value" id="trackedProjects">0</div>
+                </div>
+                <div class="floating-card">
+                    <div class="label">Active Sites</div>
+                    <div class="value" id="activeSites">0</div>
+                </div>
+            </div>
+        </div>
+
+        <section class="left-panel" id="leftPanel">
+            <button class="collapse-btn" onclick="togglePanel()" id="collapseBtn">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <div class="panel-header">
+                <h2><i class="fas fa-crosshairs" style="color:var(--primary);"></i> Scanning Sector</h2>
+                <p>
+                    Live geospatial overview of engineering projects and their site locations.
+                </p>
+            </div>
+
+            <div class="search-wrap">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input
+                        type="text"
+                        id="projectSearch"
+                        placeholder="Search by project or location..."
+                        oninput="filterProjects()"
+                    />
+                </div>
+            </div>
+
+            <div class="list-area" id="radarList">
+                <div class="empty-state">
+                    <i class="fas fa-satellite-dish"></i>
+                    Loading mapped projects...
+                </div>
+            </div>
+
+            <div class="panel-footer">
+                <i class="fas fa-circle" style="font-size:8px;"></i>
+                SATELLITE LINK STABLE
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const API_BASE_URL = "http://127.0.0.1:8000";
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+            window.location.href = "login.html";
+        }
+
+        let map;
+        let allProjects = [];
+        let markers = [];
+        let activeProjectId = null;
+
+        function showToast(message, type = "success") {
+            const toast = document.getElementById("toast");
+            const toastMessage = document.getElementById("toastMessage");
+            toast.className = `toast ${type}`;
+            toastMessage.textContent = message;
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        function applySavedTheme() {
+            const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
+            const btn = document.getElementById("themeToggleBtn");
+
+            if (savedTheme === "light") {
+                document.body.classList.add("light-mode");
+                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                document.body.classList.remove("light-mode");
+                if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        function toggleTheme() {
+            const isLight = document.body.classList.toggle("light-mode");
+            localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+
+            const btn = document.getElementById("themeToggleBtn");
+            if (btn) {
+                btn.innerHTML = isLight
+                    ? '<i class="fas fa-sun"></i>'
+                    : '<i class="fas fa-moon"></i>';
+            }
+
+            rebuildMapTheme();
+        }
+
+        function logout() {
+            localStorage.removeItem("access_token");
+            window.location.href = "login.html";
+        }
+
+        function togglePanel() {
+            const panel = document.getElementById("leftPanel");
+            const btn = document.getElementById("collapseBtn");
+            panel.classList.toggle("collapsed");
+
+            btn.innerHTML = panel.classList.contains("collapsed")
+                ? '<i class="fas fa-chevron-right"></i>'
+                : '<i class="fas fa-chevron-left"></i>';
+        }
+
+        function getStatusClass(status) {
+            if (status === "Active") return "status-active";
+            if (status === "Completed") return "status-completed";
+            return "status-pending";
+        }
+
+        function getStatusIcon(status) {
+            if (status === "Active") return "fa-circle";
+            if (status === "Completed") return "fa-check-circle";
+            return "fa-clock";
+        }
+
+        function getStatusColor(status) {
+            if (status === "Active") return "#10b981";
+            if (status === "Completed") return "#94a3b8";
+            return "#f59e0b";
+        }
+
+        function getProgressFromStatus(status) {
+            if (status === "Completed") return 100;
+            if (status === "Active") return 65;
+            return 25;
+        }
+
+        function formatProjectId(id) {
+            return `PRJ-${String(id).padStart(4, "0")}`;
+        }
+
+        function getLocationCoords(location) {
+            const map = {
+                ankara: [39.9334, 32.8597],
+                dubai: [25.2048, 55.2708],
+                london: [51.5072, -0.1276],
+                sanaa: [15.3694, 44.1910],
+                riyadh: [24.7136, 46.6753],
+                istanbul: [41.0082, 28.9784],
+                jeddah: [21.4858, 39.1925],
+                cairo: [30.0444, 31.2357]
+            };
+
+            const key = (location || "").toLowerCase().trim();
+            return map[key] || [39.9334, 32.8597];
+        }
+
+        function buildTileUrl() {
+            return document.body.classList.contains("light-mode")
+                ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+        }
+
+        function rebuildMapTheme() {
+            if (!map) return;
+
+            const center = map.getCenter();
+            const zoom = map.getZoom();
+
+            map.remove();
+            initMap(center, zoom);
+            renderMarkers(allProjects);
+        }
+
+        function initMap(center = [31.5, 33.5], zoom = 4) {
+            map = L.map("map", {
+                zoomControl: false
+            }).setView(center, zoom);
+
+            L.control.zoom({ position: "bottomright" }).addTo(map);
+
+            L.tileLayer(buildTileUrl(), {
+                attribution: "&copy; OpenStreetMap contributors"
+            }).addTo(map);
+        }
+
+        function clearMarkers() {
+            markers.forEach(item => map.removeLayer(item.marker));
+            markers = [];
+        }
+
+        function renderMarkers(projects) {
+            clearMarkers();
+
+            const bounds = [];
+
+            projects.forEach(project => {
+                const [lat, lng] = getLocationCoords(project.location);
+                const color = getStatusColor(project.status);
+
+                const icon = L.divIcon({
+                    className: "custom-div-icon",
+                    html: `
+                        <div style="
+                            width: 18px;
+                            height: 18px;
+                            border-radius: 50%;
+                            background: ${color};
+                            border: 3px solid white;
+                            box-shadow: 0 0 18px ${color};
+                        "></div>
+                    `,
+                    iconSize: [18, 18],
+                    iconAnchor: [9, 9]
+                });
+
+                const marker = L.marker([lat, lng], { icon }).addTo(map);
+
+                marker.bindPopup(`
+                    <div style="min-width:180px; font-family:Arial, sans-serif;">
+                        <div style="font-weight:800; font-size:14px; margin-bottom:6px;">${project.title}</div>
+                        <div style="font-size:12px; color:#475569; margin-bottom:4px;">${project.location || "Unknown"} · ${project.project_type || "General"}</div>
+                        <div style="font-size:12px; margin-bottom:10px;">Status: <strong>${project.status}</strong></div>
+                        <a href="project_details.html?id=${project.id}" style="
+                            display:inline-block;
+                            background:#3b82f6;
+                            color:white;
+                            padding:8px 10px;
+                            border-radius:8px;
+                            text-decoration:none;
+                            font-size:12px;
+                            font-weight:700;
+                        ">Open Details</a>
+                    </div>
+                `);
+
+                marker.on("click", () => {
+                    activeProjectId = project.id;
+                    highlightProjectCard(project.id);
+                });
+
+                markers.push({ id: project.id, marker });
+                bounds.push([lat, lng]);
+            });
+
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [60, 60] });
+            }
+        }
+
+        function highlightProjectCard(projectId) {
+            document.querySelectorAll(".project-card").forEach(card => {
+                card.classList.remove("active");
+                if (String(card.dataset.id) === String(projectId)) {
+                    card.classList.add("active");
+                    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                }
+            });
+        }
+
+        function openProjectOnMap(projectId) {
+            const project = allProjects.find(p => String(p.id) === String(projectId));
+            if (!project) return;
+
+            activeProjectId = project.id;
+            highlightProjectCard(project.id);
+
+            const markerObj = markers.find(m => String(m.id) === String(projectId));
+            if (markerObj) {
+                const [lat, lng] = getLocationCoords(project.location);
+                map.setView([lat, lng], 6, { animate: true });
+                markerObj.marker.openPopup();
+            }
+        }
+
+        function renderProjectList(projects) {
+            const list = document.getElementById("radarList");
+
+            if (!projects.length) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        No matching projects found.
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = projects.map(project => {
+                const progress = getProgressFromStatus(project.status);
+                const isActive = String(activeProjectId) === String(project.id);
+
+                return `
+                    <div class="project-card ${isActive ? "active" : ""}" data-id="${project.id}" onclick="openProjectOnMap(${project.id})">
+                        <div class="project-card-top">
+                            <div>
+                                <div class="project-card-title">${project.title}</div>
+                                <div class="project-card-sub">
+                                    <i class="fas fa-location-dot"></i>
+                                    ${project.location || "Unknown"}
+                                </div>
+                            </div>
+
+                            <span class="status-badge ${getStatusClass(project.status)}">
+                                <i class="fas ${getStatusIcon(project.status)}"></i>
+                                ${project.status}
+                            </span>
+                        </div>
+
+                        <div class="project-meta">
+                            <div class="project-meta-row">
+                                <span>Project ID</span>
+                                <strong>${formatProjectId(project.id)}</strong>
+                            </div>
+                            <div class="project-meta-row">
+                                <span>Type</span>
+                                <strong>${project.project_type || "General"}</strong>
+                            </div>
+                            <div class="project-meta-row">
+                                <span>Progress</span>
+                                <strong>${progress}%</strong>
+                            </div>
+                        </div>
+
+                        <div class="project-actions">
+                            <a class="action-btn primary" href="project_details.html?id=${project.id}" onclick="event.stopPropagation()">
+                                <i class="fas fa-arrow-right"></i> Open Details
+                            </a>
+                            <button class="action-btn" onclick="event.stopPropagation(); openProjectOnMap(${project.id})">
+                                <i class="fas fa-crosshairs"></i> Focus
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function filterProjects() {
+            const q = document.getElementById("projectSearch").value.trim().toLowerCase();
+
+            if (!q) {
+                renderProjectList(allProjects);
+                renderMarkers(allProjects);
+                return;
+            }
+
+            const filtered = allProjects.filter(project =>
+                (project.title || "").toLowerCase().includes(q) ||
+                (project.location || "").toLowerCase().includes(q) ||
+                (project.status || "").toLowerCase().includes(q) ||
+                (project.project_type || "").toLowerCase().includes(q)
+            );
+
+            renderProjectList(filtered);
+            renderMarkers(filtered);
+        }
+
+        function updateStats(projects) {
+            document.getElementById("trackedProjects").innerText = projects.length;
+            document.getElementById("activeSites").innerText =
+                projects.filter(p => p.status === "Active").length;
+        }
+
+        async function loadRadarData() {
+            try {
+                const res = await fetch(`${API_BASE_URL}/projects/`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error("Failed to load projects");
+                }
+
+                const projects = await res.json();
+                allProjects = projects;
+                activeProjectId = projects.length ? projects[0].id : null;
+
+                updateStats(projects);
+                renderProjectList(projects);
+                renderMarkers(projects);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById("radarList").innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-triangle-exclamation"></i>
+                        Failed to load radar data.
+                    </div>
+                `;
+                showToast("Failed to load project radar.", "error");
+            }
+        }
+
+        applySavedTheme();
+        initMap();
+        loadRadarData();
+    </script>
+</body>
+</html>
