@@ -39,7 +39,8 @@
             color: var(--text);
             display: flex;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             transition: background 0.3s, color 0.3s;
         }
 
@@ -65,6 +66,10 @@
             padding: 28px 18px;
             transition: background 0.3s;
             z-index: 100;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .logo {
@@ -122,8 +127,9 @@
 
         .main {
             flex: 1;
-            overflow-y: auto;
-            padding: 28px 34px 34px;
+            min-height: 100vh;
+            overflow: visible;
+            padding: 28px 34px 80px;
             background:
                 radial-gradient(circle at top left, rgba(59, 130, 246, 0.09), transparent 30%),
                 radial-gradient(circle at top right, rgba(99, 102, 241, 0.06), transparent 24%),
@@ -692,8 +698,56 @@
             color: #fecaca;
         }
 
+        .table-btn.radar {
+            background: rgba(139, 92, 246, 0.14);
+            color: #c4b5fd;
+            border: 1px solid rgba(139, 92, 246, 0.35);
+        }
+
+        .table-btn.radar:hover {
+            background: rgba(139, 92, 246, 0.24);
+            color: #ddd6fe;
+            border-color: #8b5cf6;
+        }
+
         .table-btn:hover {
             border-color: var(--primary);
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .template-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            cursor: pointer;
+            transition: 0.25s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .template-card:hover {
+            border-color: var(--primary);
+            background: rgba(59, 130, 246, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .template-icon {
+            font-size: 22px;
+            color: var(--primary);
+        }
+
+        .template-title {
+            font-size: 13px;
+            font-weight: 800;
         }
 
         .distribution-wrap {
@@ -929,12 +983,23 @@
             color: #0f172a;
         }
 
+        body.light-mode .template-card {
+            background: rgba(15, 23, 42, 0.03);
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+
         body.light-mode .top-btn,
         body.light-mode .theme-toggle,
         body.light-mode .table-btn,
         body.light-mode .hero-action:not(.primary) {
             background: rgba(15, 23, 42, 0.04);
             color: #0f172a;
+        }
+
+        body.light-mode .table-btn.radar {
+            background: rgba(139, 92, 246, 0.1);
+            color: #7c3aed;
+            border-color: rgba(139, 92, 246, 0.2);
         }
 
         body.light-mode .field input,
@@ -1067,7 +1132,7 @@
     <main class="main">
         <div class="topbar">
             <div class="topbar-left">
-                <h1>Engineering Command Center</h1>
+                <h1>Project Command Center</h1>
                 <p>Welcome back, <strong id="userWelcome">Engineer</strong></p>
             </div>
 
@@ -1153,6 +1218,20 @@
             <div class="stat-card">
                 <div class="stat-label">Completed Projects</div>
                 <div class="stat-value" id="completedProjects">0</div>
+            </div>
+        </section>
+
+        <section class="templates-section" style="margin-bottom: 24px;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-layer-group" style="color:var(--primary);"></i>
+                        Start a Project from Template
+                    </div>
+                </div>
+                <div id="projectTemplatesGrid" class="templates-grid">
+                    <!-- Templates will be rendered here -->
+                </div>
             </div>
         </section>
 
@@ -1327,8 +1406,49 @@
                         <option value="Industrial">Industrial</option>
                         <option value="Infrastructure">Infrastructure</option>
                         <option value="Software">Software</option>
+                        <option value="Energy">Energy</option>
                         <option value="General">General</option>
                     </select>
+                </div>
+
+                <div class="field">
+                    <label>Priority</label>
+                    <select id="projectPriority">
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+                        <option value="Critical">Critical</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Progress (%)</label>
+                    <input type="number" id="projectProgress" min="0" max="100" placeholder="e.g. 0" />
+                </div>
+
+                <div class="field">
+                    <label>Budget</label>
+                    <input type="text" id="projectBudget" placeholder="e.g. $100,000" />
+                </div>
+
+                <div class="field">
+                    <label>Delivery Strategy</label>
+                    <select id="projectStrategy">
+                        <option value="Agile">Agile</option>
+                        <option value="Waterfall">Waterfall</option>
+                        <option value="Design-Build">Design-Build</option>
+                        <option value="Fast-Track">Fast-Track</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Start Date</label>
+                    <input type="date" id="projectStartDate" />
+                </div>
+
+                <div class="field">
+                    <label>End Date</label>
+                    <input type="date" id="projectEndDate" />
                 </div>
 
                 <div class="field full">
@@ -1359,6 +1479,33 @@
         }
 
         let distributionChart = null;
+
+        const projectTemplates = [
+            { title: "Commercial", type: "Commercial", icon: "fa-building" },
+            { title: "Residential", type: "Residential", icon: "fa-house" },
+            { title: "Infrastructure", type: "Infrastructure", icon: "fa-road" },
+            { title: "Industrial", type: "Industrial", icon: "fa-industry" },
+            { title: "Energy", type: "Energy", icon: "fa-bolt" },
+            { title: "Software", type: "Software", icon: "fa-code" }
+        ];
+
+        function renderProjectTemplates() {
+            const grid = document.getElementById("projectTemplatesGrid");
+            if (!grid) return;
+
+            grid.innerHTML = projectTemplates.map(t => `
+                <div class="template-card" onclick="openTemplateModal('${t.type}')">
+                    <i class="fas ${t.icon} template-icon"></i>
+                    <div class="template-title">${t.title}</div>
+                </div>
+            `).join("");
+        }
+
+        function openTemplateModal(type) {
+            openModal();
+            const typeSelect = document.getElementById("projectType");
+            if (typeSelect) typeSelect.value = type;
+        }
 
         function clearAuthData() {
             localStorage.removeItem("access_token");
@@ -1498,12 +1645,24 @@
             const description = document.getElementById("projectDescription");
             const status = document.getElementById("projectStatus");
             const type = document.getElementById("projectType");
+            const priority = document.getElementById("projectPriority");
+            const progress = document.getElementById("projectProgress");
+            const budget = document.getElementById("projectBudget");
+            const strategy = document.getElementById("projectStrategy");
+            const startDate = document.getElementById("projectStartDate");
+            const endDate = document.getElementById("projectEndDate");
 
             if (title) title.value = "";
             if (location) location.value = "";
             if (description) description.value = "";
             if (status) status.value = "Pending";
             if (type) type.value = "Residential";
+            if (priority) priority.value = "Medium";
+            if (progress) progress.value = "";
+            if (budget) budget.value = "";
+            if (strategy) strategy.value = "Agile";
+            if (startDate) startDate.value = "";
+            if (endDate) endDate.value = "";
         }
 
         async function addProject() {
@@ -1511,12 +1670,45 @@
             const location = document.getElementById("projectLocation").value.trim();
             const status = document.getElementById("projectStatus").value;
             const projectType = document.getElementById("projectType").value;
-            const description = document.getElementById("projectDescription").value.trim() || "No description";
+            
+            const priorityEl = document.getElementById("projectPriority");
+            const priority = priorityEl ? priorityEl.value : "";
+            
+            const progressEl = document.getElementById("projectProgress");
+            const progress = progressEl ? progressEl.value : "";
+            
+            const budgetEl = document.getElementById("projectBudget");
+            const budget = budgetEl ? budgetEl.value.trim() : "";
+            
+            const strategyEl = document.getElementById("projectStrategy");
+            const strategy = strategyEl ? strategyEl.value : "";
+            
+            const startDateEl = document.getElementById("projectStartDate");
+            const startDate = startDateEl ? startDateEl.value : "";
+            
+            const endDateEl = document.getElementById("projectEndDate");
+            const endDate = endDateEl ? endDateEl.value : "";
+
+            let description = document.getElementById("projectDescription").value.trim();
 
             if (!title || !location) {
                 showToast("Please fill in project title and location.", "error");
                 return;
             }
+            
+            const extraFields = [];
+            if (priority) extraFields.push(`Priority: ${priority}`);
+            if (progress) extraFields.push(`Progress: ${progress}%`);
+            if (budget) extraFields.push(`Budget: ${budget}`);
+            if (strategy) extraFields.push(`Delivery Strategy: ${strategy}`);
+            if (startDate) extraFields.push(`Start Date: ${startDate}`);
+            if (endDate) extraFields.push(`End Date: ${endDate}`);
+
+            if (extraFields.length > 0) {
+                description += (description ? `\n\n` : ``) + `--- Project Creation Brief ---\n${extraFields.join("\n")}`;
+            }
+            
+            if (!description) description = "No description";
 
             const btn = document.getElementById("createProjectBtn");
 
@@ -1666,6 +1858,10 @@
                                 <button class="table-btn" type="button" onclick="editProject(${projectId})">
                                     Edit
                                 </button>
+                                
+                                <a class="table-btn radar" href="solutions.html?projectId=${projectId}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 7px;">
+                                    <i class="fas fa-satellite-dish"></i> AI Radar
+                                </a>
 
                                 <button class="table-btn danger" type="button" onclick="deleteProject(${projectId})">
                                     Delete
@@ -1945,6 +2141,7 @@ async function loadDashboardRiskSummary() {
                 updatePortfolioText(projects);
                 updateDistribution(stats);
                 await loadDashboardRiskSummary();
+                renderProjectTemplates();
 
             } catch (error) {
                 console.error(error);

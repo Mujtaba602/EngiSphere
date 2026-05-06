@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EngiSphere | Geospatial Radar</title>
+    <title>EngiSphere | AI Geospatial Solutions Radar</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -542,6 +542,189 @@
         body.light-mode .action-btn.primary {
             color: white;
         }
+        .ai-solution-panel {
+            position: absolute;
+            right: 18px;
+            bottom: 18px;
+            width: 430px;
+            max-height: calc(100vh - 110px);
+            z-index: 1200;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(18px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ai-solution-header {
+            padding: 20px 22px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .ai-solution-header h3 {
+            font-size: 15px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .ai-solution-header p {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .ai-project-name {
+            color: var(--primary);
+            font-weight: 900;
+        }
+
+        .ai-solution-body {
+            padding: 18px 20px;
+            overflow-y: auto;
+            display: grid;
+            gap: 14px;
+        }
+
+        .ai-generate-btn {
+            width: 100%;
+            min-height: 46px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            font-family: inherit;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.25s;
+            box-shadow: 0 14px 30px rgba(59,130,246,0.25);
+        }
+
+        .ai-generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 36px rgba(59,130,246,0.32);
+        }
+
+        .ai-generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-section-card {
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.035);
+            border-radius: 18px;
+            padding: 15px;
+        }
+
+        .ai-section-card h4 {
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-section-card p,
+        .ai-section-card li {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .ai-section-card ul {
+            padding-left: 18px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .ai-map-node {
+            border-left: 3px solid var(--primary);
+            padding: 10px 12px;
+            background: rgba(59,130,246,0.08);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .ai-map-node strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .ai-map-node span {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .ai-loading i {
+            animation: aiSpin 1s linear infinite;
+        }
+
+        @keyframes aiSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        body.light-mode .ai-solution-panel,
+        body.light-mode .ai-section-card {
+            background: rgba(255,255,255,0.94);
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+
+                body.light-mode .ai-map-node {
+            background: rgba(59,130,246,0.08);
+        }
+
+        .ai-section-card p {
+            margin-bottom: 8px;
+        }
+
+        .ai-section-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .ai-section-card ul {
+            margin-top: 8px;
+        }
+
+        .ai-section-card li {
+            margin-bottom: 6px;
+        }
+
+        .ai-section-card h4 {
+            color: var(--text);
+        }
+
+        body.light-mode .ai-section-card h4 {
+            color: #0f172a;
+        }
 
         @media (max-width: 980px) {
             .sidebar {
@@ -585,7 +768,7 @@
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
             <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
-            <a href="solutions.html" class="nav-link active"><i class="fas fa-satellite"></i> Geospatial Radar</a>
+           <a href="solutions.html" class="nav-link active"><i class="fas fa-satellite"></i> AI Solutions Radar</a>
             <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i> AI EngiBot</a>
 
             <div class="nav-section">Management</div>
@@ -628,7 +811,7 @@
             <div class="panel-header">
                 <h2><i class="fas fa-crosshairs" style="color:var(--primary);"></i> Scanning Sector</h2>
                 <p>
-                    Live geospatial overview of engineering projects and their site locations.
+                    AI-powered geospatial overview of projects, risks, and engineering solution strategies.
                 </p>
             </div>
 
@@ -655,9 +838,46 @@
                 <i class="fas fa-circle" style="font-size:8px;"></i>
                 SATELLITE LINK STABLE
             </div>
-        </section>
-    </main>
+              </section>
 
+        <section class="ai-solution-panel" id="aiSolutionPanel">
+            <div class="ai-solution-header">
+                <div>
+                    <h3>
+                        <i class="fas fa-wand-magic-sparkles" style="color:var(--primary);"></i>
+                        AI Solution Map
+                    </h3>
+                    <p>
+                        Select a project from the radar, then generate an AI-powered engineering solution map.
+                    </p>
+                </div>
+            </div>
+
+            <div class="ai-solution-body">
+                <div class="ai-section-card">
+                    <h4><i class="fas fa-location-crosshairs"></i> Selected Project</h4>
+                    <p id="aiSelectedProject">
+                        No project selected yet. Choose a project from the map or project list.
+                    </p>
+                </div>
+
+                <button class="ai-generate-btn" id="aiGenerateBtn" onclick="generateAISolutionMap()">
+                    <i class="fas fa-brain"></i>
+                    Generate AI Solution Map
+                </button>
+
+                <div id="aiSolutionOutput">
+                    <div class="ai-section-card">
+                        <h4><i class="fas fa-sitemap"></i> Solution Intelligence</h4>
+                        <p>
+                            The generated map will include diagnosis, root causes, immediate actions,
+                            technical recommendations, risk reduction, cost optimization, and timeline recovery.
+                        </p>
+                    </div>
+                </div>
+            </div>
+    </section>
+    </main>
   <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -801,28 +1021,215 @@
         return `PRJ-${String(id).padStart(4, "0")}`;
     }
 
-    function getLocationCoords(location) {
-        const locationMap = {
-            ankara: [39.9334, 32.8597],
-            dubai: [25.2048, 55.2708],
-            london: [51.5072, -0.1276],
-            sanaa: [15.3694, 44.1910],
-            riyadh: [24.7136, 46.6753],
-            istanbul: [41.0082, 28.9784],
-            jeddah: [21.4858, 39.1925],
-            cairo: [30.0444, 31.2357],
-            doha: [25.2854, 51.5310],
-            "abu dhabi": [24.4539, 54.3773],
-            kuwait: [29.3759, 47.9774],
-            muscat: [23.5880, 58.3829],
-            manama: [26.2235, 50.5876]
-        };
+async function getLocationCoords(location) {
+    const locationMap = {
+        // Europe
+        london: [51.5072, -0.1276],
+        paris: [48.8566, 2.3522],
+        berlin: [52.5200, 13.4050],
+        madrid: [40.4168, -3.7038],
+        barcelona: [41.3874, 2.1686],
+        rome: [41.9028, 12.4964],
+        milan: [45.4642, 9.1900],
+        amsterdam: [52.3676, 4.9041],
+        brussels: [50.8503, 4.3517],
+        vienna: [48.2082, 16.3738],
+        zurich: [47.3769, 8.5417],
+        geneva: [46.2044, 6.1432],
+        lisbon: [38.7223, -9.1393],
+        dublin: [53.3498, -6.2603],
+        copenhagen: [55.6761, 12.5683],
+        stockholm: [59.3293, 18.0686],
+        oslo: [59.9139, 10.7522],
+        helsinki: [60.1699, 24.9384],
+        warsaw: [52.2297, 21.0122],
+        prague: [50.0755, 14.4378],
+        budapest: [47.4979, 19.0402],
+        athens: [37.9838, 23.7275],
+        munich: [48.1351, 11.5820],
+        frankfurt: [50.1109, 8.6821],
+        hamburg: [53.5511, 9.9937],
+        manchester: [53.4808, -2.2426],
+        birmingham: [52.4862, -1.8904],
+        glasgow: [55.8642, -4.2518],
+        edinburgh: [55.9533, -3.1883],
+        istanbul: [41.0082, 28.9784],
+        ankara: [39.9334, 32.8597],
 
-        const key = String(location || "").toLowerCase().trim();
+        // North America
+        "new york": [40.7128, -74.0060],
+        newyork: [40.7128, -74.0060],
+        "new york city": [40.7128, -74.0060],
+        losangeles: [34.0522, -118.2437],
+        "los angeles": [34.0522, -118.2437],
+        chicago: [41.8781, -87.6298],
+        houston: [29.7604, -95.3698],
+        dallas: [32.7767, -96.7970],
+        miami: [25.7617, -80.1918],
+        sanfrancisco: [37.7749, -122.4194],
+        "san francisco": [37.7749, -122.4194],
+        seattle: [47.6062, -122.3321],
+        boston: [42.3601, -71.0589],
+        washington: [38.9072, -77.0369],
+        "washington dc": [38.9072, -77.0369],
+        toronto: [43.6532, -79.3832],
+        vancouver: [49.2827, -123.1207],
+        montreal: [45.5017, -73.5673],
+        ottawa: [45.4215, -75.6972],
+        mexico: [19.4326, -99.1332],
+        "mexico city": [19.4326, -99.1332],
 
-        return locationMap[key] || [39.9334, 32.8597];
+        // Asia
+        tokyo: [35.6762, 139.6503],
+        osaka: [34.6937, 135.5023],
+        kyoto: [35.0116, 135.7681],
+        seoul: [37.5665, 126.9780],
+        busan: [35.1796, 129.0756],
+        beijing: [39.9042, 116.4074],
+        shanghai: [31.2304, 121.4737],
+        shenzhen: [22.5431, 114.0579],
+        guangzhou: [23.1291, 113.2644],
+        hongkong: [22.3193, 114.1694],
+        "hong kong": [22.3193, 114.1694],
+        singapore: [1.3521, 103.8198],
+        bangkok: [13.7563, 100.5018],
+        jakarta: [-6.2088, 106.8456],
+        kualalumpur: [3.1390, 101.6869],
+        "kuala lumpur": [3.1390, 101.6869],
+        manila: [14.5995, 120.9842],
+        hanoi: [21.0278, 105.8342],
+        hochiminh: [10.8231, 106.6297],
+        "ho chi minh": [10.8231, 106.6297],
+        mumbai: [19.0760, 72.8777],
+        delhi: [28.6139, 77.2090],
+        newdelhi: [28.6139, 77.2090],
+        "new delhi": [28.6139, 77.2090],
+        bengaluru: [12.9716, 77.5946],
+        bangalore: [12.9716, 77.5946],
+        hyderabad: [17.3850, 78.4867],
+
+        // Middle East / Gulf
+        dubai: [25.2048, 55.2708],
+        "abu dhabi": [24.4539, 54.3773],
+        riyadh: [24.7136, 46.6753],
+        jeddah: [21.4858, 39.1925],
+        doha: [25.2854, 51.5310],
+        kuwait: [29.3759, 47.9774],
+        muscat: [23.5880, 58.3829],
+        manama: [26.2235, 50.5876],
+        telaviv: [32.0853, 34.7818],
+        "tel aviv": [32.0853, 34.7818],
+
+        // Australia / Oceania
+        sydney: [-33.8688, 151.2093],
+        melbourne: [-37.8136, 144.9631],
+        brisbane: [-27.4698, 153.0251],
+        perth: [-31.9523, 115.8613],
+        auckland: [-36.8485, 174.7633],
+        wellington: [-41.2865, 174.7762],
+
+        // Africa
+        cairo: [30.0444, 31.2357],
+        casablanca: [33.5731, -7.5898],
+        marrakesh: [31.6295, -7.9811],
+        lagos: [6.5244, 3.3792],
+        abuja: [9.0765, 7.3986],
+        nairobi: [-1.2921, 36.8219],
+        capetown: [-33.9249, 18.4241],
+        "cape town": [-33.9249, 18.4241],
+        johannesburg: [-26.2041, 28.0473],
+
+        // South America
+        saopaulo: [-23.5505, -46.6333],
+        "sao paulo": [-23.5505, -46.6333],
+        riodejaneiro: [-22.9068, -43.1729],
+        "rio de janeiro": [-22.9068, -43.1729],
+        buenosaires: [-34.6037, -58.3816],
+        "buenos aires": [-34.6037, -58.3816],
+        santiago: [-33.4489, -70.6693],
+        lima: [-12.0464, -77.0428],
+        bogota: [4.7110, -74.0721],
+        medellin: [6.2476, -75.5658]
+    };
+
+    const raw = String(location || "").toLowerCase().trim();
+
+    if (!raw) {
+        return [31.5, 33.5];
     }
 
+    const normalized = raw
+        .replaceAll(",", " ")
+        .replaceAll("-", " ")
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const compact = normalized.replace(/\s+/g, "");
+
+    // 1. Exact match
+    if (locationMap[normalized]) {
+        return locationMap[normalized];
+    }
+
+    // 2. Compact match مثل NewYork أو LosAngeles
+    if (locationMap[compact]) {
+        return locationMap[compact];
+    }
+
+    // 3. Partial match مثل London, UK أو Project in Paris
+    const matchedKey = Object.keys(locationMap).find(key => {
+        return normalized.includes(key) || compact.includes(key.replace(/\s+/g, ""));
+    });
+
+    if (matchedKey) {
+        return locationMap[matchedKey];
+    }
+
+    // 4. Cache check
+    const cacheKey = `geo_cache_${normalized}`;
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+        try {
+            const coords = JSON.parse(cached);
+            if (Array.isArray(coords) && coords.length === 2) {
+                return coords;
+            }
+        } catch (_) {}
+    }
+
+    // 5. Online geocoding fallback using OpenStreetMap Nominatim
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(location)}`;
+
+        const res = await fetch(url, {
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+
+            if (Array.isArray(data) && data.length > 0) {
+                const lat = Number(data[0].lat);
+                const lon = Number(data[0].lon);
+
+                if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
+                    const coords = [lat, lon];
+                    localStorage.setItem(cacheKey, JSON.stringify(coords));
+                    return coords;
+                }
+            }
+        }
+    } catch (error) {
+        console.warn("Geocoding failed:", location, error);
+    }
+
+    // 6. Final fallback: world overview, not Ankara
+    return [20, 0];
+}
     function buildTileUrl() {
         return document.body.classList.contains("light-mode")
             ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -889,7 +1296,7 @@
         markers = [];
     }
 
-    function renderMarkers(projects) {
+    async function renderMarkers(projects) {
         if (!map) return;
 
         clearMarkers();
@@ -900,8 +1307,8 @@
 
         const bounds = [];
 
-        projects.forEach(project => {
-            const [lat, lng] = getLocationCoords(project.location);
+        for (const project of projects) {
+            const [lat, lng] = await getLocationCoords(project.location);
             const status = normalizeStatus(project.status);
             const color = getStatusColor(status);
 
@@ -958,6 +1365,7 @@
             marker.on("click", () => {
                 activeProjectId = project.id;
                 highlightProjectCard(project.id);
+                updateAISelectedProject(project);
             });
 
             markers.push({
@@ -966,7 +1374,7 @@
             });
 
             bounds.push([lat, lng]);
-        });
+        }
 
         if (bounds.length > 0) {
             map.fitBounds(bounds, {
@@ -990,18 +1398,19 @@
         });
     }
 
-    function openProjectOnMap(projectId) {
+    async function openProjectOnMap(projectId) {
         const project = allProjects.find(p => String(p.id) === String(projectId));
 
         if (!project || !map) return;
 
         activeProjectId = project.id;
         highlightProjectCard(project.id);
+        updateAISelectedProject(project);
 
         const markerObj = markers.find(m => String(m.id) === String(projectId));
 
         if (markerObj) {
-            const [lat, lng] = getLocationCoords(project.location);
+            const [lat, lng] = await getLocationCoords(project.location);
 
             map.setView([lat, lng], 7, {
                 animate: true
@@ -1073,18 +1482,23 @@
                         </div>
                     </div>
 
-                    <div class="project-actions">
-                        <a class="action-btn primary"
-                           href="project_details.html?id=${safeId}"
-                           onclick="event.stopPropagation()">
-                            <i class="fas fa-arrow-right"></i> Open Details
-                        </a>
+                   <div class="project-actions">
+    <a class="action-btn primary"
+       href="project_details.html?id=${safeId}"
+       onclick="event.stopPropagation()">
+        <i class="fas fa-arrow-right"></i> Open Details
+    </a>
 
-                        <button class="action-btn"
-                                onclick="event.stopPropagation(); openProjectOnMap(${numericId})">
-                            <i class="fas fa-crosshairs"></i> Focus
-                        </button>
-                    </div>
+    <button class="action-btn"
+            onclick="event.stopPropagation(); openProjectOnMap(${numericId})">
+        <i class="fas fa-crosshairs"></i> Focus
+    </button>
+
+    <button class="action-btn"
+            onclick="event.stopPropagation(); openAISolutionMap(${numericId})">
+        <i class="fas fa-brain"></i> AI Map
+    </button>
+</div>
                 </div>
             `;
         }).join("");
@@ -1156,6 +1570,8 @@
             updateStats(allProjects);
             renderProjectList(allProjects);
             renderMarkers(allProjects);
+            updateAISelectedProject(getSelectedProject());
+
 
             if (allProjects.length) {
                 showToast("Radar data loaded successfully.", "success");
@@ -1175,6 +1591,443 @@
 
             updateStats([]);
             showToast("Failed to load project radar.", "error");
+        }
+    }
+    function getSelectedProject() {
+        if (!activeProjectId && allProjects.length) {
+            activeProjectId = allProjects[0].id;
+        }
+
+        return allProjects.find(project => String(project.id) === String(activeProjectId)) || null;
+    }
+
+    function updateAISelectedProject(project) {
+        const target = document.getElementById("aiSelectedProject");
+
+        if (!target) return;
+
+        if (!project) {
+            target.innerHTML = "No project selected yet. Choose a project from the map or project list.";
+            return;
+        }
+
+        const status = normalizeStatus(project.status);
+        const progress = getProgressFromStatus(status);
+
+        target.innerHTML = `
+            <strong class="ai-project-name">${escapeHTML(project.title || "Untitled Project")}</strong><br>
+            Location: ${escapeHTML(project.location || "Unknown")}<br>
+            Type: ${escapeHTML(project.project_type || "General")}<br>
+            Status: ${escapeHTML(status)} · Estimated Progress: ${progress}%
+        `;
+    }
+
+    function openAISolutionMap(projectId) {
+        activeProjectId = projectId;
+        openProjectOnMap(projectId);
+
+        const project = getSelectedProject();
+        updateAISelectedProject(project);
+
+        const panel = document.getElementById("aiSolutionPanel");
+        if (panel) {
+            panel.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+        }
+
+        showToast("Project selected for AI solution mapping.", "success");
+    }
+
+    async function safeFetchJson(path) {
+        try {
+            const res = await fetch(`${API_BASE_URL}${path}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                handleUnauthorized();
+                return null;
+            }
+
+            if (!res.ok) return null;
+
+            return await res.json();
+        } catch (error) {
+            console.warn("Optional data fetch failed:", path, error);
+            return null;
+        }
+    }
+    function buildAISolutionPrompt(project, details, tasks, teamMembers, riskSummary) {
+        const status = normalizeStatus(project.status);
+        const progress = getProgressFromStatus(status);
+
+        return `
+AI_SOLUTION_MAP_REQUEST
+
+You are EngiBot, the AI engineering intelligence system inside EngiSphere.
+
+Your task is to generate an AI-powered geospatial solution map for an engineering project.
+
+Act as:
+- Senior engineering consultant
+- Project risk analyst
+- Construction planning advisor
+- Technical solution strategist
+
+Project Context:
+- Project ID: ${project.id}
+- Title: ${project.title || "Untitled Project"}
+- Location: ${project.location || "Unknown"}
+- Project Type: ${project.project_type || "General Engineering"}
+- Current Status: ${status}
+- Estimated Progress: ${progress}%
+- Budget: ${project.budget || details?.budget || "Not provided"}
+- Description: ${project.description || details?.description || "Not provided"}
+
+Available Tasks Data:
+${JSON.stringify(tasks || [], null, 2)}
+
+Available Team Members Data:
+${JSON.stringify(teamMembers || [], null, 2)}
+
+Risk Summary Data:
+${JSON.stringify(riskSummary || {}, null, 2)}
+
+Generate a structured AI solution map with the following sections:
+
+1. Project Diagnosis
+Explain the current project situation based on status, location, type, progress, tasks, team, and risk indicators.
+
+2. Root Causes
+List the likely causes of delays, risks, inefficiencies, or technical problems.
+
+3. AI Geospatial Solution Map
+Create a map-like structure that connects:
+- Site/location factor
+- Engineering risk
+- Operational issue
+- Recommended solution
+- Expected impact
+
+4. Immediate Actions
+List actions that should be done in the next 7 days.
+
+5. Technical Recommendations
+Provide engineering-focused recommendations.
+
+6. Risk Reduction Plan
+Provide specific risk mitigation actions.
+
+7. Cost Optimization Plan
+Suggest ways to reduce cost leakage, rework, delay cost, or resource waste.
+
+8. Timeline Recovery Roadmap
+Create a phased roadmap:
+- Phase 1: Stabilization
+- Phase 2: Technical correction
+- Phase 3: Resource optimization
+- Phase 4: Monitoring and delivery control
+
+9. Final Priority Matrix
+Classify actions as:
+- Critical
+- High
+- Medium
+- Low
+
+Rules:
+- Be practical.
+- Do not invent exact costs or standards.
+- Use clear headings and bullet points.
+- Focus on engineering execution, risk, time, cost, and project control.
+- Make the answer suitable to be shown inside a project management dashboard.
+        `.trim();
+    }
+
+    async function callEngiBot(prompt) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/chat`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message: prompt
+                })
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                handleUnauthorized();
+                return null;
+            }
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.warn("EngiBot API error:", res.status, errorText);
+                return null;
+            }
+
+            const data = await res.json();
+            return data.reply || null;
+
+        } catch (error) {
+            console.warn("EngiBot request failed:", error);
+            return null;
+        }
+    }
+
+    function generateFallbackSolution(project) {
+        const status = normalizeStatus(project.status);
+        const progress = getProgressFromStatus(status);
+
+        return `
+Project Diagnosis
+The project "${project.title || "Untitled Project"}" is located in ${project.location || "an unspecified location"} and is currently marked as ${status}. The estimated progress is ${progress}%, which indicates that the project requires structured monitoring and a clear execution roadmap.
+
+Root Causes
+- Limited visibility into site progress and operational risks.
+- Possible delays caused by task dependency or resource allocation.
+- Need for stronger coordination between engineering, site, and management teams.
+
+AI Geospatial Solution Map
+- Site Factor: Review location constraints, access, weather, logistics, and site readiness.
+- Engineering Risk: Identify design, execution, safety, and coordination risks.
+- Operational Issue: Detect delayed tasks, missing owners, or unclear responsibilities.
+- Recommended Solution: Assign owners, define weekly priorities, and connect tasks to risk controls.
+- Expected Impact: Better visibility, lower delivery risk, and improved project control.
+
+Immediate Actions
+- Review project status and update actual progress.
+- Identify delayed or blocked tasks.
+- Assign a responsible engineer for each major issue.
+- Create a 7-day stabilization action plan.
+
+Technical Recommendations
+- Validate site constraints and engineering assumptions.
+- Improve documentation of project risks and decisions.
+- Use task-level tracking for execution control.
+- Connect reports with risk assessment outputs.
+
+Risk Reduction Plan
+- Define top 3 risks.
+- Set mitigation action for each risk.
+- Review risk level weekly.
+- Escalate unresolved risks to project management.
+
+Cost Optimization Plan
+- Reduce duplicated work.
+- Track cost-heavy activities.
+- Prioritize work with direct impact on delivery.
+- Avoid late design or scope changes.
+
+Timeline Recovery Roadmap
+- Phase 1: Stabilize project data and risk visibility.
+- Phase 2: Reprioritize tasks based on impact.
+- Phase 3: Reassign resources to critical activities.
+- Phase 4: Monitor weekly until delivery confidence improves.
+
+Final Priority Matrix
+- Critical: Safety risks, blocked work, missing project owners.
+- High: Delayed critical tasks, budget-sensitive activities.
+- Medium: Reporting gaps, documentation weaknesses.
+- Low: UI-level improvements and non-blocking enhancements.
+
+Note: This is a local fallback recommendation because the AI endpoint did not respond.
+        `.trim();
+    }
+
+function formatAITextToHTML(text) {
+    const safe = escapeHTML(text || "");
+    const lines = safe
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+    let html = "";
+    let currentTitle = "";
+    let paragraphs = [];
+    let bullets = [];
+
+    function cleanLine(line) {
+        return String(line || "")
+            .replace(/^#{1,6}\s*/g, "")
+            .replace(/\*\*/g, "")
+            .replace(/^[-*•]\s*/g, "")
+            .replace(/^\*+\s*/g, "")
+            .replace(/\*+$/g, "")
+            .trim();
+    }
+
+    function isBullet(line) {
+        return /^[-*•]\s+/.test(line) || /^\*\s+/.test(line);
+    }
+
+    function isHeading(line) {
+        const cleaned = cleanLine(line);
+        const lower = cleaned.toLowerCase();
+
+        return (
+            /^#{1,6}\s+/.test(line) ||
+            /^\*{0,2}\d+\.\s+/.test(line) ||
+            lower.includes("project diagnosis") ||
+            lower.includes("root causes") ||
+            lower.includes("solution map") ||
+            lower.includes("immediate actions") ||
+            lower.includes("technical recommendations") ||
+            lower.includes("risk reduction") ||
+            lower.includes("cost optimization") ||
+            lower.includes("timeline recovery") ||
+            lower.includes("priority matrix") ||
+            lower.includes("final recommendation") ||
+            lower.startsWith("phase ")
+        );
+    }
+
+    function flushSection() {
+        if (!currentTitle && paragraphs.length === 0 && bullets.length === 0) return;
+
+        const paragraphHtml = paragraphs
+            .map(item => `<p>${cleanLine(item)}</p>`)
+            .join("");
+
+        const bulletHtml = bullets.length
+            ? `<ul>${bullets.map(item => `<li>${cleanLine(item)}</li>`).join("")}</ul>`
+            : "";
+
+        html += `
+            <div class="ai-section-card">
+                ${
+                    currentTitle
+                        ? `<h4><i class="fas fa-circle-nodes"></i> ${cleanLine(currentTitle)}</h4>`
+                        : ""
+                }
+                ${paragraphHtml}
+                ${bulletHtml}
+            </div>
+        `;
+
+        currentTitle = "";
+        paragraphs = [];
+        bullets = [];
+    }
+
+    lines.forEach(line => {
+        const cleaned = cleanLine(line);
+
+        if (!cleaned) return;
+
+        if (isHeading(line)) {
+            flushSection();
+            currentTitle = cleaned;
+            return;
+        }
+
+        if (isBullet(line)) {
+            bullets.push(line);
+            return;
+        }
+
+        // Handle Gemini-style bold pseudo bullets like:
+        // *** Status & Progress Discrepancy: ...
+        if (/^\*{2,}/.test(line)) {
+            bullets.push(line);
+            return;
+        }
+
+        paragraphs.push(line);
+    });
+
+    flushSection();
+
+    return html || `
+        <div class="ai-section-card">
+            <h4><i class="fas fa-triangle-exclamation"></i> No AI Output</h4>
+            <p>No solution map was generated.</p>
+        </div>
+    `;
+}
+
+    async function generateAISolutionMap() {
+        const project = getSelectedProject();
+        const output = document.getElementById("aiSolutionOutput");
+        const btn = document.getElementById("aiGenerateBtn");
+
+        if (!project) {
+            showToast("Please select a project first.", "error");
+            return;
+        }
+
+        updateAISelectedProject(project);
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner"></i> Generating AI Map...';
+        }
+
+        if (output) {
+            output.innerHTML = `
+                <div class="ai-section-card">
+                    <div class="ai-loading">
+                        <i class="fas fa-spinner"></i>
+                        EngiBot is analyzing project risks, location, schedule, and execution strategy...
+                    </div>
+                </div>
+            `;
+        }
+
+        try {
+            const projectId = encodeURIComponent(project.id);
+
+            const [details, tasks, teamMembers, riskSummary] = await Promise.all([
+                safeFetchJson(`/projects/${projectId}`),
+                safeFetchJson(`/tasks/project/${projectId}`),
+                safeFetchJson(`/team-members/project/${projectId}`),
+                safeFetchJson(`/projects/risk-summary`)
+            ]);
+
+            const prompt = buildAISolutionPrompt(
+                project,
+                details,
+                tasks,
+                teamMembers,
+                riskSummary
+            );
+
+            let aiText = await callEngiBot(prompt);
+
+            if (!aiText) {
+                aiText = generateFallbackSolution(project);
+                showToast("AI service unavailable. Local solution map generated.", "error");
+            } else {
+                showToast("AI solution map generated successfully.", "success");
+            }
+
+            if (output) {
+                output.innerHTML = formatAITextToHTML(aiText);
+            }
+
+        } catch (error) {
+            console.error("AI solution generation error:", error);
+
+            const fallback = generateFallbackSolution(project);
+
+            if (output) {
+                output.innerHTML = formatAITextToHTML(fallback);
+            }
+
+            showToast("AI generation failed. Fallback solution map generated.", "error");
+
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-brain"></i> Generate AI Solution Map';
+            }
         }
     }
 
