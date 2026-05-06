@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>EngiSphere | Settings</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --soft: #f8fafc;
+      --panel: #ffffff;
+      --line: #e2e8f0;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 16px 42px rgba(15, 23, 42, 0.06);
+    }
+
+    body.dark-theme {
+      --ink: #ffffff;
+      --muted: #cbd5e1;
+      --soft: #020617;
+      --panel: #0f172a;
+      --line: rgba(255, 255, 255, 0.10);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.08), transparent 28%),
+        var(--soft);
+      color: var(--ink);
+      overflow-x: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    /* ===== UNIFIED NAVBAR ===== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      min-height: 78px;
+      padding: 0 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      background: rgba(255, 255, 255, 0.88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+    }
+
+    body.dark-theme .nav {
+      background: rgba(2, 6, 23, 0.86);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      white-space: nowrap;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+      flex: 0 0 auto;
+    }
+
+    .brand-text {
+      font-size: 22px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .brand-text span {
+      color: var(--primary);
+    }
+
+    .nav-center,
+    .nav-right,
+    .auth-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      transition: 0.2s ease;
+      white-space: nowrap;
+      text-transform: none;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--primary);
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: 0.2s ease;
+      font-family: inherit;
+      flex: 0 0 auto;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      color: var(--primary);
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      min-height: 42px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+      white-space: nowrap;
+      font-family: inherit;
+      text-transform: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: var(--panel);
+      border-color: rgba(37, 99, 235, 0.35);
+      color: var(--primary);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: rgba(37, 99, 235, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border-color: rgba(239, 68, 68, 0.35);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #ffffff;
+      box-shadow: 0 14px 28px rgba(16, 185, 129, 0.18);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-1px);
+      filter: brightness(0.96);
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .nav a,
+    .nav button,
+    .nav .btn,
+    .nav-link {
+      text-transform: none !important;
+    }
+
+    /* ===== SETTINGS PAGE ===== */
+    .settings-page {
+      min-height: 100vh;
+      padding: 136px 7% 70px;
+    }
+
+    .settings-container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 34px;
+    }
+
+    .page-title {
+      max-width: 760px;
+    }
+
+    .page-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 32px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.10);
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 18px;
+    }
+
+    .page-title h1 {
+      font-size: clamp(40px, 5vw, 62px);
+      line-height: 1.04;
+      letter-spacing: -2.4px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .page-title h1 span {
+      color: var(--primary);
+    }
+
+    .page-title p {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .settings-column {
+      display: grid;
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 17px;
+      background: rgba(37, 99, 235, 0.10);
+      color: var(--primary);
+      font-size: 19px;
+      flex: 0 0 auto;
+    }
+
+    .card-header h2 {
+      font-size: 23px;
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+    }
+
+    .card-header p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    /* ===== ACCOUNT SUMMARY ===== */
+    .account-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .account-card::before {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      right: -90px;
+      top: -90px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.10);
+      pointer-events: none;
+    }
+
+    .account-top {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .account-avatar {
+      width: 78px;
+      height: 78px;
+      display: grid;
+      place-items: center;
+      border-radius: 24px;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: #ffffff;
+      font-size: 30px;
+      font-weight: 800;
+      box-shadow: 0 18px 34px rgba(37, 99, 235, 0.25);
+      flex: 0 0 auto;
+    }
+
+    .account-info h2 {
+      font-size: 25px;
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .account-info p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      word-break: break-word;
+    }
+
+    .info-list {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 14px;
+    }
+
+    .info-row {
+      padding: 16px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 18px;
+    }
+
+    .info-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 7px;
+    }
+
+    .info-row strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      word-break: break-word;
+    }
+
+    /* ===== FORMS ===== */
+    .settings-form {
+      display: grid;
+      gap: 15px;
+    }
+
+    .form-group {
+      display: grid;
+      gap: 8px;
+    }
+
+    .form-group label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-wrap i {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 14px;
+      pointer-events: none;
+    }
+
+    .form-input {
+      width: 100%;
+      min-height: 52px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--soft);
+      color: var(--ink);
+      padding: 0 16px 0 44px;
+      outline: none;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .form-input::placeholder {
+      color: var(--muted);
+      opacity: 0.75;
+    }
+
+    .form-input:focus {
+      border-color: rgba(37, 99, 235, 0.55);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    .password-hint {
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      background: rgba(245, 158, 11, 0.08);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .password-hint i {
+      color: var(--warning);
+      margin-right: 6px;
+    }
+
+    .form-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .form-actions .btn {
+      min-height: 48px;
+      padding: 0 22px;
+    }
+
+    /* ===== APPEARANCE ===== */
+    .setting-option {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 20px;
+    }
+
+    .setting-option h3 {
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+
+    .setting-option p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .switch {
+      width: 56px;
+      height: 32px;
+      border: 0;
+      border-radius: 999px;
+      background: #cbd5e1;
+      cursor: pointer;
+      position: relative;
+      transition: 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .switch::before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 4px;
+      top: 4px;
+      border-radius: 999px;
+      background: #ffffff;
+      box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+      transition: 0.2s ease;
+    }
+
+    .switch.active {
+      background: var(--primary);
+    }
+
+    .switch.active::before {
+      transform: translateX(24px);
+    }
+
+    /* ===== SECURITY ===== */
+    .security-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .security-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 20px;
+    }
+
+    .security-item h3 {
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .security-item p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .status-badge {
+      min-height: 30px;
+      padding: 0 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .status-success {
+      background: rgba(16, 185, 129, 0.10);
+      color: var(--success);
+    }
+
+    .status-warning {
+      background: rgba(245, 158, 11, 0.10);
+      color: var(--warning);
+    }
+
+    /* ===== DANGER ZONE ===== */
+
+    .danger-box {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(239, 68, 68, 0.06);
+      border: 1px solid rgba(239, 68, 68, 0.22);
+    }
+
+    .danger-box h3 {
+      color: var(--danger);
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+
+    .danger-box p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6000;
+      min-width: min(420px, calc(100% - 32px));
+      padding: 15px 18px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      transition: 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+    }
+
+    .toast.show {
+      top: 26px;
+    }
+
+    .toast.success {
+      background: rgba(16, 185, 129, 0.95);
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, 0.95);
+    }
+
+    .toast.warning,
+    .toast.info {
+      background: rgba(245, 158, 11, 0.95);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1080px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .nav {
+        position: relative;
+        min-height: auto;
+        padding: 16px 22px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
+      .nav-center,
+      .nav-right,
+      .auth-actions {
+        width: 100%;
+        gap: 12px;
+      }
+
+      .nav-link {
+        font-size: 13px;
+      }
+
+      .auth-actions .btn {
+        flex: 1;
+      }
+
+      .settings-page {
+        padding: 48px 22px 60px;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .brand-text {
+        font-size: 18px;
+      }
+
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      .page-title h1 {
+        font-size: 38px;
+        letter-spacing: -2px;
+      }
+
+      .card {
+        padding: 24px;
+        border-radius: 24px;
+      }
+
+      .account-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .security-item,
+      .setting-option {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .security-item .btn,
+      .form-actions .btn,
+      .auth-actions .btn {
+        width: 100%;
+      }
+
+      .auth-actions,
+      .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+    }
+    /* ===== REFINED SETTINGS LAYOUT ===== */
+.settings-page {
+  min-height: 100vh;
+  padding: 124px 7% 64px;
+}
+
+.settings-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.settings-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 0 12px;
+  margin-bottom: 14px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.10);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.settings-header h1 {
+  max-width: 760px;
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.03;
+  letter-spacing: -2.2px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.settings-header h1 span {
+  color: var(--primary);
+}
+
+.settings-header p {
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+
+.settings-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 24px;
+  align-items: start;
+}
+
+.settings-main-panel,
+.settings-side-panel {
+  display: grid;
+  gap: 18px;
+}
+
+.settings-card {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 30px;
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.account-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.account-card::before {
+  content: "";
+  position: absolute;
+  width: 280px;
+  height: 280px;
+  right: -120px;
+  top: -140px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.11);
+  pointer-events: none;
+}
+
+.account-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.settings-avatar {
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: 800;
+  box-shadow: 0 18px 34px rgba(37, 99, 235, 0.23);
+  flex: 0 0 auto;
+}
+
+.account-row h2 {
+  font-size: 28px;
+  letter-spacing: -1px;
+  margin-bottom: 6px;
+}
+
+.account-row p {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.settings-info-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.settings-info-tile {
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  border-radius: 18px;
+}
+
+.settings-info-tile span {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 8px;
+}
+
+.settings-info-tile strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.compact-card {
+  padding: 24px;
+}
+
+.settings-card-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.settings-card-icon {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(37, 99, 235, 0.10);
+  color: var(--primary);
+  font-size: 17px;
+  flex: 0 0 auto;
+}
+
+.settings-card-head h2 {
+  font-size: 21px;
+  letter-spacing: -0.7px;
+  margin-bottom: 5px;
+}
+
+.settings-card-head p {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.settings-row,
+.security-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  border-radius: 20px;
+}
+
+.settings-row h3,
+.security-item h3,
+
+.settings-row p,
+.security-item p,
+
+.security-list {
+  display: grid;
+  gap: 12px;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.status-pill.active,
+.status-pill.enabled {
+  background: rgba(16, 185, 129, 0.10);
+  color: var(--success);
+}
+
+.settings-form-group {
+  margin-bottom: 14px;
+}
+
+.settings-form-group label {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.55px;
+  margin-bottom: 8px;
+}
+
+.settings-input-wrap {
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  border-radius: 16px;
+  padding: 0 14px;
+  transition: 0.2s ease;
+}
+
+.settings-input-wrap:focus-within {
+  border-color: rgba(37, 99, 235, 0.55);
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+}
+
+.settings-input-wrap i {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.settings-input-wrap input {
+  width: 100%;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.password-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 13px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: rgba(245, 158, 11, 0.07);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+  margin-bottom: 16px;
+}
+
+.password-note i {
+  color: var(--warning);
+  margin-top: 2px;
+}
+
+.settings-submit-btn {
+  width: 100%;
+  min-height: 48px;
+}
+
+.danger-card {
+  border-color: rgba(239, 68, 68, 0.18);
+}
+
+.danger-icon {
+  background: rgba(239, 68, 68, 0.10);
+  color: var(--danger);
+}
+
+.logout-zone {
+  padding: 18px;
+  border-radius: 20px;
+  background: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.20);
+}
+
+.logout-zone p {
+  margin-bottom: 16px;
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  width: 58px;
+  height: 34px;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+
+.switch input {
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  border-radius: 999px;
+  background: #cbd5e1;
+  transition: 0.2s ease;
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  left: 4px;
+  top: 4px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(15, 23, 42, 0.18);
+  transition: 0.2s ease;
+}
+
+.switch input:checked + .slider {
+  background: var(--primary);
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(24px);
+}
+
+@media (max-width: 1080px) {
+  .settings-board {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .settings-page {
+    padding: 48px 22px 60px;
+  }
+
+  .settings-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .settings-card {
+    border-radius: 26px;
+  }
+}
+
+@media (max-width: 700px) {
+  .settings-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .settings-row,
+  .security-item {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-header-actions,
+  .settings-header-actions .btn {
+    width: 100%;
+  }
+
+  .settings-header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 560px) {
+  .settings-card {
+    padding: 24px;
+  }
+
+  .settings-avatar {
+    width: 68px;
+    height: 68px;
+    border-radius: 22px;
+    font-size: 26px;
+  }
+}
+/* ===== SETTINGS MINIMAL COLOR OVERRIDE ===== */
+
+/* Softer page background */
+body {
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.05), transparent 28%),
+    var(--soft) !important;
+}
+
+/* Fix top spacing under fixed navbar */
+.settings-page {
+  padding-top: 140px !important;
+}
+
+/* Remove colorful decorative blob */
+.account-card::before {
+  display: none !important;
+}
+
+/* Cleaner cards */
+.settings-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: var(--line) !important;
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.06) !important;
+  border-radius: 28px !important;
+}
+
+body.dark-theme .settings-card {
+  background: rgba(15, 23, 42, 0.92) !important;
+}
+
+/* Make avatar blue only instead of purple gradient */
+.settings-avatar {
+  background: var(--primary) !important;
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18) !important;
+}
+
+/* Make icons subtle */
+.settings-card-icon {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--primary) !important;
+}
+
+/* Simplify all inner boxes */
+.settings-info-tile,
+.settings-row,
+.security-item,
+.settings-input-wrap {
+  background: var(--soft) !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+
+/* Make security status blue/neutral instead of green */
+.status-pill.active,
+.status-pill.enabled {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--primary) !important;
+}
+
+/* Make password note neutral instead of yellow */
+.password-note {
+  background: var(--soft) !important;
+  border-color: var(--line) !important;
+  color: var(--muted) !important;
+}
+
+.password-note i {
+  color: var(--primary) !important;
+}
+
+/* Make danger section less aggressive */
+.danger-card {
+  border-color: var(--line) !important;
+}
+
+.danger-icon {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--primary) !important;
+}
+
+.logout-zone {
+  background: var(--soft) !important;
+  border-color: var(--line) !important;
+}
+
+/* Logout button remains red, but softer */
+.logout-zone .btn-danger,
+.settings-side-panel .btn-danger {
+  background: transparent !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  color: var(--danger) !important;
+  box-shadow: none !important;
+}
+
+.logout-zone .btn-danger:hover,
+.settings-side-panel .btn-danger:hover {
+  background: rgba(239, 68, 68, 0.06) !important;
+}
+
+/* Keep primary button clean */
+.settings-submit-btn {
+  box-shadow: 0 12px 24px rgba(37, 99, 235, 0.14) !important;
+}
+
+/* Reduce visual heaviness */
+.settings-board {
+  gap: 22px !important;
+}
+
+.settings-main-panel,
+.settings-side-panel {
+  gap: 16px !important;
+}
+
+/* Header badge calmer */
+.settings-badge {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--primary) !important;
+}
+
+/* Softer dark mode switch */
+.slider {
+  background: #cbd5e1 !important;
+}
+
+.switch input:checked + .slider {
+  background: var(--primary) !important;
+}
+  </style>
+</head>
+
+<body>
+  <nav class="nav">
+    <a href="home.html" class="brand" aria-label="EngiSphere Home">
+      <span class="brand-icon">
+        <i class="fas fa-compass-drafting"></i>
+      </span>
+      <span class="brand-text">ENGI<span>SPHERE</span></span>
+    </a>
+
+    <div class="nav-center">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="#" onclick="requireAuth('index.html'); return false;" class="nav-link">Workspace</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
+    </div>
+
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+      </button>
+
+      <div id="authActions" class="auth-actions">
+        <a href="login.html" class="btn btn-primary">
+          <i class="fas fa-right-to-bracket"></i>
+          System Access
+        </a>
+      </div>
+    </div>
+  </nav>
+
+<main class="settings-page">
+  <div class="settings-container">
+    <header class="settings-header">
+      <div>
+        <div class="settings-badge">
+          <i class="fas fa-gear"></i>
+          Account Settings
+        </div>
+
+        <h1>Manage your <span>EngiSphere</span> account.</h1>
+
+        <p>
+         Manage your security preferences, password, and appearance settings.
+        </p>
+      </div>
+
+      <div class="settings-header-actions">
+        <a href="profile.html" class="btn btn-outline">
+          <i class="fas fa-user"></i>
+          View Profile
+        </a>
+
+        <a href="#" onclick="requireAuth('index.html'); return false;" class="btn btn-primary">
+          <i class="fas fa-table-columns"></i>
+          Workspace
+        </a>
+      </div>
+    </header>
+
+    <section class="settings-board">
+      <div class="settings-main-panel">
+        <article class="settings-card account-card">
+          <div class="account-row">
+            <div class="settings-avatar" id="settingsInit">U</div>
+
+            <div>
+              <h2 id="settingsName">Loading user...</h2>
+              <p id="settingsEmail">Loading email...</p>
+            </div>
+          </div>
+
+          <div class="settings-info-grid">
+            <div class="settings-info-tile">
+              <span>Full Name</span>
+              <strong id="settingsFullName">Loading...</strong>
+            </div>
+
+            <div class="settings-info-tile">
+              <span>Email Address</span>
+              <strong id="settingsEmailBox">Loading...</strong>
+            </div>
+
+            <div class="settings-info-tile">
+              <span>Account Status</span>
+              <strong>Authenticated</strong>
+            </div>
+          </div>
+        </article>
+
+        <article class="settings-card compact-card">
+          <div class="settings-card-head">
+            <div class="settings-card-icon">
+              <i class="fas fa-palette"></i>
+            </div>
+
+            <div>
+              <h2>Appearance</h2>
+              <p>Customize how EngiSphere looks on this device.</p>
+            </div>
+          </div>
+
+          <div class="settings-row">
+            <div>
+              <h3>Dark Mode</h3>
+              <p>Switch between light and dark interface mode.</p>
+            </div>
+
+            <label class="switch">
+              <input type="checkbox" id="darkModeSwitch">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </article>
+
+       
+      </div>
+
+      <aside class="settings-side-panel">
+        <article class="settings-card password-card">
+          <div class="settings-card-head">
+            <div class="settings-card-icon">
+              <i class="fas fa-lock"></i>
+            </div>
+
+            <div>
+              <h2>Update Password</h2>
+              <p>Use a strong password to keep your workspace secure.</p>
+            </div>
+          </div>
+
+          <form id="settingsPasswordForm">
+  <div class="settings-form-group">
+    <label for="settingsOldPass">Current Password</label>
+    <div class="settings-input-wrap">
+      <i class="fas fa-key"></i>
+      <input type="password" id="settingsOldPass" placeholder="Enter current password" required>
+    </div>
+  </div>
+
+  <div class="settings-form-group">
+    <label for="settingsNewPass">New Password</label>
+    <div class="settings-input-wrap">
+      <i class="fas fa-shield-halved"></i>
+      <input type="password" id="settingsNewPass" placeholder="At least 8 characters" required>
+    </div>
+  </div>
+
+  <div class="settings-form-group">
+    <label for="settingsConfirmPass">Confirm New Password</label>
+    <div class="settings-input-wrap">
+      <i class="fas fa-check"></i>
+      <input type="password" id="settingsConfirmPass" placeholder="Repeat new password" required>
+    </div>
+  </div>
+
+  <div class="password-note">
+    <i class="fas fa-circle-info"></i>
+    Use at least 8 characters. Avoid simple or repeated passwords.
+  </div>
+
+  <button class="btn btn-primary settings-submit-btn" id="settingsPasswordBtn" type="submit">
+    <i class="fas fa-floppy-disk"></i>
+    Save New Password
+  </button>
+</form>
+        </article>
+
+        
+      </aside>
+    </section>
+  </div>
+</main>
+
+  <div class="toast" id="toast"></div>
+
+ <script>
+  const API_BASE_URL = "http://127.0.0.1:8000";
+
+  window.requireAuth = function (page) {
+    const currentToken = localStorage.getItem("access_token");
+
+    if (!currentToken) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    window.location.href = page;
+  };
+
+  function clearAuthData() {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("token");
+    localStorage.removeItem("token_type");
+    localStorage.removeItem("user_email");
+  }
+
+  window.logout = function () {
+    clearAuthData();
+    window.location.href = "login.html";
+  };
+
+  function setTextByIds(ids, value) {
+    ids.forEach(function (id) {
+      const element = document.getElementById(id);
+
+      if (element) {
+        element.textContent = value;
+      }
+    });
+  }
+
+  function getElementByIds(ids) {
+    for (const id of ids) {
+      const element = document.getElementById(id);
+
+      if (element) {
+        return element;
+      }
+    }
+
+    return null;
+  }
+
+  function getInitial(name, email) {
+    const value = (name || email || "User").trim();
+    return value.charAt(0).toUpperCase() || "U";
+  }
+
+  function getReadableError(data, fallback = "Operation failed.") {
+    if (!data) return fallback;
+
+    if (typeof data.detail === "string") {
+      return data.detail;
+    }
+
+    if (Array.isArray(data.detail)) {
+      return data.detail.map((err) => err.msg || JSON.stringify(err)).join(" | ");
+    }
+
+    if (data.detail && typeof data.detail === "object") {
+      return JSON.stringify(data.detail);
+    }
+
+    if (typeof data.message === "string") {
+      return data.message;
+    }
+
+    return fallback;
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const token = localStorage.getItem("access_token");
+
+    const body = document.body;
+    const toast = document.getElementById("toast");
+    const themeToggle = document.getElementById("themeToggle");
+    const darkModeSwitch = getElementByIds(["darkModeSwitch", "darkSwitch"]);
+    const authActions = document.getElementById("authActions");
+    const passwordForm = getElementByIds(["settingsPasswordForm", "passwordForm"]);
+
+    if (!token) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    function showToast(message, type = "info") {
+      if (!toast) {
+        if (type === "error") {
+          alert(message);
+        }
+        return;
+      }
+
+      toast.innerHTML = `
+        <i class="fas ${
+          type === "success"
+            ? "fa-check-circle"
+            : type === "error"
+              ? "fa-circle-xmark"
+              : "fa-circle-info"
+        }"></i>
+        <span>${message}</span>
+      `;
+
+      toast.className = `toast show ${type}`;
+
+      setTimeout(function () {
+        toast.className = "toast";
+      }, 3200);
+    }
+
+    function updateThemeIcon(isDark) {
+      if (!themeToggle) return;
+
+      themeToggle.innerHTML = isDark
+        ? '<i class="fas fa-sun"></i>'
+        : '<i class="fas fa-moon"></i>';
+    }
+
+    function updateDarkSwitch(isDark) {
+      if (!darkModeSwitch) return;
+
+      if (darkModeSwitch.tagName === "INPUT") {
+        darkModeSwitch.checked = isDark;
+      } else {
+        darkModeSwitch.classList.toggle("active", isDark);
+      }
+    }
+
+    function applySavedTheme() {
+      const savedTheme = localStorage.getItem("theme") || "light";
+      const isDark = savedTheme === "dark";
+
+      body.classList.toggle("dark-theme", isDark);
+      updateThemeIcon(isDark);
+      updateDarkSwitch(isDark);
+    }
+
+    function toggleTheme() {
+      const isCurrentlyDark = body.classList.contains("dark-theme");
+      const nextTheme = isCurrentlyDark ? "light" : "dark";
+
+      localStorage.setItem("theme", nextTheme);
+      applySavedTheme();
+    }
+
+    function renderAuthActions() {
+      if (!authActions) return;
+
+      authActions.innerHTML = `
+        <a href="profile.html" class="btn btn-outline">
+          <i class="fas fa-user"></i>
+          Profile
+        </a>
+
+        <a href="settings.html" class="btn btn-outline">
+          <i class="fas fa-gear"></i>
+          Settings
+        </a>
+
+        <button type="button" class="btn btn-danger" onclick="logout()">
+          <i class="fas fa-power-off"></i>
+          Logout
+        </button>
+      `;
+    }
+
+    async function loadUserInfo() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+          clearAuthData();
+          window.location.href = "login.html";
+          return;
+        }
+
+        if (!response.ok) {
+          showToast("Unable to load account information.", "error");
+          applyFallbackUserInfo();
+          return;
+        }
+
+        const user = await response.json();
+
+        const fullName = user.full_name || user.name || "EngiSphere User";
+        const email = user.email || localStorage.getItem("user_email") || "Not available";
+
+        localStorage.setItem("user_email", email);
+
+        setTextByIds(["settingsInit", "userInitial"], getInitial(fullName, email));
+        setTextByIds(["settingsName", "userName"], fullName);
+        setTextByIds(["settingsEmail", "userEmail"], email);
+        setTextByIds(["settingsFullName", "userNameRow"], fullName);
+        setTextByIds(["settingsEmailBox", "userEmailRow"], email);
+        setTextByIds(["userStatus"], "Authenticated");
+
+      } catch (error) {
+        console.error("Failed to load user info:", error);
+        showToast("Backend connection failed.", "error");
+        applyFallbackUserInfo();
+      }
+    }
+
+    function applyFallbackUserInfo() {
+      const fallbackEmail = localStorage.getItem("user_email") || "Not available";
+      const fallbackName = "EngiSphere User";
+
+      setTextByIds(["settingsInit", "userInitial"], getInitial(fallbackName, fallbackEmail));
+      setTextByIds(["settingsName", "userName"], fallbackName);
+      setTextByIds(["settingsEmail", "userEmail"], fallbackEmail);
+      setTextByIds(["settingsFullName", "userNameRow"], fallbackName);
+      setTextByIds(["settingsEmailBox", "userEmailRow"], fallbackEmail);
+      setTextByIds(["userStatus"], "Authenticated");
+    }
+
+    window.updateSettingsPassword = async function (event) {
+      if (event) event.preventDefault();
+
+      const currentPasswordInput = getElementByIds(["settingsOldPass", "currentPassword"]);
+      const newPasswordInput = getElementByIds(["settingsNewPass", "newPassword"]);
+      const confirmPasswordInput = getElementByIds(["settingsConfirmPass", "confirmPassword"]);
+      const passwordBtn = getElementByIds(["settingsPasswordBtn", "passwordBtn"]);
+
+      if (!currentPasswordInput || !newPasswordInput || !confirmPasswordInput) {
+        showToast("Password form fields are missing.", "error");
+        return;
+      }
+
+      const currentPassword = currentPasswordInput.value.trim();
+      const newPassword = newPasswordInput.value.trim();
+      const confirmPassword = confirmPasswordInput.value.trim();
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        showToast("Please fill in all password fields.", "error");
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        showToast("New password must be at least 8 characters.", "error");
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showToast("New password confirmation does not match.", "error");
+        return;
+      }
+
+      try {
+        if (passwordBtn) {
+          passwordBtn.disabled = true;
+          passwordBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+        }
+
+        const response = await fetch(`${API_BASE_URL}/users/update-password`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            old_password: currentPassword,
+            new_password: newPassword
+          })
+        });
+
+        if (response.status === 401 || response.status === 403) {
+          clearAuthData();
+          window.location.href = "login.html";
+          return;
+        }
+
+        let data = {};
+
+        try {
+          data = await response.json();
+        } catch (_) {
+          data = {};
+        }
+
+        if (!response.ok) {
+          const errorMessage = getReadableError(data, "Password update failed.");
+          throw new Error(errorMessage);
+        }
+
+        if (passwordForm) {
+          passwordForm.reset();
+        }
+
+        showToast("Password updated successfully.", "success");
+
+      } catch (error) {
+        console.error("Password update error:", error);
+        showToast(error.message || "Password update failed.", "error");
+
+      } finally {
+        if (passwordBtn) {
+          passwordBtn.disabled = false;
+          passwordBtn.innerHTML = '<i class="fas fa-floppy-disk"></i> Save New Password';
+        }
+      }
+    };
+
+    applySavedTheme();
+    renderAuthActions();
+    loadUserInfo();
+
+    if (themeToggle) {
+      themeToggle.addEventListener("click", toggleTheme);
+    }
+
+    if (darkModeSwitch) {
+      darkModeSwitch.addEventListener("change", toggleTheme);
+      darkModeSwitch.addEventListener("click", function (event) {
+        if (darkModeSwitch.tagName !== "INPUT") {
+          toggleTheme();
+        }
+      });
+    }
+
+    if (passwordForm) {
+      passwordForm.addEventListener("submit", window.updateSettingsPassword);
+    }
+  });
+</script>
+</body>
+</html>

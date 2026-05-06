@@ -59,87 +59,10 @@
       color: inherit;
     }
 
-    .nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      height: 78px;
-      padding: 0 7%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(255, 255, 255, 0.88);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(18px);
-    }
 
-    body.dark-theme .nav {
-      background: rgba(2, 6, 23, 0.86);
-    }
 
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: -0.8px;
-    }
 
-    .brand-icon {
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      border-radius: 13px;
-      background: var(--primary);
-      color: #ffffff;
-      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
-      flex: 0 0 auto;
-    }
 
-    .brand-text {
-      font-size: 22px;
-      color: var(--ink);
-      line-height: 1;
-    }
-
-    .brand-text span {
-      color: var(--primary);
-    }
-
-    .nav-right {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .theme-toggle {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      color: var(--ink);
-      border-radius: 14px;
-      cursor: pointer;
-      box-shadow: var(--shadow-soft);
-      transition: 0.2s ease;
-      font-family: inherit;
-    }
-
-    .theme-toggle:hover {
-      transform: translateY(-1px);
-      color: var(--primary);
-    }
-
-    .auth-btns {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
 
     .btn {
       display: inline-flex;
@@ -169,11 +92,12 @@
       transform: translateY(-1px);
     }
 
-    .btn-outline {
-      background: transparent;
-      border-color: var(--primary);
-      color: var(--primary);
-    }
+   .btn-outline {
+  background: var(--panel);
+  border-color: rgba(37, 99, 235, 0.35);
+  color: var(--primary);
+  box-shadow: none;
+}
 
     .btn-outline:hover {
       background: rgba(37, 99, 235, 0.08);
@@ -188,16 +112,6 @@
 
     .btn-danger:hover {
       background: rgba(239, 68, 68, 0.08);
-    }
-
-    .user-chip {
-      color: var(--muted);
-      font-size: 13px;
-      font-weight: 700;
-      max-width: 190px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .hero {
@@ -609,172 +523,324 @@
       font-size: 12.5px;
       line-height: 1.7;
     }
+/* ===== UNIFIED NAVBAR ===== */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  min-height: 78px;
+  padding: 0 7%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+}
 
-    @media (max-width: 1100px) {
-      .hero {
-        grid-template-columns: 1fr;
-        gap: 42px;
-        padding-top: 120px;
-      }
+body.dark-theme .nav {
+  background: rgba(2, 6, 23, 0.86);
+}
 
-      .hero-visual {
-        justify-self: stretch;
-        max-width: 100%;
-      }
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  white-space: nowrap;
+}
 
-      .clean-hero-image img {
-        height: 420px;
-      }
+.brand-icon {
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+  flex: 0 0 auto;
+}
 
-      .module-grid,
-      .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-      }
+.brand-text {
+  font-size: 22px;
+  color: var(--ink);
+  line-height: 1;
+}
 
-      .site-footer-grid {
-        grid-template-columns: 1fr 1fr;
-      }
+.brand-text span {
+  color: var(--primary);
+}
 
-      .footer-brand-block {
-        grid-column: 1 / -1;
-      }
-    }
+.nav-center,
+.nav-right,
+.auth-btns {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
 
-    @media (max-width: 760px) {
-      .nav {
-        height: auto;
-        padding: 14px 20px;
-        align-items: flex-start;
-        gap: 12px;
-      }
+.nav-link {
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 14px;
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
 
-      .nav-right {
-        gap: 8px;
-      }
+.nav-link:hover,
+.nav-link.active {
+  color: var(--primary);
+}
 
-      .brand-text {
-        font-size: 18px;
-      }
+.theme-toggle {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--ink);
+  border-radius: 14px;
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: 0.2s ease;
+  font-family: inherit;
+  flex: 0 0 auto;
+}
 
-      .brand-icon {
-        width: 36px;
-        height: 36px;
-      }
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  color: var(--primary);
+}
 
-      .auth-btns {
-        gap: 8px;
-      }
+.user-chip {
+  min-height: 42px;
+  max-width: 220px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-shadow: var(--shadow-soft);
+}
 
-      .user-chip {
-        display: none;
-      }
+.user-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-      .btn {
-        padding: 0 12px;
-        font-size: 12px;
-      }
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1100px) {
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 42px;
+    padding-top: 120px;
+  }
 
-      .hero {
-        padding: 112px 22px 50px;
-      }
+  .hero-visual {
+    justify-self: stretch;
+    max-width: 100%;
+  }
 
-      .hero h1 {
-        font-size: 38px;
-        letter-spacing: -2px;
-      }
+  .clean-hero-image img {
+    height: 420px;
+  }
 
-      .hero p {
-        font-size: 15.5px;
-      }
+  .module-grid,
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 
-      .hero-actions {
-        flex-direction: column;
-        align-items: stretch;
-      }
+  .site-footer-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 
-      .hero-actions .btn {
-        width: 100%;
-      }
+  .footer-brand-block {
+    grid-column: 1 / -1;
+  }
+}
 
-      .stats,
-      .section,
-      .site-footer {
-        padding-left: 22px;
-        padding-right: 22px;
-      }
+@media (max-width: 900px) {
+  .nav {
+    position: relative;
+    min-height: auto;
+    height: auto;
+    padding: 16px 22px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
 
-      .stats-grid,
-      .module-grid,
-      .site-footer-grid {
-        grid-template-columns: 1fr;
-      }
+  .nav-center,
+  .nav-right,
+  .auth-btns {
+    width: 100%;
+    gap: 12px;
+  }
 
-      .clean-hero-image img {
-        height: 330px;
-      }
+  .nav-link {
+    font-size: 13px;
+  }
 
-      .site-footer-grid {
-        gap: 28px;
-      }
+  .nav-right .btn,
+  .auth-btns .btn {
+    flex: 1;
+  }
 
-      .footer-bottom {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-    }
+  .user-chip {
+    max-width: 100%;
+  }
+
+  .hero {
+    padding-top: 54px;
+  }
+}
+
+@media (max-width: 760px) {
+  .brand-text {
+    font-size: 18px;
+  }
+
+  .brand-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .user-chip {
+    display: none;
+  }
+
+  .btn {
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .hero {
+    padding: 52px 22px 50px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+    letter-spacing: -2px;
+  }
+
+  .hero p {
+    font-size: 15.5px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+  }
+
+  .stats,
+  .section,
+  .site-footer {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .stats-grid,
+  .module-grid,
+  .site-footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .clean-hero-image img {
+    height: 330px;
+  }
+
+  .site-footer-grid {
+    gap: 28px;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
   </style>
 </head>
 
 <body>
-  <nav class="nav">
-    <a href="home.html" class="brand" aria-label="EngiSphere Home">
-      <span class="brand-icon">
-        <i class="fas fa-compass-drafting"></i>
-      </span>
-      <span class="brand-text">ENGI<span>SPHERE</span></span>
-    </a>
+<nav class="nav">
+  <a href="home.html" class="brand" aria-label="EngiSphere Home">
+    <span class="brand-icon">
+      <i class="fas fa-compass-drafting"></i>
+    </span>
+    <span class="brand-text">ENGI<span>SPHERE</span></span>
+  </a>
 
-    <div class="nav-right">
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <i class="fas fa-moon"></i>
-      </button>
+  <div class="nav-center">
+   <a href="home.html" class="nav-link active">Home</a>
+<a href="#" onclick="requireAuth('index.html'); return false;" class="nav-link">Workspace</a>
+<a href="about.html" class="nav-link">About</a>
+<a href="contact.html" class="nav-link">Contact</a>
+  </div>
 
-      <div class="auth-btns" id="authSection">
-        <a href="login.html" class="btn btn-outline">Login</a>
-        <a href="register.html" class="btn btn-primary">Sign Up</a>
-      </div>
+  <div class="nav-right">
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+      <i class="fas fa-moon"></i>
+    </button>
+
+    <div id="authActions" class="auth-actions">
+      <a href="login.html" class="btn btn-primary">
+        <i class="fas fa-right-to-bracket"></i>
+        System Access
+      </a>
     </div>
-  </nav>
+  </div>
+</nav>
 
   <section class="hero">
     <div class="hero-content" data-aos="fade-right">
       <div class="hero-label">Built for engineering project operations</div>
 
-      <h1>
-        Manage engineering projects with <span>clarity.</span>
-      </h1>
+     <h1>
+  Manage engineering projects smarter with <span>AI.</span>
+</h1>
 
-      <p>
-        EngiSphere helps you manage projects, maps, AI tools, and reports
-        from one professional engineering workspace.
-      </p>
+<p>
+  EngiSphere helps engineering teams manage projects, tasks, team members,
+  risk assessments, and AI-powered insights from one secure workspace.
+</p>
 
       <div class="hero-actions" id="heroBtns">
-        <a href="index.html" class="btn btn-primary">
-          <i class="fas fa-table-columns"></i>
-          Open Workspace
-        </a>
+  <a href="register.html" class="btn btn-primary">
+    <i class="fas fa-user-plus"></i>
+    Get Started
+  </a>
 
-        <a href="ai_chat.html" class="btn btn-outline">
-          <i class="fas fa-robot"></i>
-          Open EngiBot
-        </a>
-      </div>
+  <a href="login.html" class="btn btn-outline">
+    <i class="fas fa-right-to-bracket"></i>
+    Login
+  </a>
+</div>
+
 
       <div class="hero-points">
-        <div><i class="fas fa-check"></i> Secure access and protected project data</div>
-        <div><i class="fas fa-check"></i> Dashboards, maps, AI tools, and reports</div>
-        <div><i class="fas fa-check"></i> Built for professional engineering workflow management</div>
+    <div><i class="fas fa-check"></i> Secure JWT-based access and protected project data</div>
+<div><i class="fas fa-check"></i> Projects, tasks, teams, risk analysis, and AI support</div>
+<div><i class="fas fa-check"></i> Built for professional engineering project workflows</div>
       </div>
     </div>
 
@@ -784,6 +850,14 @@
       </div>
     </div>
   </section>
+
+  <div class="section-head center" style="margin-bottom: 28px;">
+  <div class="section-kicker">Live Project Overview</div>
+  <h2 style="font-size: 32px;">Project performance at a glance.</h2>
+  <p>
+    Once logged in, EngiSphere displays real project statistics from your workspace.
+  </p>
+</div>
 
   <section class="stats">
     <div class="stats-grid">
@@ -812,42 +886,41 @@
   <section class="section modules" id="modules">
     <div class="section-head center" data-aos="fade-up">
       <div class="section-kicker">Platform Modules</div>
-      <h2>Everything your engineering workflow needs.</h2>
-      <p>
-        The system demonstrates a complete software engineering solution:
-        authenticated users, project records, smart navigation, maps, and an AI assistant.
-      </p>
+      <h2>Core modules built for engineering project control.</h2>
+<p>
+  EngiSphere combines project management, team coordination, task tracking,
+  automated risk assessment, and AI assistance in one integrated platform.
+</p>
     </div>
+<div class="module-grid">
+  <div class="module-card" onclick="requireAuth('index.html')" data-aos="fade-up">
+    <div class="module-icon"><i class="fas fa-folder-tree"></i></div>
+    <h3>Project Management</h3>
+    <p>Create, update, track, and organize engineering projects with structured project data and clear status visibility.</p>
+    <div class="module-link">Open Projects <i class="fas fa-arrow-right"></i></div>
+  </div>
 
-    <div class="module-grid">
-      <div class="module-card" onclick="location.href='index.html'" data-aos="fade-up">
-        <div class="module-icon"><i class="fas fa-table-columns"></i></div>
-        <h3>Command Workspace</h3>
-        <p>Open the main workspace to create projects, manage engineering records, and navigate project tools.</p>
-        <div class="module-link">Open Workspace <i class="fas fa-arrow-right"></i></div>
-      </div>
+  <div class="module-card" onclick="requireAuth('index.html')" data-aos="fade-up" data-aos-delay="100">
+    <div class="module-icon"><i class="fas fa-triangle-exclamation"></i></div>
+    <h3>Risk Assessment</h3>
+    <p>Evaluate project health using an automated risk engine that generates risk scores, levels, and recommendations.</p>
+    <div class="module-link">View Risk Engine <i class="fas fa-arrow-right"></i></div>
+  </div>
 
-      <div class="module-card" onclick="location.href='solutions.html'" data-aos="fade-up" data-aos-delay="100">
-        <div class="module-icon"><i class="fas fa-map-location-dot"></i></div>
-        <h3>Geospatial Solutions</h3>
-        <p>Access engineering solutions, project mapping logic, and location-based project support.</p>
-        <div class="module-link">Open Solutions <i class="fas fa-arrow-right"></i></div>
-      </div>
+  <div class="module-card" onclick="requireAuth('team.html')" data-aos="fade-up" data-aos-delay="200">
+    <div class="module-icon"><i class="fas fa-users-gear"></i></div>
+    <h3>Team & Tasks</h3>
+    <p>Manage team members, assign them to projects, create tasks, and monitor execution progress across your workflow.</p>
+    <div class="module-link">Manage Team <i class="fas fa-arrow-right"></i></div>
+  </div>
 
-      <div class="module-card" onclick="location.href='ai_chat.html'" data-aos="fade-up" data-aos-delay="200">
-        <div class="module-icon"><i class="fas fa-robot"></i></div>
-        <h3>AI EngiBot</h3>
-        <p>Ask engineering-related questions and receive structured support for planning, risks, and reporting.</p>
-        <div class="module-link">Open EngiBot <i class="fas fa-arrow-right"></i></div>
-      </div>
-
-      <div class="module-card" onclick="openFeatureModal('security')" data-aos="fade-up" data-aos-delay="300">
-        <div class="module-icon"><i class="fas fa-shield-halved"></i></div>
-        <h3>Secure Access</h3>
-        <p>JWT-based login and protected backend endpoints keep user and project information controlled.</p>
-        <div class="module-link">Security Details <i class="fas fa-arrow-right"></i></div>
-      </div>
-    </div>
+  <div class="module-card" onclick="requireAuth('ai_chat.html')" data-aos="fade-up" data-aos-delay="300">
+    <div class="module-icon"><i class="fas fa-robot"></i></div>
+    <h3>EngiBot AI Assistant</h3>
+    <p>Ask engineering questions, generate project insights, analyze risks, and receive intelligent planning support.</p>
+    <div class="module-link">Open EngiBot <i class="fas fa-arrow-right"></i></div>
+  </div>
+</div>
   </section>
 
   <footer class="site-footer">
@@ -862,8 +935,8 @@
           </a>
 
           <p class="footer-description">
-            An engineering management platform for project tracking, secure access,
-            AI assistance, and geospatial workflow support.
+           An AI-powered engineering management platform for project tracking,
+team coordination, task management, risk assessment, and secure workflow control.
           </p>
         </div>
 
@@ -871,8 +944,10 @@
           <h4>Quick Links</h4>
           <div class="footer-links">
             <a href="home.html" class="footer-link"><i class="fas fa-house"></i>Home</a>
-            <a href="index.html" class="footer-link"><i class="fas fa-table-columns"></i>Workspace</a>
-            <a href="about_us.html" class="footer-link"><i class="fas fa-circle-info"></i>About Us</a>
+           <a href="#" onclick="requireAuth('index.html')" class="footer-link">
+  <i class="fas fa-table-columns"></i>Workspace
+</a>
+           <a href="about.html" class="footer-link"><i class="fas fa-circle-info"></i>About Us</a>
             <a href="contact.html" class="footer-link"><i class="fas fa-paper-plane"></i>Contact</a>
           </div>
         </div>
@@ -885,10 +960,10 @@
               engisphere.project@gmail.com
             </a>
 
-            <a href="#" class="footer-link" onclick="alert('GitHub repository link will be added after final upload.'); return false;">
-              <i class="fab fa-github"></i>
-              GitHub Repository
-            </a>
+           <a href="https://github.com/Mujtaba602/EngiSphere" target="_blank" class="footer-link">
+  <i class="fab fa-github"></i>
+  GitHub Repository
+</a>
           </div>
         </div>
       </div>
@@ -908,162 +983,283 @@
   </div>
 
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.AOS) {
+      AOS.init({
+        duration: 850,
+        once: true,
+        offset: 80
+      });
+    }
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      if (window.AOS) {
-        AOS.init({
-          duration: 850,
-          once: true,
-          offset: 80
-        });
-      }
+    const API_BASE_URL = "http://127.0.0.1:8000";
+    const token = localStorage.getItem("access_token");
 
-      const API_BASE_URL = "http://127.0.0.1:8000";
-      const token = localStorage.getItem("access_token") || localStorage.getItem("token");
-      const authSection = document.getElementById("authSection");
-      const heroBtns = document.getElementById("heroBtns");
-      const themeBtn = document.getElementById("themeToggle");
-      const body = document.body;
+    const authActions = document.getElementById("authActions");
+    const heroBtns = document.getElementById("heroBtns");
+    const themeBtn = document.getElementById("themeToggle");
+    const body = document.body;
 
-      function applySavedTheme() {
-        const saved = localStorage.getItem("theme");
+    function applySavedTheme() {
+      const saved = localStorage.getItem("theme") || "light";
+      const isDark = saved === "dark";
 
-        if (saved === "dark") {
-          body.classList.add("dark-theme");
-          themeBtn.innerHTML = '<i class="fas fa-sun"></i>';
-        } else {
-          body.classList.remove("dark-theme");
-          themeBtn.innerHTML = '<i class="fas fa-moon"></i>';
-        }
-      }
+      body.classList.toggle("dark-theme", isDark);
+      updateThemeIcon(isDark);
+    }
 
-      if (themeBtn) {
-        applySavedTheme();
+    function updateThemeIcon(isDark) {
+      if (!themeBtn) return;
 
-        themeBtn.onclick = function () {
-          body.classList.toggle("dark-theme");
-          const isDark = body.classList.contains("dark-theme");
-          localStorage.setItem("theme", isDark ? "dark" : "light");
-          themeBtn.innerHTML = isDark
-            ? '<i class="fas fa-sun"></i>'
-            : '<i class="fas fa-moon"></i>';
-        };
-      }
+      themeBtn.innerHTML = isDark
+        ? '<i class="fas fa-sun"></i>'
+        : '<i class="fas fa-moon"></i>';
+    }
 
-      async function loadUserInfo() {
-        if (!token || !authSection || !heroBtns) return;
+    function toggleTheme() {
+      body.classList.toggle("dark-theme");
 
-        try {
-          const response = await fetch(`${API_BASE_URL}/users/me`, {
-            headers: {
-              "Authorization": `Bearer ${token}`
-            }
-          });
+      const isDark = body.classList.contains("dark-theme");
 
-          if (!response.ok) return;
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+      updateThemeIcon(isDark);
+    }
 
-          const user = await response.json();
+    if (themeBtn) {
+      themeBtn.addEventListener("click", toggleTheme);
+    }
 
-          authSection.innerHTML = `
-            <span class="user-chip">Welcome, ${user.full_name || user.email || "User"}</span>
-            <a href="index.html" class="btn btn-outline">Workspace</a>
-            <button onclick="logout()" class="btn btn-danger">Logout</button>
-          `;
+    applySavedTheme();
 
-          heroBtns.innerHTML = `
-            <a href="index.html" class="btn btn-primary">
-              <i class="fas fa-table-columns"></i>
-              Open Workspace
-            </a>
-            <a href="ai_chat.html" class="btn btn-outline">
-              <i class="fas fa-robot"></i>
-              Open EngiBot
-            </a>
-          `;
-        } catch (error) {
-          console.error("Failed to load user info:", error);
-        }
-      }
+    function clearAuthData() {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("token");
+      localStorage.removeItem("token_type");
+      localStorage.removeItem("user_email");
+    }
 
-      async function loadProjectStats() {
-        if (!token) return;
+    window.logout = function () {
+      clearAuthData();
+      window.location.href = "login.html";
+    };
 
-        try {
-          const response = await fetch(`${API_BASE_URL}/projects/stats`, {
-            headers: {
-              "Authorization": `Bearer ${token}`
-            }
-          });
+    window.requireAuth = function (page) {
+      const currentToken = localStorage.getItem("access_token");
 
-          if (!response.ok) return;
-
-          const stats = await response.json();
-
-          document.getElementById("statTotal").textContent = stats.total ?? 0;
-          document.getElementById("statActive").textContent = stats.active ?? 0;
-          document.getElementById("statPending").textContent = stats.pending ?? 0;
-          document.getElementById("statCompleted").textContent = stats.completed ?? 0;
-        } catch (error) {
-          console.error("Failed to load project stats:", error);
-        }
-      }
-
-      window.logout = function () {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("token");
-        localStorage.removeItem("user_email");
+      if (!currentToken) {
         window.location.href = "login.html";
-      };
+        return;
+      }
 
-      const featureData = {
-        security: {
-          icon: "fa-shield-halved",
-          title: "Secure Access",
-          desc: "EngiSphere uses token-based authentication with protected backend routes, allowing users to access only the data and actions permitted for their account."
-        }
-      };
+      window.location.href = page;
+    };
 
-      window.openFeatureModal = function (feature) {
-        const data = featureData[feature];
-        const modalBody = document.getElementById("modalBody");
-        const modal = document.getElementById("featureModal");
+    function renderLoggedOutButtons() {
+      if (!authActions) return;
 
-        if (!data || !modalBody || !modal) return;
+      authActions.innerHTML = `
+        <a href="login.html" class="btn btn-primary">
+          <i class="fas fa-right-to-bracket"></i>
+          System Access
+        </a>
+      `;
 
-        modalBody.innerHTML = `
-          <div class="module-icon" style="margin-bottom: 20px;">
-            <i class="fas ${data.icon}"></i>
-          </div>
-          <h2 style="font-size: 32px; margin-bottom: 14px; letter-spacing: -1px;">
-            ${data.title}
-          </h2>
-          <p style="color: var(--muted); line-height: 1.8; font-size: 16px;">
-            ${data.desc}
-          </p>
-          <button class="btn btn-primary" style="margin-top: 26px;" onclick="closeFeatureModal()">
-            Understood
-          </button>
+      if (heroBtns) {
+        heroBtns.innerHTML = `
+          <a href="register.html" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i>
+            Get Started
+          </a>
+
+          <a href="login.html" class="btn btn-outline">
+            <i class="fas fa-right-to-bracket"></i>
+            Login
+          </a>
         `;
+      }
+    }
 
-        modal.style.display = "flex";
-        setTimeout(() => modal.classList.add("active"), 10);
-      };
+    function renderLoggedInButtons(user) {
+      if (!authActions) return;
 
-      window.closeFeatureModal = function () {
-        const modal = document.getElementById("featureModal");
-        if (!modal) return;
+      const displayName = user?.full_name || user?.email || localStorage.getItem("user_email") || "User";
 
-        modal.classList.remove("active");
+authActions.innerHTML = `
+  <a href="profile.html" class="btn btn-outline">
+    <i class="fas fa-user"></i>
+    Profile
+  </a>
 
-        setTimeout(() => {
-          modal.style.display = "none";
-        }, 250);
-      };
+  <a href="settings.html" class="btn btn-outline">
+    <i class="fas fa-gear"></i>
+    Settings
+  </a>
 
-      loadUserInfo();
-      loadProjectStats();
-    });
-  </script>
+  <button type="button" class="btn btn-danger" onclick="logout()">
+    <i class="fas fa-power-off"></i>
+    Logout
+  </button>
+`;
+
+
+      if (heroBtns) {
+        heroBtns.innerHTML = `
+          <a href="index.html" class="btn btn-primary">
+            <i class="fas fa-table-columns"></i>
+         Open Workspace
+          </a>
+
+          <a href="ai_chat.html" class="btn btn-outline">
+            <i class="fas fa-robot"></i>
+            Open EngiBot
+          </a>
+        `;
+      }
+    }
+
+    async function loadUserInfo() {
+      if (!token) {
+        renderLoggedOutButtons();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/users/me`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+          clearAuthData();
+          renderLoggedOutButtons();
+          return;
+        }
+
+        if (!response.ok) {
+          renderLoggedInButtons({
+            full_name: localStorage.getItem("user_email") || "User"
+          });
+          return;
+        }
+
+        const user = await response.json();
+
+        if (user.email) {
+          localStorage.setItem("user_email", user.email);
+        }
+
+        renderLoggedInButtons(user);
+
+      } catch (error) {
+        console.error("Failed to load user info:", error);
+
+        if (token) {
+          renderLoggedInButtons({
+            full_name: localStorage.getItem("user_email") || "User"
+          });
+        } else {
+          renderLoggedOutButtons();
+        }
+      }
+    }
+
+    async function loadProjectStats() {
+      if (!token) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/projects/stats`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+          clearAuthData();
+          return;
+        }
+
+        if (!response.ok) {
+          return;
+        }
+
+        const stats = await response.json();
+
+        const statTotal = document.getElementById("statTotal");
+        const statActive = document.getElementById("statActive");
+        const statPending = document.getElementById("statPending");
+        const statCompleted = document.getElementById("statCompleted");
+
+        if (statTotal) statTotal.textContent = stats.total ?? 0;
+        if (statActive) statActive.textContent = stats.active ?? 0;
+        if (statPending) statPending.textContent = stats.pending ?? 0;
+        if (statCompleted) statCompleted.textContent = stats.completed ?? 0;
+
+      } catch (error) {
+        console.error("Failed to load project stats:", error);
+      }
+    }
+
+    const featureData = {
+      security: {
+        icon: "fa-shield-halved",
+        title: "Secure Access",
+        desc: "EngiSphere uses token-based authentication with protected backend routes, allowing users to access only the data and actions permitted for their account."
+      }
+    };
+
+    window.openFeatureModal = function (feature) {
+      const data = featureData[feature];
+      const modalBody = document.getElementById("modalBody");
+      const modal = document.getElementById("featureModal");
+
+      if (!data || !modalBody || !modal) return;
+
+      modalBody.innerHTML = `
+        <div class="module-icon" style="margin-bottom: 20px;">
+          <i class="fas ${data.icon}"></i>
+        </div>
+
+        <h2 style="font-size: 32px; margin-bottom: 14px; letter-spacing: -1px;">
+          ${data.title}
+        </h2>
+
+        <p style="color: var(--muted); line-height: 1.8; font-size: 16px;">
+          ${data.desc}
+        </p>
+
+        <button class="btn btn-primary" style="margin-top: 26px;" onclick="closeFeatureModal()">
+          Understood
+        </button>
+      `;
+
+      modal.style.display = "flex";
+
+      setTimeout(() => {
+        modal.classList.add("active");
+      }, 10);
+    };
+
+    window.closeFeatureModal = function () {
+      const modal = document.getElementById("featureModal");
+
+      if (!modal) return;
+
+      modal.classList.remove("active");
+
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 250);
+    };
+
+    loadUserInfo();
+    loadProjectStats();
+  });
+</script>
 </body>
 </html>

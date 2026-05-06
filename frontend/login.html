@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <title>EngiSphere | Login</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
 
   <style>
@@ -78,7 +80,7 @@
       pointer-events: none;
     }
 
-    .left > * {
+    .left>* {
       position: relative;
       z-index: 2;
     }
@@ -485,26 +487,26 @@
         <div class="hero-line"></div>
 
         <h1>
-          Manage engineering projects with <span>clarity.</span>
+          Access your engineering command center with <span>AI.</span>
         </h1>
 
         <p>
-          Access your secure EngiSphere workspace for project tracking,
-          geospatial monitoring, AI support, and professional engineering reports.
+          Sign in to manage projects, team members, tasks, risk assessments,
+          and AI-powered engineering insights from one secure workspace.
         </p>
 
         <div class="hero-points">
           <div>
             <i class="fas fa-check"></i>
-            Project management workspace
+            Secure project and task management
           </div>
           <div>
             <i class="fas fa-check"></i>
-            Secure authenticated dashboard
+            Automated risk assessment engine
           </div>
           <div>
             <i class="fas fa-check"></i>
-            Built for engineering presentations
+            EngiBot AI support for engineering workflows
           </div>
         </div>
       </div>
@@ -512,15 +514,15 @@
 
     <section class="right">
       <div class="card">
-        <h2>Sign in</h2>
-        <p class="subtitle">Enter your account details to continue.</p>
+        <h2>Welcome back</h2>
+        <p class="subtitle">Sign in to access your EngiSphere engineering workspace.</p>
 
         <form id="loginForm" novalidate>
           <div class="field">
             <label for="email">Email Address</label>
             <div class="input-wrap">
               <i class="fas fa-envelope left-icon"></i>
-              <input class="input" type="email" id="email" placeholder="commander@engisphere.com" required>
+              <input class="input" type="email" id="email" placeholder="engineer@engisphere.com" required>
             </div>
           </div>
 
@@ -529,13 +531,14 @@
             <div class="input-wrap">
               <i class="fas fa-lock left-icon"></i>
               <input class="input" type="password" id="password" placeholder="Enter password" required>
-              <button type="button" class="toggle-pass" onclick="togglePassword('password', this)" aria-label="Show or hide password">
+              <button type="button" class="toggle-pass" onclick="togglePassword('password', this)"
+                aria-label="Show or hide password">
                 <i class="fas fa-eye"></i>
               </button>
             </div>
           </div>
 
-          <button type="submit" class="submit-btn" id="loginBtn">Sign In</button>
+          <button type="submit" class="submit-btn" id="loginBtn">Access Workspace</button>
         </form>
 
         <div class="footer-text">
@@ -552,6 +555,13 @@
 
   <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
+    const HOME_PAGE = "home.html";
+
+    const existingToken = localStorage.getItem("access_token");
+
+    if (existingToken) {
+      window.location.href = "./home.html";
+    }
 
     function showToast(message, type = "success") {
       const toast = document.getElementById("toast");
@@ -594,16 +604,16 @@
       }
     }
 
-    function goHome() {
-      window.location.href = new URL("home.html", window.location.href).href;
+    function goDashboard() {
+      window.location.href = "./home.html";
     }
 
     document.getElementById("loginForm").addEventListener("submit", async function (e) {
       e.preventDefault();
 
       const btn = document.getElementById("loginBtn");
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
 
       if (!email || !password) {
         showToast("Please enter your email and password.", "error");
@@ -611,10 +621,12 @@
       }
 
       btn.disabled = true;
-      btn.textContent = "Signing in...";
+      btn.textContent = "Authenticating...";
 
       try {
         const formData = new URLSearchParams();
+
+        // FastAPI OAuth2PasswordRequestForm expects username
         formData.append("username", email);
         formData.append("password", password);
 
@@ -627,10 +639,14 @@
         });
 
         const data = await safeJson(response);
+
         console.log("LOGIN RESPONSE:", response.status, data);
 
         if (!response.ok) {
-          showToast(data.detail || "Access denied. Please verify your credentials.", "error");
+          showToast(
+            data.detail || "Access denied. Please verify your credentials.",
+            "error"
+          );
           return;
         }
 
@@ -639,20 +655,30 @@
           return;
         }
 
-        localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("token", data.access_token);
-        localStorage.setItem("user_email", email);
+       localStorage.setItem("access_token", data.access_token);
+localStorage.setItem("token_type", data.token_type || "bearer");
+localStorage.setItem("user_email", email);
 
-        showToast("Access granted. Redirecting...", "success");
+showToast("Access granted. Redirecting...", "success");
 
-        setTimeout(goHome, 450);
+console.log("TOKEN SAVED:", localStorage.getItem("access_token"));
+console.log("REDIRECTING TO:", new URL("home.html", window.location.href).href);
+
+setTimeout(() => {
+  window.location.assign(new URL("home.html", window.location.href).href);
+}, 300);
+
+return;
 
       } catch (error) {
         console.error("Login error:", error);
         showToast("SYSTEM OFFLINE: Cannot reach core server.", "error");
       } finally {
-        btn.disabled = false;
-        btn.textContent = "Sign In";
+        // Only re-enable if we are NOT redirecting (i.e. an error occurred)
+        if (!localStorage.getItem("access_token")) {
+          btn.disabled = false;
+          btn.textContent = "Access Workspace";
+        }
       }
     });
   </script>

@@ -132,9 +132,6 @@
 .brand-text span {
   color: #93c5fd;
 }
-  .brand-fallback span {
-    color: #93c5fd;
-  }
 
   .hero {
     max-width: 650px;
@@ -513,7 +510,7 @@
     <div class="success-box">
       <i class="fas fa-circle-check"></i>
       <h2>Account Created</h2>
-      <p>Your EngiSphere workspace is ready. Redirecting to home...</p>
+      <p>Your EngiSphere account has been created. Redirecting to home...</p>
     </div>
   </div>
 
@@ -528,43 +525,43 @@
       <div class="hero">
         <div class="hero-line"></div>
 
-        <h1>
-          Start your <span>engineering workspace.</span>
-        </h1>
+     <h1>
+  Build your engineering workspace with <span>AI.</span>
+</h1>
 
-        <p>
-          Create your EngiSphere account to manage projects, reports, geospatial tools,
-          and AI-assisted engineering workflows.
-        </p>
+<p>
+  Create your EngiSphere account to manage projects, team members, tasks,
+  risk assessments, and AI-powered engineering workflows.
+</p>
 
         <div class="hero-points">
           <div>
-            <i class="fas fa-check"></i>
-            Project tracking and reporting
-          </div>
-          <div>
-            <i class="fas fa-check"></i>
-            AI-assisted engineering support
-          </div>
-          <div>
-            <i class="fas fa-check"></i>
-            Secure workspace access
-          </div>
+  <i class="fas fa-check"></i>
+  Project, team, and task management
+</div>
+<div>
+  <i class="fas fa-check"></i>
+  Automated risk assessment engine
+</div>
+<div>
+  <i class="fas fa-check"></i>
+  EngiBot AI support for engineering workflows
+</div>
         </div>
       </div>
     </section>
 
     <section class="right">
       <div class="card">
-        <h2>Create account</h2>
-        <p class="subtitle">Enter your details to initialize your workspace.</p>
+   <h2>Create account</h2>
+<p class="subtitle">Join EngiSphere and start managing engineering projects securely.</p>
 
         <div id="registerContainer">
           <div class="field">
             <label for="fullName">Full Name</label>
             <div class="input-wrap">
               <i class="fas fa-user left-icon"></i>
-              <input class="input" type="text" id="fullName" placeholder="Your name" required>
+             <input class="input" type="text" id="fullName" placeholder="Enter your full name" required>
             </div>
           </div>
 
@@ -572,7 +569,7 @@
             <label for="email">Email Address</label>
             <div class="input-wrap">
               <i class="fas fa-envelope left-icon"></i>
-              <input class="input" type="email" id="email" placeholder="email@example.com" required>
+             <input class="input" type="email" id="email" placeholder="engineer@engisphere.com" required>
             </div>
           </div>
 
@@ -605,125 +602,173 @@
   </main>
 
   <script>
-    const API_BASE_URL = "http://127.0.0.1:8000";
+ const API_BASE_URL = "http://127.0.0.1:8000";
+const HOME_PAGE = "home.html";
 
-    function showToast(message, type = "success") {
-      const toast = document.getElementById("toast");
-      const toastMessage = document.getElementById("toastMessage");
+const existingToken = localStorage.getItem("access_token");
 
-      if (!toast || !toastMessage) {
-        alert(message);
+if (existingToken) {
+  window.location.replace(new URL("home.html", window.location.href).href);
+}
+
+  function showToast(message, type = "success") {
+    const toast = document.getElementById("toast");
+    const toastMessage = document.getElementById("toastMessage");
+
+    if (!toast || !toastMessage) {
+      alert(message);
+      return;
+    }
+
+    toast.className = `toast ${type}`;
+    toastMessage.textContent = message;
+    toast.classList.add("show");
+
+    setTimeout(() => {
+      toast.classList.remove("show");
+    }, 2600);
+  }
+
+  function togglePassword(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector("i");
+
+    if (!input || !icon) return;
+
+    if (input.type === "password") {
+      input.type = "text";
+      icon.className = "fas fa-eye-slash";
+    } else {
+      input.type = "password";
+      icon.className = "fas fa-eye";
+    }
+  }
+
+  async function safeJson(response) {
+    const text = await response.text();
+
+    try {
+      return text ? JSON.parse(text) : {};
+    } catch {
+      return { raw: text };
+    }
+  }
+
+
+
+  function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  }
+
+  async function autoLogin(email, password) {
+  const formData = new URLSearchParams();
+
+  formData.append("username", email);
+  formData.append("password", password);
+
+  const response = await fetch(`${API_BASE_URL}/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: formData
+  });
+
+  const data = await safeJson(response);
+
+  if (!response.ok || !data.access_token) {
+    throw new Error(data.detail || "Auto login failed.");
+  }
+
+  localStorage.setItem("access_token", data.access_token);
+  localStorage.setItem("token_type", data.token_type || "bearer");
+  localStorage.setItem("user_email", email);
+
+  return data;
+}
+
+  async function executeRegistration() {
+    const btn = document.getElementById("registerBtn");
+    const overlay = document.getElementById("successOverlay");
+
+    const fullName = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+
+    const payload = {
+      full_name: fullName,
+      email: email,
+      password: password
+    };
+
+    if (!payload.full_name || !payload.email || !payload.password) {
+      showToast("Please fill all fields.", "error");
+      return;
+    }
+
+    if (!isValidEmail(payload.email)) {
+      showToast("Please enter a valid email address.", "error");
+      return;
+    }
+
+    if (payload.password.length < 8) {
+      showToast("Password must be at least 8 characters.", "error");
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Creating account...";
+
+    try {
+     const response = await fetch(`${API_BASE_URL}/register/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await safeJson(response);
+
+      console.log("REGISTER RESPONSE:", response.status, data);
+
+      if (!response.ok) {
+        showToast(data.detail || "Registration failed.", "error");
         return;
       }
 
-      toast.className = `toast ${type}`;
-      toastMessage.textContent = message;
-      toast.classList.add("show");
+     await autoLogin(payload.email, payload.password);
 
-      setTimeout(() => {
-        toast.classList.remove("show");
-      }, 2600);
+if (overlay) {
+  overlay.classList.add("show");
+} else {
+  showToast("Account created successfully. Redirecting to home...", "success");
+}
+
+setTimeout(() => {
+  window.location.assign(new URL("home.html", window.location.href).href);
+}, 900);
+return;
+
+    } catch (error) {
+      console.error("Registration error:", error);
+      showToast("SERVER OFFLINE: Make sure the Python server is running.", "error");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Create Account";
     }
+  }
 
-    function togglePassword(inputId, btn) {
-      const input = document.getElementById(inputId);
-      const icon = btn.querySelector("i");
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Enter") {
+      const active = document.activeElement;
+      const ids = ["fullName", "email", "password"];
 
-      if (input.type === "password") {
-        input.type = "text";
-        icon.className = "fas fa-eye-slash";
-      } else {
-        input.type = "password";
-        icon.className = "fas fa-eye";
-      }
-    }
-
-    async function safeJson(response) {
-      const text = await response.text();
-
-      try {
-        return text ? JSON.parse(text) : {};
-      } catch {
-        return { raw: text };
-      }
-    }
-
-    function goHome() {
-      window.location.href = new URL("home.html", window.location.href).href;
-    }
-
-    async function executeRegistration() {
-      const btn = document.getElementById("registerBtn");
-      const overlay = document.getElementById("successOverlay");
-
-      const payload = {
-        full_name: document.getElementById("fullName").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        password: document.getElementById("password").value.trim()
-      };
-
-      if (!payload.full_name || !payload.email || !payload.password) {
-        showToast("Please fill all fields.", "error");
-        return;
-      }
-
-      if (payload.password.length < 8) {
-        showToast("Password must be at least 8 characters.", "error");
-        return;
-      }
-
-      btn.disabled = true;
-      btn.textContent = "Creating account...";
-
-      try {
-        const response = await fetch(`${API_BASE_URL}/register/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await safeJson(response);
-        console.log("REGISTER RESPONSE:", response.status, data);
-
-        if (!response.ok) {
-          showToast(data.detail || "Registration failed.", "error");
-          return;
-        }
-
-        if (!data.access_token) {
-          showToast("Account created, but no access token was returned.", "error");
-          return;
-        }
-
-        localStorage.setItem("access_token", data.access_token);
-        localStorage.setItem("token", data.access_token);
-        localStorage.setItem("user_email", payload.email);
-
-        overlay.classList.add("show");
-
-        setTimeout(goHome, 450);
-
-      } catch (error) {
-        console.error("Registration error:", error);
-        showToast("SERVER OFFLINE: Make sure the Python server is running.", "error");
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Create Account";
+      if (active && ids.includes(active.id)) {
+        executeRegistration();
       }
     }
-
-    document.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        const active = document.activeElement;
-        const ids = ["fullName", "email", "password"];
-
-        if (ids.includes(active.id)) {
-          executeRegistration();
-        }
-      }
-    });
-  </script>
+  });
+</script>
 </body>
 </html>

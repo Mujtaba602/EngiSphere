@@ -1,186 +1,1498 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Commander Profile | EngiSphere</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #3b82f6; --bg: #020617; --sidebar: #0f172a; 
-            --card: rgba(30, 41, 59, 0.6); --border: rgba(255, 255, 255, 0.08); 
-            --text: #f8fafc; --muted: #94a3b8; --success: #10b981; --danger: #ef4444;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
+  <title>Profile | EngiSphere</title>
 
-        /* --- 🛰️ Sidebar --- */
-        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); padding: 30px 20px; display: flex; flex-direction: column; height: 100vh; position: fixed; }
-        .logo { font-size: 24px; font-weight: 800; color: var(--primary); display: flex; align-items: center; gap: 12px; margin-bottom: 50px; letter-spacing: -1.5px; }
-        .nav-link { display: flex; align-items: center; gap: 14px; padding: 14px 18px; text-decoration: none; color: var(--muted); border-radius: 14px; font-weight: 600; transition: 0.3s; }
-        .nav-link:hover { color: var(--primary); background: rgba(59, 130, 246, 0.1); }
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-        /* --- 🖥️ Main Profile Area --- */
-        .main-profile { flex: 1; margin-left: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(circle at center, #0f172a, #020617); }
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --soft: #f8fafc;
+      --panel: #ffffff;
+      --line: #e2e8f0;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 16px 42px rgba(15, 23, 42, 0.06);
+    }
 
-        .profile-card { background: var(--card); backdrop-filter: blur(20px); width: 500px; padding: 40px; border-radius: 35px; border: 1px solid var(--border); text-align: center; box-shadow: 0 25px 50px rgba(0,0,0,0.4); }
+    body.dark-theme {
+      --ink: #ffffff;
+      --muted: #cbd5e1;
+      --soft: #020617;
+      --panel: #0f172a;
+      --line: rgba(255, 255, 255, 0.10);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
+    }
 
-        .avatar-circle { width: 100px; height: 100px; background: linear-gradient(135deg, var(--primary), #8b5cf6); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 800; color: white; border: 5px solid rgba(59, 130, 246, 0.1); }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        .info-field { background: rgba(0,0,0,0.2); padding: 15px 25px; border-radius: 18px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .field-label { font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
-        .field-value { font-size: 14px; font-weight: 700; color: white; }
+    html {
+      scroll-behavior: smooth;
+    }
 
-        /* --- 🔒 Password Modal --- */
-        #passwordModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
-        .modal-body { background: #0f172a; width: 400px; padding: 35px; border-radius: 30px; border: 1px solid var(--primary); box-shadow: 0 0 40px rgba(59, 130, 246, 0.2); }
-        input { width: 100%; padding: 14px; background: #1e293b; border: 1px solid var(--border); border-radius: 12px; color: white; margin-bottom: 15px; outline: none; }
-        input:focus { border-color: var(--primary); }
+    body {
+      min-height: 100vh;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.12), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.08), transparent 28%),
+        var(--soft);
+      color: var(--ink);
+      overflow-x: hidden;
+      transition: background 0.25s ease, color 0.25s ease;
+    }
 
-        /* --- 🚀 Buttons --- */
-        .btn { width: 100%; padding: 15px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: 0.3s; border: none; font-size: 13px; }
-        .btn-primary { background: var(--primary); color: white; margin-top: 10px; }
-        .btn-outline { background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); margin-top: 25px; }
-        .btn-outline:hover { background: white; color: var(--bg); }
-        .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); margin-top: 10px; border: 1px solid rgba(239, 68, 68, 0.2); }
-        .btn-danger:hover { background: var(--danger); color: white; }
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
 
-        /* --- 🔔 Toasts (الإشعارات الفخمة) --- */
-        .toast-container { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; padding: 16px 30px; border-radius: 16px; font-weight: 800; font-size: 13px; color: white; z-index: 5000; transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); backdrop-filter: blur(10px); }
-        .toast-success { background: rgba(16, 185, 129, 0.9); border: 1px solid #10b981; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3); }
-        .toast-error { background: rgba(239, 68, 68, 0.9); border: 1px solid #ef4444; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.3); }
-        .toast-container.show { top: 30px; }
-    </style>
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    /* ===== UNIFIED NAVBAR ===== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      min-height: 78px;
+      padding: 0 7%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      background: rgba(255, 255, 255, 0.88);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+    }
+
+    body.dark-theme .nav {
+      background: rgba(2, 6, 23, 0.86);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: -0.8px;
+      white-space: nowrap;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
+      flex: 0 0 auto;
+    }
+
+    .brand-text {
+      font-size: 22px;
+      color: var(--ink);
+      line-height: 1;
+    }
+
+    .brand-text span {
+      color: var(--primary);
+    }
+
+    .nav-center,
+    .nav-right,
+    .auth-actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .nav-link {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+      transition: 0.2s ease;
+      white-space: nowrap;
+      text-transform: none;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: var(--primary);
+    }
+
+    .theme-toggle {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--ink);
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: var(--shadow-soft);
+      transition: 0.2s ease;
+      font-family: inherit;
+      flex: 0 0 auto;
+    }
+
+    .theme-toggle:hover {
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      min-height: 42px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+      white-space: nowrap;
+      font-family: inherit;
+      text-transform: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.18);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: var(--panel);
+      border-color: rgba(37, 99, 235, 0.35);
+      color: var(--primary);
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: rgba(37, 99, 235, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border-color: rgba(239, 68, 68, 0.35);
+      color: var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .nav a,
+    .nav button,
+    .nav .btn,
+    .nav-link {
+      text-transform: none !important;
+    }
+
+    /* ===== PROFILE PAGE ===== */
+    .profile-page {
+      min-height: 100vh;
+      padding: 132px 7% 70px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 34px;
+    }
+
+    .page-title h1 {
+      font-size: clamp(40px, 5vw, 62px);
+      line-height: 1.04;
+      letter-spacing: -2.4px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .page-title h1 span {
+      color: var(--primary);
+    }
+
+    .page-title p {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.85;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 30px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      position: relative;
+      overflow: hidden;
+      min-height: 360px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at top right, rgba(37, 99, 235, 0.18), transparent 35%),
+        radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 32%);
+      pointer-events: none;
+    }
+
+    .profile-main {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .avatar {
+      width: 112px;
+      height: 112px;
+      border-radius: 30px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: #ffffff;
+      font-size: 44px;
+      font-weight: 800;
+      box-shadow: 0 22px 42px rgba(37, 99, 235, 0.25);
+      flex: 0 0 auto;
+    }
+
+    .profile-meta .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.10);
+      color: var(--success);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .profile-meta h2 {
+      font-size: clamp(28px, 3vw, 38px);
+      letter-spacing: -1.4px;
+      margin-bottom: 10px;
+      word-break: break-word;
+    }
+
+    .profile-meta p {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+      word-break: break-word;
+    }
+
+    .status-grid {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 34px;
+    }
+
+    .mini-stat {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.58);
+    }
+
+    body.dark-theme .mini-stat {
+      background: rgba(2, 6, 23, 0.42);
+    }
+
+    .mini-stat i {
+      color: var(--primary);
+      margin-bottom: 12px;
+    }
+
+    .mini-stat strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .mini-stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: rgba(37, 99, 235, 0.10);
+      color: var(--primary);
+      font-size: 18px;
+      flex: 0 0 auto;
+    }
+
+    .card-header h2 {
+      font-size: 22px;
+      letter-spacing: -0.8px;
+      margin-bottom: 6px;
+    }
+
+    .card-header p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .info-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .info-row {
+      padding: 16px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 18px;
+    }
+
+    .info-row span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 7px;
+    }
+
+    .info-row strong {
+      display: block;
+      color: var(--ink);
+      font-size: 15px;
+      word-break: break-word;
+    }
+
+    .quick-actions {
+      display: grid;
+      gap: 12px;
+    }
+
+    .action-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      border-radius: 20px;
+    }
+
+    .action-card h3 {
+      font-size: 15px;
+      margin-bottom: 5px;
+    }
+
+    .action-card p {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .action-card .btn {
+      flex: 0 0 auto;
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 4000;
+      background: rgba(15, 23, 42, 0.62);
+      backdrop-filter: blur(12px);
+      padding: 22px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    body.dark-theme .modal {
+      background: rgba(0, 0, 0, 0.72);
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-body {
+      width: 100%;
+      max-width: 460px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .modal-top h3 {
+      font-size: 22px;
+      letter-spacing: -0.8px;
+      margin-bottom: 8px;
+    }
+
+    .modal-top p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .close-btn {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--muted);
+      cursor: pointer;
+      transition: 0.2s ease;
+      flex: 0 0 auto;
+    }
+
+    .close-btn:hover {
+      color: var(--danger);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      min-height: 50px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: var(--soft);
+      color: var(--ink);
+      padding: 0 16px;
+      outline: none;
+      font-size: 14px;
+      transition: 0.2s ease;
+    }
+
+    .form-group input:focus {
+      border-color: rgba(37, 99, 235, 0.55);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    .modal-actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .modal-actions .btn {
+      width: 100%;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      top: -120px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6000;
+      min-width: min(420px, calc(100% - 32px));
+      padding: 15px 18px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      transition: 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .toast.show {
+      top: 26px;
+    }
+
+    .toast-success {
+      background: rgba(16, 185, 129, 0.95);
+    }
+
+    .toast-error {
+      background: rgba(239, 68, 68, 0.95);
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1080px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .nav {
+        position: relative;
+        min-height: auto;
+        padding: 16px 22px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+
+      .nav-center,
+      .nav-right,
+      .auth-actions {
+        width: 100%;
+        gap: 12px;
+      }
+
+      .nav-link {
+        font-size: 13px;
+      }
+
+      .auth-actions .btn {
+        flex: 1;
+      }
+
+      .profile-page {
+        padding: 46px 22px 60px;
+      }
+
+      .page-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .profile-main {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .action-card .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .brand-text {
+        font-size: 18px;
+      }
+
+      .brand-icon {
+        width: 36px;
+        height: 36px;
+      }
+
+      .card {
+        padding: 24px;
+        border-radius: 24px;
+      }
+
+      .avatar {
+        width: 92px;
+        height: 92px;
+        border-radius: 24px;
+        font-size: 36px;
+      }
+
+      .auth-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .auth-actions .btn,
+      .header-actions .btn {
+        width: 100%;
+      }
+    }
+    /* ===== PROFILE REFINED LAYOUT OVERRIDE ===== */
+.profile-page {
+  min-height: 100vh;
+  padding: 124px 7% 64px;
+}
+
+.profile-container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+
+.page-title h1 {
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1.03;
+  letter-spacing: -2.2px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.page-title h1 span {
+  color: var(--primary);
+}
+
+.page-title p {
+  max-width: 680px;
+  color: var(--muted);
+  font-size: 15.5px;
+  line-height: 1.75;
+}
+
+.profile-board {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) 380px;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.profile-primary,
+.profile-side {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: 32px;
+  box-shadow: var(--shadow);
+}
+
+.profile-primary {
+  position: relative;
+  overflow: hidden;
+  padding: 34px;
+}
+
+.profile-primary::before {
+  content: "";
+  position: absolute;
+  width: 360px;
+  height: 360px;
+  right: -140px;
+  top: -160px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.11);
+  pointer-events: none;
+}
+
+.profile-primary::after {
+  content: "";
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  left: -120px;
+  bottom: -140px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.09);
+  pointer-events: none;
+}
+
+.identity-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.avatar {
+  width: 106px;
+  height: 106px;
+  border-radius: 30px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--primary), #7c3aed);
+  color: #ffffff;
+  font-size: 42px;
+  font-weight: 800;
+  box-shadow: 0 22px 42px rgba(37, 99, 235, 0.25);
+  flex: 0 0 auto;
+}
+
+.identity-meta {
+  min-width: 0;
+}
+
+.identity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.10);
+  color: var(--success);
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 12px;
+}
+
+.identity-meta h2 {
+  font-size: clamp(28px, 3vw, 40px);
+  letter-spacing: -1.4px;
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
+.identity-meta p {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.profile-details {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.detail-tile {
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  border-radius: 20px;
+}
+
+.detail-tile span {
+  display: block;
+  color: var(--muted);
+  font-size: 11.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 8px;
+}
+
+.detail-tile strong {
+  display: block;
+  color: var(--ink);
+  font-size: 14px;
+  word-break: break-word;
+}
+
+.status-strip {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.status-item {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+body.dark-theme .status-item {
+  background: rgba(2, 6, 23, 0.42);
+}
+
+.status-item i {
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.status-item strong {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 4px;
+}
+
+.status-item span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-side {
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.side-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.side-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: rgba(37, 99, 235, 0.10);
+  color: var(--primary);
+  font-size: 18px;
+  flex: 0 0 auto;
+}
+
+.side-head h2 {
+  font-size: 22px;
+  letter-spacing: -0.8px;
+  margin-bottom: 6px;
+}
+
+.side-head p {
+  color: var(--muted);
+  font-size: 13.5px;
+  line-height: 1.65;
+}
+
+.action-list {
+  display: grid;
+  gap: 12px;
+}
+
+.action-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid var(--line);
+  background: var(--soft);
+  border-radius: 20px;
+}
+
+.action-row h3 {
+  font-size: 14.5px;
+  margin-bottom: 5px;
+}
+
+.action-row p {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.session-note {
+  padding: 16px;
+  border-radius: 20px;
+  background: rgba(37, 99, 235, 0.07);
+  border: 1px solid rgba(37, 99, 235, 0.18);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.session-note i {
+  color: var(--primary);
+  margin-right: 7px;
+}
+
+/* Hide old card spacing effect if old classes remain */
+.profile-grid,
+.hero-card,
+.quick-actions,
+.action-card {
+  all: unset;
+}
+
+/* Responsive refined profile */
+@media (max-width: 1080px) {
+  .profile-board {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-side {
+    display: block;
+  }
+}
+
+@media (max-width: 900px) {
+  .profile-page {
+    padding: 48px 22px 60px;
+  }
+
+  .page-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-primary,
+  .profile-side {
+    border-radius: 26px;
+  }
+}
+
+@media (max-width: 700px) {
+  .identity-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .profile-details,
+  .status-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row {
+    grid-template-columns: 1fr;
+  }
+
+  .action-row .btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-primary,
+  .profile-side {
+    padding: 24px;
+  }
+
+  .avatar {
+    width: 92px;
+    height: 92px;
+    border-radius: 24px;
+    font-size: 36px;
+  }
+}
+/* ===== PROFILE MINIMAL COLOR OVERRIDE ===== */
+
+/* Softer page background */
+body {
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.06), transparent 28%),
+    var(--soft) !important;
+}
+
+/* Remove colorful decorative blobs */
+.profile-primary::before,
+.profile-primary::after {
+  display: none !important;
+}
+
+/* Cleaner main cards */
+.profile-primary,
+.profile-side {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--line);
+  box-shadow: 0 18px 46px rgba(15, 23, 42, 0.06);
+}
+
+body.dark-theme .profile-primary,
+body.dark-theme .profile-side {
+  background: rgba(15, 23, 42, 0.92);
+}
+
+/* Make avatar blue only instead of purple gradient */
+.avatar {
+  background: var(--primary) !important;
+  box-shadow: 0 16px 34px rgba(37, 99, 235, 0.18) !important;
+}
+
+/* Make authenticated badge neutral-blue instead of green */
+.identity-badge {
+  background: rgba(37, 99, 235, 0.08) !important;
+  color: var(--primary) !important;
+}
+
+/* Simplify info/status tiles */
+.detail-tile,
+.status-item,
+.action-row {
+  background: var(--soft) !important;
+  border-color: var(--line) !important;
+  box-shadow: none !important;
+}
+
+/* Make status icons calmer */
+.status-item i,
+.side-icon {
+  color: var(--primary) !important;
+}
+
+/* Remove strong blue note background */
+.session-note {
+  background: var(--soft) !important;
+  border-color: var(--line) !important;
+  color: var(--muted) !important;
+}
+
+.session-note i {
+  color: var(--primary) !important;
+}
+
+/* Make side icon subtle */
+.side-icon {
+  background: rgba(37, 99, 235, 0.08) !important;
+}
+
+/* Make logout less visually aggressive */
+.profile-side .btn-danger {
+  background: transparent !important;
+  border-color: rgba(239, 68, 68, 0.25) !important;
+  color: var(--danger) !important;
+  box-shadow: none !important;
+}
+
+.profile-side .btn-danger:hover {
+  background: rgba(239, 68, 68, 0.06) !important;
+}
+
+/* Reduce overall visual heaviness */
+.profile-board {
+  gap: 22px;
+}
+
+.profile-primary,
+.profile-side {
+  border-radius: 28px;
+}
+
+  </style>
 </head>
+
 <body>
+  <div id="successToast" class="toast toast-success">
+    <i class="fas fa-circle-check"></i>
+    <span>Profile action completed successfully.</span>
+  </div>
 
-    <div id="successToast" class="toast-container toast-success">
-        <i class="fas fa-shield-check" style="font-size: 16px;"></i>
-        <span>SECURITY PROTOCOL: CREDENTIALS UPDATED</span>
+  <div id="errorToast" class="toast toast-error">
+    <i class="fas fa-triangle-exclamation"></i>
+    <span>Something went wrong.</span>
+  </div>
+
+  <nav class="nav">
+    <a href="home.html" class="brand" aria-label="EngiSphere Home">
+      <span class="brand-icon">
+        <i class="fas fa-compass-drafting"></i>
+      </span>
+      <span class="brand-text">ENGI<span>SPHERE</span></span>
+    </a>
+
+    <div class="nav-center">
+      <a href="home.html" class="nav-link">Home</a>
+      <a href="#" onclick="requireAuth('index.html'); return false;" class="nav-link">Workspace</a>
+      <a href="about.html" class="nav-link">About</a>
+      <a href="contact.html" class="nav-link">Contact</a>
     </div>
-    
-    <div id="errorToast" class="toast-container toast-error">
-        <i class="fas fa-triangle-exclamation" style="font-size: 16px;"></i>
-        <span>ERROR: PASSWORDS DO NOT MATCH!</span>
+
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+        <i class="fas fa-moon"></i>
+      </button>
+
+      <div id="authActions" class="auth-actions">
+        <a href="login.html" class="btn btn-primary">
+          <i class="fas fa-right-to-bracket"></i>
+          System Access
+        </a>
+      </div>
     </div>
+  </nav>
 
-    <div class="sidebar">
-        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
-        <nav style="flex: 1;">
-            <a href="index.html" class="nav-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-        </nav>
-    </div>
+ <main class="profile-page">
+  <div class="profile-container">
+    <header class="page-header">
+      <div class="page-title">
+        <h1>Profile <span>Center.</span></h1>
+        <p>
+         View your EngiSphere identity, account details, and current secure session status.
+        </p>
+      </div>
 
-    <div class="main-profile">
-        <div class="profile-card">
-            <div class="avatar-circle" id="uInit">M</div>
-            <h2 id="uName" style="font-weight: 800; margin-bottom: 30px;">Commander</h2>
+   <div class="header-actions">
+  <a href="#" onclick="requireAuth('index.html'); return false;" class="btn btn-primary">
+    <i class="fas fa-table-columns"></i>
+    Workspace
+  </a>
+</div>
+    </header>
 
-            <div class="info-field">
-                <span class="field-label">Full Name</span>
-                <span class="field-value" id="dispName">Loading...</span>
+    <section class="profile-board">
+      <article class="profile-primary">
+        <div class="identity-row">
+          <div class="avatar" id="uInit">U</div>
+
+          <div class="identity-meta">
+            <div class="identity-badge">
+              <i class="fas fa-shield-halved"></i>
+              Authenticated User
             </div>
-            <div class="info-field">
-                <span class="field-label">Email Access</span>
-                <span class="field-value" id="dispEmail">Loading...</span>
-            </div>
 
-            <button class="btn btn-outline" onclick="openPasswordModal()">
-                <i class="fas fa-key"></i> Update Access Credentials
-            </button>
-            <button class="btn btn-danger" onclick="logout()">
-                <i class="fas fa-power-off"></i> Terminate Session
-            </button>
+            <h2 id="uName">Loading profile...</h2>
+            <p id="uEmail">
+              Please wait while EngiSphere retrieves your account information.
+            </p>
+          </div>
         </div>
+
+        <div class="profile-details">
+          <div class="detail-tile">
+            <span>Full Name</span>
+            <strong id="dispName">Loading...</strong>
+          </div>
+
+          <div class="detail-tile">
+            <span>Email Address</span>
+            <strong id="dispEmail">Loading...</strong>
+          </div>
+
+          <div class="detail-tile">
+            <span>Account Role</span>
+            <strong id="dispRole">Standard User</strong>
+          </div>
+        </div>
+
+        <div class="status-strip">
+          <div class="status-item">
+            <i class="fas fa-lock"></i>
+            <strong>Secure</strong>
+            <span>Bearer Token</span>
+          </div>
+
+          <div class="status-item">
+            <i class="fas fa-database"></i>
+            <strong>Live</strong>
+            <span>Backend Data</span>
+          </div>
+
+          <div class="status-item">
+            <i class="fas fa-user-check"></i>
+            <strong>Active</strong>
+            <span>Session Status</span>
+          </div>
+        </div>
+      </article>
+
+<aside class="profile-side">
+  <div>
+    <div class="side-head">
+      <div class="side-icon">
+        <i class="fas fa-user-shield"></i>
+      </div>
+
+      <div>
+        <h2>Session Status</h2>
+        <p>
+          Your profile is active and protected with a secure access token.
+        </p>
+      </div>
     </div>
 
-    <div id="passwordModal">
-        <div class="modal-body">
-            <h3 style="margin-bottom: 20px; font-weight: 800;"><i class="fas fa-lock" style="color: var(--primary);"></i> SECURE VAULT</h3>
-            <p style="font-size: 12px; color: var(--muted); margin-bottom: 25px;">Update your system access password.</p>
-            
-            <input type="password" id="oldPass" placeholder="Current Password">
-            <input type="password" id="newPass" placeholder="New Password">
-            <input type="password" id="confirmPass" placeholder="Confirm New Password">
-            
-            <button class="btn btn-primary" onclick="updatePassword()">AUTHORIZE CHANGE</button>
-            <p onclick="closePasswordModal()" style="text-align: center; margin-top: 15px; font-size: 11px; cursor: pointer; color: var(--muted); font-weight: 600;">[ CANCEL ACCESS ]</p>
-        </div>
-    </div>
 
-    <script>
-        const token = localStorage.getItem("access_token");
-        if (!token) window.location.href = "login.html";
+  </div>
 
-        function openPasswordModal() { document.getElementById('passwordModal').style.display = 'flex'; }
-        
-        function closePasswordModal() { 
-            document.getElementById('passwordModal').style.display = 'none'; 
-            document.getElementById('oldPass').value = '';
-            document.getElementById('newPass').value = '';
-            document.getElementById('confirmPass').value = '';
+  <div class="session-note">
+    <i class="fas fa-circle-info"></i>
+    Password and appearance preferences are managed from the Settings page.
+  </div>
+</aside>
+    </section>
+  </div>
+</main>
+
+
+
+  <script>
+    const API_BASE_URL = "http://127.0.0.1:8000";
+    let token = localStorage.getItem("access_token");
+
+    function clearAuthData() {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("token");
+      localStorage.removeItem("token_type");
+      localStorage.removeItem("user_email");
+    }
+
+    function handleUnauthorized() {
+      clearAuthData();
+      window.location.href = "login.html";
+    }
+
+    window.logout = function () {
+      clearAuthData();
+      window.location.href = "login.html";
+    };
+
+    window.requireAuth = function (page) {
+      const currentToken = localStorage.getItem("access_token");
+
+      if (!currentToken) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      window.location.href = page;
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
+      if (!token) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const themeBtn = document.getElementById("themeToggle");
+
+      applySavedTheme();
+      renderAuthActions();
+      loadProfile();
+
+      if (themeBtn) {
+        themeBtn.addEventListener("click", toggleTheme);
+      }
+    });
+
+    function renderAuthActions() {
+      const authActions = document.getElementById("authActions");
+
+      if (!authActions) return;
+
+      authActions.innerHTML = `
+        <a href="profile.html" class="btn btn-outline">
+          <i class="fas fa-user"></i>
+          Profile
+        </a>
+
+        <a href="settings.html" class="btn btn-outline">
+          <i class="fas fa-gear"></i>
+          Settings
+        </a>
+
+        <button type="button" class="btn btn-danger" onclick="logout()">
+          <i class="fas fa-power-off"></i>
+          Logout
+        </button>
+      `;
+    }
+
+    function applySavedTheme() {
+      const savedTheme = localStorage.getItem("theme") || "light";
+      const isDark = savedTheme === "dark";
+
+      document.body.classList.toggle("dark-theme", isDark);
+      updateThemeButton(isDark);
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark-theme");
+
+      const isDark = document.body.classList.contains("dark-theme");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+
+      updateThemeButton(isDark);
+    }
+
+    function updateThemeButton(isDark) {
+      const themeBtn = document.getElementById("themeToggle");
+
+      if (!themeBtn) return;
+
+      themeBtn.innerHTML = isDark
+        ? '<i class="fas fa-sun"></i>'
+        : '<i class="fas fa-moon"></i>';
+    }
+
+    function showToast(id, message = null) {
+      const toast = document.getElementById(id);
+
+      if (!toast) return;
+
+      if (message) {
+        const span = toast.querySelector("span");
+        if (span) span.innerText = message;
+      }
+
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
+
+    function getReadableError(data, fallback = "Operation failed.") {
+      if (!data) return fallback;
+
+      if (typeof data.detail === "string") {
+        return data.detail;
+      }
+
+      if (Array.isArray(data.detail)) {
+        return data.detail.map((err) => err.msg || JSON.stringify(err)).join(" | ");
+      }
+
+      if (data.detail && typeof data.detail === "object") {
+        return JSON.stringify(data.detail);
+      }
+
+      if (typeof data.message === "string") {
+        return data.message;
+      }
+
+      return fallback;
+    }
+
+    async function loadProfile() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        });
+
+        if (res.status === 401 || res.status === 403) {
+          handleUnauthorized();
+          return;
         }
 
-        function showToast(id) {
-            const toast = document.getElementById(id);
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        if (!res.ok) {
+          showToast("errorToast", "ERROR: Failed to load profile data.");
+          return;
         }
 
-     async function updatePassword() {
-            const oldP = document.getElementById('oldPass').value;
-            const newP = document.getElementById('newPass').value;
-            const confP = document.getElementById('confirmPass').value;
+        const user = await res.json();
 
-            if(!oldP || !newP || !confP) return;
+        const fullName = user.full_name || user.name || "EngiSphere User";
+        const email = user.email || localStorage.getItem("user_email") || "No email available";
+        const role = user.role || "Standard User";
 
-            if(newP !== confP) {
-                document.querySelector('#errorToast span').innerText = "ERROR: PASSWORDS DO NOT MATCH!";
-                showToast('errorToast');
-                return;
-            }
+        localStorage.setItem("user_email", email);
 
-            try {
-                const res = await fetch("http://127.0.0.1:8000/users/update-password", {
-                    method: "PUT",
-                    headers: { 
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json" 
-                    },
-                    body: JSON.stringify({ old_password: oldP, new_password: newP })
-                });
+        document.getElementById("uName").innerText = fullName;
+        document.getElementById("uEmail").innerText = email;
+        document.getElementById("dispName").innerText = fullName;
+        document.getElementById("dispEmail").innerText = email;
+        document.getElementById("dispRole").innerText = role;
+        document.getElementById("uInit").innerText = fullName.charAt(0).toUpperCase();
 
-                if(res.ok) {
-                    showToast('successToast'); // الإشعار الأخضر
-                    closePasswordModal();
-                } else {
-                    const data = await res.json();
-                    // استخدام الإشعار الأحمر بدلاً من الـ alert
-                    document.querySelector('#errorToast span').innerText = "SERVER ERROR: " + (data.detail || "Not Found");
-                    showToast('errorToast');
-                }
-            } catch (e) {
-                document.querySelector('#errorToast span').innerText = "SYSTEM ERROR: Backend is offline!";
-                showToast('errorToast');
-            }
-        }
+      } catch (error) {
+        console.error("Profile loading error:", error);
+        showToast("errorToast", "SYSTEM ERROR: Backend is offline!");
+      }
+    }
 
-        async function loadProfile() {
-            try {
-                const res = await fetch("http://127.0.0.1:8000/users/me", { headers: { "Authorization": `Bearer ${token}` } });
-                const user = await res.json();
-                document.getElementById('uName').innerText = user.full_name;
-                document.getElementById('dispName').innerText = user.full_name;
-                document.getElementById('dispEmail').innerText = user.email;
-                document.getElementById('uInit').innerText = user.full_name.charAt(0).toUpperCase();
-            } catch (e) { console.error(e); }
-        }
 
-        function logout() { localStorage.removeItem("access_token"); window.location.href = "login.html"; }
-        
-        loadProfile();
-    </script>
+  </script>
 </body>
 </html>
