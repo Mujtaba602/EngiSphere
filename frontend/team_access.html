@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Access | EngiSphere</title>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --bg: #020617;
+            --sidebar: #0f172a;
+            --card: rgba(15, 23, 42, 0.72);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 20px 40px rgba(0,0,0,0.28);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+        .sidebar {
+            width: 260px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 30px 20px;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 40px;
+            letter-spacing: -1.5px;
+            text-shadow: 0 0 15px rgba(59, 130, 246, 0.35);
+        }
+
+        .nav-section {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin: 15px 0 5px 15px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 18px;
+            text-decoration: none;
+            color: var(--muted);
+            border-radius: 14px;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.3s;
+            margin-bottom: 4px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            box-shadow: inset 4px 0 0 var(--primary);
+        }
+
+        .exit-link {
+            color: var(--danger) !important;
+            margin-top: auto;
+        }
+
+        .exit-link:hover {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--danger) !important;
+            box-shadow: inset 4px 0 0 var(--danger);
+        }
+
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 30px 42px 42px;
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.10), transparent 30%),
+                linear-gradient(180deg, #071225 0%, #020617 100%);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 26px;
+        }
+
+        .title-wrap h1 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 6px;
+        }
+
+        .title-wrap p {
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .theme-toggle,
+        .btn {
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+            font-weight: 700;
+        }
+
+        .theme-toggle {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+        }
+
+        .btn {
+            height: 42px;
+            padding: 0 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 12px;
+            text-decoration: none;
+        }
+
+        .btn:hover,
+        .theme-toggle:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+            box-shadow: 0 12px 24px rgba(59,130,246,0.20);
+        }
+
+        .btn-primary:hover {
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-muted {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--border);
+            color: var(--text);
+            justify-content: center;
+        }
+
+        .btn-muted:hover {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            backdrop-filter: blur(16px);
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .card-title i {
+            color: var(--primary);
+        }
+
+        .owner-panel {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+        }
+
+        .avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            display: grid;
+            place-items: center;
+            font-size: 25px;
+            font-weight: 800;
+            color: white;
+            box-shadow: 0 14px 28px rgba(59,130,246,0.22);
+        }
+
+        .owner-info h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .owner-info p {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(16,185,129,0.12);
+            color: var(--success);
+            font-size: 11px;
+            font-weight: 800;
+            margin-top: 10px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-top: 16px;
+        }
+
+        .mini-stat {
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.035);
+        }
+
+        .mini-stat span {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .mini-stat strong {
+            font-size: 25px;
+            font-weight: 800;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 14px;
+        }
+
+        .field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .field label {
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 46px;
+            border-radius: 13px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            padding: 0 14px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.09);
+        }
+
+        select option {
+            background: #0f172a;
+            color: white;
+        }
+
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .member-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: 0.25s;
+        }
+
+        .member-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(59,130,246,0.35);
+        }
+
+        .member-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 14px;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .member-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            color: white;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        }
+
+        .member-name {
+            font-size: 16px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .member-email {
+            color: var(--muted);
+            font-size: 12px;
+            word-break: break-word;
+        }
+
+        .member-role {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(59,130,246,0.10);
+            color: #93c5fd;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .perm-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .perm {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .perm i {
+            color: var(--success);
+        }
+
+        .member-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .edit-btn {
+            width: 100%;
+            height: 38px;
+            border-radius: 11px;
+            border: 1px solid rgba(59,130,246,0.35);
+            background: rgba(59,130,246,0.10);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+        }
+
+        .edit-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .remove-btn {
+            margin-top: 16px;
+            width: 100%;
+            height: 38px;
+            border-radius: 11px;
+            border: 1px solid rgba(239,68,68,0.25);
+            background: rgba(239,68,68,0.08);
+            color: var(--danger);
+            font-weight: 800;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+        }
+
+        .member-actions .remove-btn {
+            margin-top: 0;
+        }
+
+        .remove-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.78);
+            backdrop-filter: blur(10px);
+            z-index: 3000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 22px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-card {
+            width: 100%;
+            max-width: 520px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            box-shadow: var(--shadow);
+            padding: 24px;
+            animation: modalIn 0.25s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.4px;
+        }
+
+        .modal-close {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .modal-close:hover {
+            color: var(--danger);
+            border-color: rgba(239,68,68,0.35);
+        }
+
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            color: var(--muted);
+            padding: 42px;
+            border: 1px dashed var(--border);
+            border-radius: 22px;
+            background: rgba(255,255,255,0.03);
+        }
+
+        .empty-state i {
+            color: var(--primary);
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            z-index: 4000;
+            transition: 0.35s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show { top: 24px; }
+        .toast.success { background: rgba(16,185,129,0.96); border: 1px solid #10b981; }
+        .toast.error { background: rgba(239,68,68,0.96); border: 1px solid #ef4444; }
+
+        .assign-project-box {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.025);
+        }
+
+        .assign-project-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 10px;
+        }
+
+        .assign-project-title i {
+            color: var(--primary);
+        }
+
+        .assign-project-controls {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+        }
+
+        .assign-project-select {
+            width: 100%;
+            height: 38px;
+            border-radius: 11px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            padding: 0 10px;
+            outline: none;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .assign-project-select option {
+            background: #0f172a;
+            color: white;
+        }
+
+        .assign-project-btn {
+            height: 38px;
+            border-radius: 11px;
+            border: 1px solid rgba(59,130,246,0.35);
+            background: rgba(59,130,246,0.12);
+            color: var(--primary);
+            font-weight: 800;
+            font-size: 11px;
+            cursor: pointer;
+            transition: 0.25s;
+            font-family: inherit;
+            padding: 0 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .assign-project-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .assign-project-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            background: rgba(148,163,184,0.08);
+            color: var(--muted);
+            border-color: var(--border);
+        }
+
+        body.light-mode .assign-project-box {
+            background: rgba(15,23,42,0.025);
+        }
+
+        body.light-mode .assign-project-select {
+            background: rgba(15,23,42,0.03);
+            color: #0f172a;
+        }
+
+        @media (max-width: 640px) {
+            .assign-project-controls {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        body.light-mode {
+            --bg: #f3f7fc;
+            --sidebar: #ffffff;
+            --card: rgba(255,255,255,0.94);
+            --border: rgba(15,23,42,0.08);
+            --text: #0f172a;
+            --muted: #64748b;
+            --shadow: 0 10px 30px rgba(15,23,42,0.07);
+        }
+
+        body.light-mode .main {
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.07), transparent 26%),
+                linear-gradient(180deg, #ffffff 0%, #eef4fb 100%);
+        }
+
+        body.light-mode input,
+        body.light-mode select {
+            background: rgba(15,23,42,0.03);
+            color: #0f172a;
+        }
+
+        body.light-mode .owner-panel,
+        body.light-mode .mini-stat {
+            background: rgba(15,23,42,0.03);
+        }
+
+        @media (max-width: 1180px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .members-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main {
+                padding: 22px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .members-grid,
+            .stats-row,
+            .modal-actions,
+            .member-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .title-wrap h1 {
+                font-size: 24px;
+            }
+        }
+                .assigned-projects-box {
+            margin-top: 14px;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.035);
+        }
+
+        .assigned-projects-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            margin-bottom: 10px;
+        }
+
+        .assigned-projects-title i {
+            color: var(--primary);
+        }
+
+        .project-chip-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .project-chip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 9px 10px;
+            border-radius: 12px;
+            background: rgba(59,130,246,0.08);
+            border: 1px solid rgba(59,130,246,0.16);
+            color: var(--text);
+            text-decoration: none;
+            transition: 0.25s;
+        }
+
+        .project-chip:hover {
+            border-color: rgba(59,130,246,0.45);
+            transform: translateY(-1px);
+        }
+
+        .project-chip-main {
+            min-width: 0;
+        }
+
+        .project-chip-title {
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .project-chip-meta {
+            margin-top: 3px;
+            font-size: 10px;
+            color: var(--muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .project-chip i {
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .no-projects-text {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        body.light-mode .assigned-projects-box {
+            background: rgba(15,23,42,0.03);
+        }
+
+        body.light-mode .project-chip {
+            background: rgba(59,130,246,0.07);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast" class="toast success">
+        <i class="fas fa-circle-check"></i>
+        <span id="toastMsg">Done.</span>
+    </div>
+
+    <aside class="sidebar">
+        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
+
+        <nav style="flex:1;">
+            <div class="nav-section">Core Systems</div>
+            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i> Geospatial Radar</a>
+            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i> AI EngiBot</a>
+
+            <div class="nav-section">Management</div>
+            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-astronaut"></i> My Profile</a>
+            <a href="team_access.html" class="nav-link active"><i class="fas fa-users-gear"></i> Team Access</a>
+            <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+        </nav>
+
+        <a href="#" onclick="logout()" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i> Exit System
+        </a>
+    </aside>
+
+    <main class="main">
+        <div class="topbar">
+            <div class="title-wrap">
+                <h1>Team Access Control</h1>
+                <p>Manage project collaborators, roles, and access permissions for your EngiSphere workspace.</p>
+            </div>
+
+            <div class="top-actions">
+                <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
+                    <i class="fas fa-moon"></i>
+                </button>
+
+                <a href="index.html" class="btn">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+
+                <button class="btn btn-primary" onclick="focusInviteForm()">
+                    <i class="fas fa-user-plus"></i>
+                    Invite Member
+                </button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <section class="card">
+                <div class="card-title">
+                    <i class="fas fa-user-shield"></i>
+                    Workspace Owner
+                </div>
+
+                <div class="owner-panel">
+                    <div class="avatar" id="ownerInitial">E</div>
+
+                    <div class="owner-info">
+                        <h2 id="ownerName">Loading...</h2>
+                        <p id="ownerEmail">Loading account...</p>
+
+                        <div class="role-badge">
+                            <i class="fas fa-crown"></i>
+                            System Administrator
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="mini-stat">
+                        <span>Projects</span>
+                        <strong id="projectCount">0</strong>
+                    </div>
+
+                    <div class="mini-stat">
+                        <span>Team Members</span>
+                        <strong id="teamCount">0</strong>
+                    </div>
+
+                    <div class="mini-stat">
+                        <span>Access Mode</span>
+                        <strong style="font-size:18px; color:var(--success);">Secure</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card" id="inviteCard">
+                <div class="card-title">
+                    <i class="fas fa-paper-plane"></i>
+                    Add Team Member
+                </div>
+
+                <div class="form-grid">
+                    <div class="field">
+                        <label>Full Name</label>
+                        <input type="text" id="memberName" placeholder="e.g., Ahmed Engineer">
+                    </div>
+
+                    <div class="field">
+                        <label>Email Address</label>
+                        <input type="email" id="memberEmail" placeholder="e.g., engineer@example.com">
+                    </div>
+
+                    <div class="field">
+                        <label>Role</label>
+                        <select id="memberRole">
+                            <option value="Project Engineer">Project Engineer</option>
+                            <option value="Site Supervisor">Site Supervisor</option>
+                            <option value="Data Analyst">Data Analyst</option>
+                            <option value="Viewer">Viewer</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="addMember()">
+                        <i class="fas fa-plus"></i>
+                        Add Member
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <section class="card">
+            <div class="card-title">
+                <i class="fas fa-users"></i>
+                Team Members
+            </div>
+
+            <div class="members-grid" id="membersGrid">
+                <div class="empty-state">
+                    <i class="fas fa-user-group"></i>
+                    <div>No team members added yet.</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal-overlay" id="editMemberModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>
+                    <i class="fas fa-user-pen" style="color:var(--primary);"></i>
+                    Edit Team Member
+                </h3>
+
+                <button class="modal-close" onclick="closeEditMemberModal()">
+                    <i class="fas fa-xmark"></i>
+                </button>
+            </div>
+
+            <input type="hidden" id="editMemberId">
+
+            <div class="form-grid">
+                <div class="field">
+                    <label>Full Name</label>
+                    <input type="text" id="editMemberName" placeholder="Full name">
+                </div>
+
+                <div class="field">
+                    <label>Email Address</label>
+                    <input type="email" id="editMemberEmail" placeholder="Email address">
+                </div>
+
+                <div class="field">
+                    <label>Role</label>
+                    <select id="editMemberRole">
+                        <option value="Project Engineer">Project Engineer</option>
+                        <option value="Site Supervisor">Site Supervisor</option>
+                        <option value="Data Analyst">Data Analyst</option>
+                        <option value="Viewer">Viewer</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Department</label>
+                    <input type="text" id="editMemberDepartment" placeholder="e.g., Engineering">
+                </div>
+
+                <div class="field">
+                    <label>Access Level</label>
+                    <select id="editMemberAccessLevel">
+                        <option value="Viewer">Viewer</option>
+                        <option value="Editor">Editor</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+
+                <div class="field">
+                    <label>Status</label>
+                    <select id="editMemberStatus">
+                        <option value="Active">Active</option>
+                        <option value="Suspended">Suspended</option>
+                        <option value="Pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-muted" onclick="closeEditMemberModal()">
+                    <i class="fas fa-ban"></i>
+                    Cancel
+                </button>
+
+                <button class="btn btn-primary" onclick="saveEditedMember()" style="justify-content:center;">
+                    <i class="fas fa-floppy-disk"></i>
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+   <script>
+    const API_BASE_URL = "http://127.0.0.1:8000";
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+       let teamMembers = [];
+    let allProjects = [];
+    let memberProjectMap = {};
+
+    function clearAuthData() {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+        localStorage.removeItem("token_type");
+        localStorage.removeItem("user_email");
+    }
+
+    function handleUnauthorized() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    function logout() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        const toastMsg = document.getElementById("toastMsg");
+
+        if (!toast || !toastMsg) return;
+
+        toastMsg.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
+    }
+
+    function applySavedTheme() {
+        const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
+        const btn = document.getElementById("themeToggleBtn");
+
+        if (savedTheme === "light") {
+            document.body.classList.add("light-mode");
+            if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            document.body.classList.remove("light-mode");
+            if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+    }
+
+    function toggleTheme() {
+        const isLight = document.body.classList.toggle("light-mode");
+        localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+
+        const btn = document.getElementById("themeToggleBtn");
+
+        if (btn) {
+            btn.innerHTML = isLight
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
+        }
+    }
+
+    function getInitials(name) {
+        const parts = String(name || "E").trim().split(" ").filter(Boolean);
+
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+
+        return String(name || "E").charAt(0).toUpperCase();
+    }
+
+    function getRoleIcon(role) {
+        if (role === "Site Supervisor") return "fa-helmet-safety";
+        if (role === "Data Analyst") return "fa-chart-simple";
+        if (role === "Viewer") return "fa-eye";
+        return "fa-user-gear";
+    }
+
+    function getMemberId(member) {
+        return member.id || member.member_id;
+    }
+    function getProjectStatusLabel(status) {
+        const value = String(status || "Pending").toLowerCase();
+
+        if (value === "active") return "Active";
+        if (value === "completed") return "Completed";
+        return "Pending";
+    }
+
+    async function loadProjectsIfNeeded() {
+        if (Array.isArray(allProjects) && allProjects.length > 0) {
+            return;
+        }
+
+        const response = await apiRequest(`${API_BASE_URL}/projects/`);
+
+        if (!response) return;
+
+        if (!response.ok) {
+            throw new Error("Failed to load projects");
+        }
+
+        const projects = await response.json();
+        allProjects = Array.isArray(projects) ? projects : [];
+
+        const projectCount = document.getElementById("projectCount");
+        if (projectCount) {
+            projectCount.innerText = allProjects.length;
+        }
+    }
+
+    async function loadProjectAssignments() {
+        memberProjectMap = {};
+
+        if (!Array.isArray(allProjects) || allProjects.length === 0) {
+            return;
+        }
+
+        const assignmentResults = await Promise.all(
+            allProjects.map(async project => {
+                try {
+                    const response = await apiRequest(`${API_BASE_URL}/projects/${project.id}/team`);
+
+                    if (!response || !response.ok) {
+                        return {
+                            project,
+                            members: []
+                        };
+                    }
+
+                    const members = await response.json();
+
+                    return {
+                        project,
+                        members: Array.isArray(members) ? members : []
+                    };
+
+                } catch (error) {
+                    console.error("Assignment load error for project:", project.id, error);
+
+                    return {
+                        project,
+                        members: []
+                    };
+                }
+            })
+        );
+
+        assignmentResults.forEach(item => {
+            item.members.forEach(member => {
+                const memberId = getMemberId(member);
+
+                if (!memberId) return;
+
+                if (!memberProjectMap[memberId]) {
+                    memberProjectMap[memberId] = [];
+                }
+
+                memberProjectMap[memberId].push(item.project);
+            });
+        });
+    }
+
+    function getAssignedProjectsForMember(memberId) {
+        return memberProjectMap[memberId] || memberProjectMap[String(memberId)] || [];
+    }
+
+    function renderAssignedProjectsForMember(memberId) {
+        const assignedProjects = getAssignedProjectsForMember(memberId);
+
+        if (!assignedProjects.length) {
+            return `
+                <div class="assigned-projects-box">
+                    <div class="assigned-projects-title">
+                        <i class="fas fa-folder-tree"></i>
+                        Assigned Projects
+                    </div>
+
+                    <div class="no-projects-text">
+                        This member is not assigned to any project yet.
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="assigned-projects-box">
+                <div class="assigned-projects-title">
+                    <i class="fas fa-folder-tree"></i>
+                    Assigned Projects (${assignedProjects.length})
+                </div>
+
+                <div class="project-chip-list">
+                    ${assignedProjects.map(project => {
+                        const safeTitle = escapeHTML(project.title || "Untitled Project");
+                        const safeLocation = escapeHTML(project.location || "Unknown location");
+                        const safeStatus = escapeHTML(getProjectStatusLabel(project.status));
+                        const safeId = encodeURIComponent(project.id);
+
+                        return `
+                            <a class="project-chip" href="project_details.html?id=${safeId}">
+                                <div class="project-chip-main">
+                                    <div class="project-chip-title">${safeTitle}</div>
+                                    <div class="project-chip-meta">${safeLocation} · ${safeStatus}</div>
+                                </div>
+
+                                <i class="fas fa-arrow-up-right-from-square"></i>
+                            </a>
+                        `;
+                    }).join("")}
+                </div>
+            </div>
+        `;
+    }
+
+        function getAvailableProjectsForMember(memberId) {
+        const assignedProjects = getAssignedProjectsForMember(memberId);
+        const assignedIds = new Set(
+            assignedProjects.map(project => String(project.id))
+        );
+
+        return allProjects.filter(project => {
+            return !assignedIds.has(String(project.id));
+        });
+    }
+
+    function renderAssignProjectControl(memberId) {
+        const availableProjects = getAvailableProjectsForMember(memberId);
+        const safeMemberId = escapeHTML(memberId);
+
+        if (!Array.isArray(allProjects) || allProjects.length === 0) {
+            return `
+                <div class="assign-project-box">
+                    <div class="assign-project-title">
+                        <i class="fas fa-link"></i>
+                        Assign to Project
+                    </div>
+
+                    <div class="no-projects-text">
+                        No projects available yet.
+                    </div>
+                </div>
+            `;
+        }
+
+        if (availableProjects.length === 0) {
+            return `
+                <div class="assign-project-box">
+                    <div class="assign-project-title">
+                        <i class="fas fa-link"></i>
+                        Assign to Project
+                    </div>
+
+                    <div class="no-projects-text">
+                        This member is already assigned to all projects.
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="assign-project-box">
+                <div class="assign-project-title">
+                    <i class="fas fa-link"></i>
+                    Assign to Project
+                </div>
+
+                <div class="assign-project-controls">
+                    <select class="assign-project-select" id="assignProjectSelect_${safeMemberId}">
+                        <option value="">Select project...</option>
+                        ${availableProjects.map(project => {
+                            const safeProjectId = escapeHTML(project.id);
+                            const safeTitle = escapeHTML(project.title || "Untitled Project");
+                            const safeLocation = escapeHTML(project.location || "Unknown location");
+
+                            return `
+                                <option value="${safeProjectId}">
+                                    ${safeTitle} · ${safeLocation}
+                                </option>
+                            `;
+                        }).join("")}
+                    </select>
+
+                    <button class="assign-project-btn" id="assignProjectBtn_${safeMemberId}" onclick="assignMemberToSelectedProject('${safeMemberId}')">
+                        <i class="fas fa-plus"></i>
+                        Assign
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    async function assignMemberToSelectedProject(memberId) {
+        if (!memberId || memberId === "undefined") {
+            showToast("Invalid member ID.", "error");
+            return;
+        }
+
+        const select = document.getElementById(`assignProjectSelect_${memberId}`);
+        const btn = document.getElementById(`assignProjectBtn_${memberId}`);
+
+        if (!select || !select.value) {
+            showToast("Please select a project first.", "error");
+            return;
+        }
+
+        const projectId = select.value;
+
+        try {
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Assigning...`;
+            }
+
+            const response = await apiRequest(`${API_BASE_URL}/projects/${projectId}/team/${memberId}`, {
+                method: "POST"
+            });
+
+            if (!response) return;
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                throw new Error(data.detail || "Failed to assign member to project");
+            }
+
+            showToast(data.message || "Member assigned to project successfully.", "success");
+
+            await refreshTeamWorkspaceData();
+
+        } catch (error) {
+            console.error("Assign member to project error:", error);
+            showToast(error.message || "Unable to assign member to project.", "error");
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = `<i class="fas fa-plus"></i> Assign`;
+            }
+        }
+    }
+
+
+    async function refreshTeamWorkspaceData() {
+        await loadProjectsIfNeeded();
+        await loadProjectAssignments();
+        renderMembers();
+    }
+
+    async function apiRequest(url, options = {}) {
+        const response = await fetch(url, {
+            ...options,
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json",
+                ...(options.headers || {})
+            }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            handleUnauthorized();
+            return null;
+        }
+
+        return response;
+    }
+
+        function renderMembers() {
+        const grid = document.getElementById("membersGrid");
+        const teamCount = document.getElementById("teamCount");
+
+        if (teamCount) {
+            teamCount.innerText = teamMembers.length;
+        }
+
+        if (!grid) return;
+
+        if (!teamMembers.length) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-user-group"></i>
+                    <div>No team members added yet.</div>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = teamMembers.map(member => {
+            const memberId = getMemberId(member);
+
+            const memberName = member.full_name || member.name || "Unnamed Member";
+            const memberEmail = member.email || "No email";
+            const memberRole = member.role || "Engineer";
+
+            const safeName = escapeHTML(memberName);
+            const safeEmail = escapeHTML(memberEmail);
+            const safeRole = escapeHTML(memberRole);
+            const safeAccessLevel = escapeHTML(member.access_level || "Viewer");
+            const safeStatus = escapeHTML(member.status || "Active");
+            const safeDepartment = escapeHTML(member.department || "Engineering");
+
+            return `
+                <div class="member-card">
+                    <div class="member-top">
+                        <div>
+                            <div class="member-avatar">${getInitials(memberName)}</div>
+                        </div>
+
+                        <div style="flex:1;">
+                            <div class="member-name">${safeName}</div>
+                            <div class="member-email">${safeEmail}</div>
+                        </div>
+                    </div>
+
+                    <div class="member-role">
+                        <i class="fas ${getRoleIcon(memberRole)}"></i>
+                        ${safeRole}
+                    </div>
+
+                    <div class="perm-list">
+                        <div class="perm">
+                            <i class="fas fa-building"></i>
+                            Department: ${safeDepartment}
+                        </div>
+
+                        <div class="perm">
+                            <i class="fas fa-check-circle"></i>
+                            Access Level: ${safeAccessLevel}
+                        </div>
+
+                        <div class="perm">
+                            <i class="fas fa-check-circle"></i>
+                            Status: ${safeStatus}
+                        </div>
+                    </div>
+
+                                      ${renderAssignedProjectsForMember(memberId)}
+
+                    ${renderAssignProjectControl(memberId)}
+
+                    <div class="member-actions">
+
+                        <button class="edit-btn" onclick="openEditMemberModal('${memberId}')">
+                            <i class="fas fa-pen"></i>
+                            Edit
+                        </button>
+
+                        <button class="remove-btn" onclick="removeMember('${memberId}')">
+                            <i class="fas fa-trash"></i>
+                            Remove
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+
+    async function loadTeamMembers() {
+        try {
+            const response = await apiRequest(`${API_BASE_URL}/team-members/`);
+
+            if (!response) return;
+
+            if (!response.ok) {
+                throw new Error("Failed to load team members");
+            }
+
+                       const data = await response.json();
+            teamMembers = Array.isArray(data) ? data : [];
+
+            await refreshTeamWorkspaceData();
+
+        } catch (error) {
+            console.error("Load team members error:", error);
+            showToast("Unable to load team members.", "error");
+        }
+    }
+
+    async function addMember() {
+        const nameInput = document.getElementById("memberName");
+        const emailInput = document.getElementById("memberEmail");
+        const roleInput = document.getElementById("memberRole");
+
+        const name = nameInput.value.trim();
+        const email = emailInput.value.trim();
+        const role = roleInput.value;
+
+        if (!name || !email || !role) {
+            showToast("Please fill all member fields.", "error");
+            return;
+        }
+
+        const exists = teamMembers.some(member => {
+            return String(member.email).toLowerCase() === email.toLowerCase();
+        });
+
+        if (exists) {
+            showToast("This email is already in the team list.", "error");
+            return;
+        }
+
+        try {
+            const payload = {
+                full_name: name,
+                email: email,
+                role: role,
+                department: "Engineering",
+                access_level: role === "Viewer" ? "Viewer" : "Editor",
+                status: "Active"
+            };
+
+            const response = await apiRequest(`${API_BASE_URL}/team-members/`, {
+                method: "POST",
+                body: JSON.stringify(payload)
+            });
+
+            if (!response) return;
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || "Failed to add team member");
+            }
+
+            nameInput.value = "";
+            emailInput.value = "";
+            roleInput.value = "Project Engineer";
+
+            await loadTeamMembers();
+
+            showToast("Team member added successfully.", "success");
+
+        } catch (error) {
+            console.error("Add member error:", error);
+            showToast(error.message || "Unable to add team member.", "error");
+        }
+    }
+
+    function openEditMemberModal(id) {
+        if (!id || id === "undefined") {
+            showToast("Invalid member ID.", "error");
+            return;
+        }
+
+        const member = teamMembers.find(item => {
+            const itemId = getMemberId(item);
+            return String(itemId) === String(id);
+        });
+
+        if (!member) {
+            showToast("Team member not found.", "error");
+            return;
+        }
+
+        const memberId = getMemberId(member);
+        const memberName = member.full_name || member.name || "";
+        const memberEmail = member.email || "";
+        const memberRole = member.role || "Project Engineer";
+        const memberDepartment = member.department || "Engineering";
+        const memberAccessLevel = member.access_level || "Viewer";
+        const memberStatus = member.status || "Active";
+
+        document.getElementById("editMemberId").value = memberId;
+        document.getElementById("editMemberName").value = memberName;
+        document.getElementById("editMemberEmail").value = memberEmail;
+        document.getElementById("editMemberRole").value = memberRole;
+        document.getElementById("editMemberDepartment").value = memberDepartment;
+        document.getElementById("editMemberAccessLevel").value = memberAccessLevel;
+        document.getElementById("editMemberStatus").value = memberStatus;
+
+        document.getElementById("editMemberModal").classList.add("show");
+    }
+
+    function closeEditMemberModal() {
+        const modal = document.getElementById("editMemberModal");
+
+        if (modal) {
+            modal.classList.remove("show");
+        }
+    }
+
+    async function saveEditedMember() {
+        const id = document.getElementById("editMemberId").value;
+        const name = document.getElementById("editMemberName").value.trim();
+        const email = document.getElementById("editMemberEmail").value.trim();
+        const role = document.getElementById("editMemberRole").value;
+        const department = document.getElementById("editMemberDepartment").value.trim();
+        const accessLevel = document.getElementById("editMemberAccessLevel").value;
+        const status = document.getElementById("editMemberStatus").value;
+
+        if (!id || id === "undefined") {
+            showToast("Invalid member ID.", "error");
+            return;
+        }
+
+        if (!name || !email || !role) {
+            showToast("Please fill name, email, and role.", "error");
+            return;
+        }
+
+        const duplicatedEmail = teamMembers.some(member => {
+            const memberId = getMemberId(member);
+
+            return String(memberId) !== String(id) &&
+                String(member.email).toLowerCase() === email.toLowerCase();
+        });
+
+        if (duplicatedEmail) {
+            showToast("Another member already uses this email.", "error");
+            return;
+        }
+
+        try {
+            const payload = {
+                full_name: name,
+                email: email,
+                role: role,
+                department: department || "Engineering",
+                access_level: accessLevel,
+                status: status
+            };
+
+            const response = await apiRequest(`${API_BASE_URL}/team-members/${id}`, {
+                method: "PUT",
+                body: JSON.stringify(payload)
+            });
+
+            if (!response) return;
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || "Failed to update team member");
+            }
+
+            // الأهم:
+            // بعد نجاح التعديل، نعيد جلب البيانات من قاعدة البيانات
+            await loadTeamMembers();
+
+            closeEditMemberModal();
+
+            showToast("Team member updated successfully.", "success");
+
+        } catch (error) {
+            console.error("Update member error:", error);
+            showToast(error.message || "Unable to update team member.", "error");
+        }
+    }
+
+    async function removeMember(id) {
+        if (!id || id === "undefined") {
+            showToast("Invalid member ID.", "error");
+            return;
+        }
+
+        const confirmed = confirm("Are you sure you want to remove this team member?");
+
+        if (!confirmed) return;
+
+        try {
+            const response = await apiRequest(`${API_BASE_URL}/team-members/${id}`, {
+                method: "DELETE"
+            });
+
+            if (!response) return;
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || "Failed to remove team member");
+            }
+
+            await loadTeamMembers();
+
+            showToast("Team member access removed.", "success");
+
+        } catch (error) {
+            console.error("Remove member error:", error);
+            showToast(error.message || "Unable to remove team member.", "error");
+        }
+    }
+
+    function focusInviteForm() {
+        const card = document.getElementById("inviteCard");
+        const input = document.getElementById("memberName");
+
+        if (card) {
+            card.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }
+
+        setTimeout(() => {
+            if (input) input.focus();
+        }, 350);
+    }
+
+    async function loadInitialData() {
+        try {
+            const [userRes, projectsRes, teamRes] = await Promise.all([
+                apiRequest(`${API_BASE_URL}/users/me`),
+                apiRequest(`${API_BASE_URL}/projects/`),
+                apiRequest(`${API_BASE_URL}/team-members/`)
+            ]);
+
+            if (!userRes || !projectsRes || !teamRes) return;
+
+            if (userRes.ok) {
+                const user = await userRes.json();
+                const fullName = user.full_name || "EngiSphere User";
+                const email = user.email || "No email";
+
+                document.getElementById("ownerName").innerText = fullName;
+                document.getElementById("ownerEmail").innerText = email;
+                document.getElementById("ownerInitial").innerText = getInitials(fullName);
+            }
+
+              if (projectsRes.ok) {
+                const projects = await projectsRes.json();
+                allProjects = Array.isArray(projects) ? projects : [];
+                document.getElementById("projectCount").innerText = allProjects.length;
+            }
+
+            if (teamRes.ok) {
+                const members = await teamRes.json();
+                teamMembers = Array.isArray(members) ? members : [];
+            }
+
+            await loadProjectAssignments();
+            renderMembers();
+
+        } catch (error) {
+            console.error("Team access loading error:", error);
+            showToast("Unable to load account data.", "error");
+        }
+    }
+
+    document.addEventListener("click", function(event) {
+        const modal = document.getElementById("editMemberModal");
+
+        if (!modal) return;
+
+        if (event.target === modal) {
+            closeEditMemberModal();
+        }
+    });
+
+    document.addEventListener("keydown", function(event) {
+        if (event.key === "Escape") {
+            closeEditMemberModal();
+        }
+    });
+
+    applySavedTheme();
+    renderMembers();
+    loadInitialData();
+</script>
+</body>
+</html>

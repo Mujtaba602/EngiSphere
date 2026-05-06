@@ -590,8 +590,9 @@
 
             <div class="nav-section">Management</div>
             <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
-            <a href="#" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
-            <a href="#" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-astronaut"></i> My Profile</a>
+            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
+           <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
         </nav>
 
         <a href="#" onclick="logout()" class="nav-link exit-link">
@@ -657,358 +658,529 @@
         </section>
     </main>
 
-    <script>
-        const API_BASE_URL = "http://127.0.0.1:8000";
-        const token = localStorage.getItem("access_token");
+  <script>
+    const API_BASE_URL = "http://127.0.0.1:8000";
+    const token = localStorage.getItem("access_token");
 
-        if (!token) {
-            window.location.href = "login.html";
+    if (!token) {
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    let map;
+    let allProjects = [];
+    let markers = [];
+    let activeProjectId = null;
+
+    function clearAuthData() {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+        localStorage.removeItem("token_type");
+        localStorage.removeItem("user_email");
+    }
+
+    function handleUnauthorized() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    function logout() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function normalizeStatus(status) {
+        const value = String(status || "Pending").toLowerCase().trim();
+
+        if (value === "active") return "Active";
+        if (value === "completed") return "Completed";
+        return "Pending";
+    }
+
+    function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        const toastMessage = document.getElementById("toastMessage");
+
+        if (!toast || !toastMessage) return;
+
+        toast.className = `toast ${type}`;
+        toastMessage.textContent = message;
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
+    }
+
+    function applySavedTheme() {
+        const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
+        const btn = document.getElementById("themeToggleBtn");
+
+        if (savedTheme === "light") {
+            document.body.classList.add("light-mode");
+            if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            document.body.classList.remove("light-mode");
+            if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+    }
+
+    function toggleTheme() {
+        const isLight = document.body.classList.toggle("light-mode");
+        localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+
+        const btn = document.getElementById("themeToggleBtn");
+
+        if (btn) {
+            btn.innerHTML = isLight
+                ? '<i class="fas fa-sun"></i>'
+                : '<i class="fas fa-moon"></i>';
         }
 
-        let map;
-        let allProjects = [];
-        let markers = [];
-        let activeProjectId = null;
+        rebuildMapTheme();
+    }
 
-        function showToast(message, type = "success") {
-            const toast = document.getElementById("toast");
-            const toastMessage = document.getElementById("toastMessage");
-            toast.className = `toast ${type}`;
-            toastMessage.textContent = message;
-            toast.classList.add("show");
+    function togglePanel() {
+        const panel = document.getElementById("leftPanel");
+        const btn = document.getElementById("collapseBtn");
 
-            setTimeout(() => {
-                toast.classList.remove("show");
-            }, 3000);
-        }
+        if (!panel || !btn) return;
 
-        function applySavedTheme() {
-            const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
-            const btn = document.getElementById("themeToggleBtn");
+        panel.classList.toggle("collapsed");
 
-            if (savedTheme === "light") {
-                document.body.classList.add("light-mode");
-                if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                document.body.classList.remove("light-mode");
-                if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
+        btn.innerHTML = panel.classList.contains("collapsed")
+            ? '<i class="fas fa-chevron-right"></i>'
+            : '<i class="fas fa-chevron-left"></i>';
+
+        setTimeout(() => {
+            if (map) map.invalidateSize();
+        }, 350);
+    }
+
+    function getStatusClass(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Active") return "status-active";
+        if (normalized === "Completed") return "status-completed";
+        return "status-pending";
+    }
+
+    function getStatusIcon(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Active") return "fa-circle";
+        if (normalized === "Completed") return "fa-check-circle";
+        return "fa-clock";
+    }
+
+    function getStatusColor(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Active") return "#10b981";
+        if (normalized === "Completed") return "#94a3b8";
+        return "#f59e0b";
+    }
+
+    function getProgressFromStatus(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Completed") return 100;
+        if (normalized === "Active") return 65;
+        return 25;
+    }
+
+    function formatProjectId(id) {
+        return `PRJ-${String(id).padStart(4, "0")}`;
+    }
+
+    function getLocationCoords(location) {
+        const locationMap = {
+            ankara: [39.9334, 32.8597],
+            dubai: [25.2048, 55.2708],
+            london: [51.5072, -0.1276],
+            sanaa: [15.3694, 44.1910],
+            riyadh: [24.7136, 46.6753],
+            istanbul: [41.0082, 28.9784],
+            jeddah: [21.4858, 39.1925],
+            cairo: [30.0444, 31.2357],
+            doha: [25.2854, 51.5310],
+            "abu dhabi": [24.4539, 54.3773],
+            kuwait: [29.3759, 47.9774],
+            muscat: [23.5880, 58.3829],
+            manama: [26.2235, 50.5876]
+        };
+
+        const key = String(location || "").toLowerCase().trim();
+
+        return locationMap[key] || [39.9334, 32.8597];
+    }
+
+    function buildTileUrl() {
+        return document.body.classList.contains("light-mode")
+            ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    }
+
+    function initMap(center = [31.5, 33.5], zoom = 4) {
+        const mapContainer = document.getElementById("map");
+
+        if (!mapContainer) return;
+
+        map = L.map("map", {
+            zoomControl: false
+        }).setView(center, zoom);
+
+        L.control.zoom({
+            position: "bottomright"
+        }).addTo(map);
+
+        L.tileLayer(buildTileUrl(), {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 300);
+    }
+
+    function rebuildMapTheme() {
+        if (!map) return;
+
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+
+        map.remove();
+        markers = [];
+
+        initMap(center, zoom);
+
+        const searchInput = document.getElementById("projectSearch");
+        const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+        const projectsToRender = q
+            ? allProjects.filter(project =>
+                String(project.title || "").toLowerCase().includes(q) ||
+                String(project.location || "").toLowerCase().includes(q) ||
+                String(project.status || "").toLowerCase().includes(q) ||
+                String(project.project_type || "").toLowerCase().includes(q)
+            )
+            : allProjects;
+
+        renderMarkers(projectsToRender);
+    }
+
+    function clearMarkers() {
+        if (!map) return;
+
+        markers.forEach(item => {
+            if (item.marker) {
+                map.removeLayer(item.marker);
             }
+        });
+
+        markers = [];
+    }
+
+    function renderMarkers(projects) {
+        if (!map) return;
+
+        clearMarkers();
+
+        if (!Array.isArray(projects) || projects.length === 0) {
+            return;
         }
 
-        function toggleTheme() {
-            const isLight = document.body.classList.toggle("light-mode");
-            localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+        const bounds = [];
 
-            const btn = document.getElementById("themeToggleBtn");
-            if (btn) {
-                btn.innerHTML = isLight
-                    ? '<i class="fas fa-sun"></i>'
-                    : '<i class="fas fa-moon"></i>';
-            }
+        projects.forEach(project => {
+            const [lat, lng] = getLocationCoords(project.location);
+            const status = normalizeStatus(project.status);
+            const color = getStatusColor(status);
 
-            rebuildMapTheme();
-        }
+            const safeTitle = escapeHTML(project.title || "Untitled Project");
+            const safeLocation = escapeHTML(project.location || "Unknown");
+            const safeType = escapeHTML(project.project_type || "General");
+            const safeStatus = escapeHTML(status);
+            const safeId = encodeURIComponent(project.id);
 
-        function logout() {
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html";
-        }
+            const icon = L.divIcon({
+                className: "custom-div-icon",
+                html: `
+                    <div style="
+                        width: 18px;
+                        height: 18px;
+                        border-radius: 50%;
+                        background: ${color};
+                        border: 3px solid white;
+                        box-shadow: 0 0 18px ${color};
+                    "></div>
+                `,
+                iconSize: [18, 18],
+                iconAnchor: [9, 9]
+            });
 
-        function togglePanel() {
-            const panel = document.getElementById("leftPanel");
-            const btn = document.getElementById("collapseBtn");
-            panel.classList.toggle("collapsed");
-
-            btn.innerHTML = panel.classList.contains("collapsed")
-                ? '<i class="fas fa-chevron-right"></i>'
-                : '<i class="fas fa-chevron-left"></i>';
-        }
-
-        function getStatusClass(status) {
-            if (status === "Active") return "status-active";
-            if (status === "Completed") return "status-completed";
-            return "status-pending";
-        }
-
-        function getStatusIcon(status) {
-            if (status === "Active") return "fa-circle";
-            if (status === "Completed") return "fa-check-circle";
-            return "fa-clock";
-        }
-
-        function getStatusColor(status) {
-            if (status === "Active") return "#10b981";
-            if (status === "Completed") return "#94a3b8";
-            return "#f59e0b";
-        }
-
-        function getProgressFromStatus(status) {
-            if (status === "Completed") return 100;
-            if (status === "Active") return 65;
-            return 25;
-        }
-
-        function formatProjectId(id) {
-            return `PRJ-${String(id).padStart(4, "0")}`;
-        }
-
-        function getLocationCoords(location) {
-            const map = {
-                ankara: [39.9334, 32.8597],
-                dubai: [25.2048, 55.2708],
-                london: [51.5072, -0.1276],
-                sanaa: [15.3694, 44.1910],
-                riyadh: [24.7136, 46.6753],
-                istanbul: [41.0082, 28.9784],
-                jeddah: [21.4858, 39.1925],
-                cairo: [30.0444, 31.2357]
-            };
-
-            const key = (location || "").toLowerCase().trim();
-            return map[key] || [39.9334, 32.8597];
-        }
-
-        function buildTileUrl() {
-            return document.body.classList.contains("light-mode")
-                ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-        }
-
-        function rebuildMapTheme() {
-            if (!map) return;
-
-            const center = map.getCenter();
-            const zoom = map.getZoom();
-
-            map.remove();
-            initMap(center, zoom);
-            renderMarkers(allProjects);
-        }
-
-        function initMap(center = [31.5, 33.5], zoom = 4) {
-            map = L.map("map", {
-                zoomControl: false
-            }).setView(center, zoom);
-
-            L.control.zoom({ position: "bottomright" }).addTo(map);
-
-            L.tileLayer(buildTileUrl(), {
-                attribution: "&copy; OpenStreetMap contributors"
+            const marker = L.marker([lat, lng], {
+                icon
             }).addTo(map);
-        }
 
-        function clearMarkers() {
-            markers.forEach(item => map.removeLayer(item.marker));
-            markers = [];
-        }
-
-        function renderMarkers(projects) {
-            clearMarkers();
-
-            const bounds = [];
-
-            projects.forEach(project => {
-                const [lat, lng] = getLocationCoords(project.location);
-                const color = getStatusColor(project.status);
-
-                const icon = L.divIcon({
-                    className: "custom-div-icon",
-                    html: `
-                        <div style="
-                            width: 18px;
-                            height: 18px;
-                            border-radius: 50%;
-                            background: ${color};
-                            border: 3px solid white;
-                            box-shadow: 0 0 18px ${color};
-                        "></div>
-                    `,
-                    iconSize: [18, 18],
-                    iconAnchor: [9, 9]
-                });
-
-                const marker = L.marker([lat, lng], { icon }).addTo(map);
-
-                marker.bindPopup(`
-                    <div style="min-width:180px; font-family:Arial, sans-serif;">
-                        <div style="font-weight:800; font-size:14px; margin-bottom:6px;">${project.title}</div>
-                        <div style="font-size:12px; color:#475569; margin-bottom:4px;">${project.location || "Unknown"} · ${project.project_type || "General"}</div>
-                        <div style="font-size:12px; margin-bottom:10px;">Status: <strong>${project.status}</strong></div>
-                        <a href="project_details.html?id=${project.id}" style="
-                            display:inline-block;
-                            background:#3b82f6;
-                            color:white;
-                            padding:8px 10px;
-                            border-radius:8px;
-                            text-decoration:none;
-                            font-size:12px;
-                            font-weight:700;
-                        ">Open Details</a>
+            marker.bindPopup(`
+                <div style="min-width:180px; font-family:Arial, sans-serif;">
+                    <div style="font-weight:800; font-size:14px; margin-bottom:6px;">
+                        ${safeTitle}
                     </div>
-                `);
+                    <div style="font-size:12px; color:#475569; margin-bottom:4px;">
+                        ${safeLocation} · ${safeType}
+                    </div>
+                    <div style="font-size:12px; margin-bottom:10px;">
+                        Status: <strong>${safeStatus}</strong>
+                    </div>
+                    <a href="project_details.html?id=${safeId}" style="
+                        display:inline-block;
+                        background:#3b82f6;
+                        color:white;
+                        padding:8px 10px;
+                        border-radius:8px;
+                        text-decoration:none;
+                        font-size:12px;
+                        font-weight:700;
+                    ">Open Details</a>
+                </div>
+            `);
 
-                marker.on("click", () => {
-                    activeProjectId = project.id;
-                    highlightProjectCard(project.id);
-                });
-
-                markers.push({ id: project.id, marker });
-                bounds.push([lat, lng]);
+            marker.on("click", () => {
+                activeProjectId = project.id;
+                highlightProjectCard(project.id);
             });
 
-            if (bounds.length > 0) {
-                map.fitBounds(bounds, { padding: [60, 60] });
+            markers.push({
+                id: project.id,
+                marker
+            });
+
+            bounds.push([lat, lng]);
+        });
+
+        if (bounds.length > 0) {
+            map.fitBounds(bounds, {
+                padding: [60, 60],
+                maxZoom: 8
+            });
+        }
+    }
+
+    function highlightProjectCard(projectId) {
+        document.querySelectorAll(".project-card").forEach(card => {
+            card.classList.remove("active");
+
+            if (String(card.dataset.id) === String(projectId)) {
+                card.classList.add("active");
+                card.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest"
+                });
             }
+        });
+    }
+
+    function openProjectOnMap(projectId) {
+        const project = allProjects.find(p => String(p.id) === String(projectId));
+
+        if (!project || !map) return;
+
+        activeProjectId = project.id;
+        highlightProjectCard(project.id);
+
+        const markerObj = markers.find(m => String(m.id) === String(projectId));
+
+        if (markerObj) {
+            const [lat, lng] = getLocationCoords(project.location);
+
+            map.setView([lat, lng], 7, {
+                animate: true
+            });
+
+            markerObj.marker.openPopup();
+        }
+    }
+
+    function renderProjectList(projects) {
+        const list = document.getElementById("radarList");
+
+        if (!list) return;
+
+        if (!Array.isArray(projects) || projects.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    No matching projects found.
+                </div>
+            `;
+            return;
         }
 
-        function highlightProjectCard(projectId) {
-            document.querySelectorAll(".project-card").forEach(card => {
-                card.classList.remove("active");
-                if (String(card.dataset.id) === String(projectId)) {
-                    card.classList.add("active");
-                    card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        list.innerHTML = projects.map(project => {
+            const status = normalizeStatus(project.status);
+            const progress = getProgressFromStatus(status);
+            const isActive = String(activeProjectId) === String(project.id);
+
+            const safeTitle = escapeHTML(project.title || "Untitled Project");
+            const safeLocation = escapeHTML(project.location || "Unknown");
+            const safeType = escapeHTML(project.project_type || "General");
+            const safeStatus = escapeHTML(status);
+            const safeId = encodeURIComponent(project.id);
+            const numericId = Number(project.id);
+
+            return `
+                <div class="project-card ${isActive ? "active" : ""}"
+                     data-id="${safeId}"
+                     onclick="openProjectOnMap(${numericId})">
+
+                    <div class="project-card-top">
+                        <div>
+                            <div class="project-card-title">${safeTitle}</div>
+                            <div class="project-card-sub">
+                                <i class="fas fa-location-dot"></i>
+                                ${safeLocation}
+                            </div>
+                        </div>
+
+                        <span class="status-badge ${getStatusClass(status)}">
+                            <i class="fas ${getStatusIcon(status)}"></i>
+                            ${safeStatus}
+                        </span>
+                    </div>
+
+                    <div class="project-meta">
+                        <div class="project-meta-row">
+                            <span>Project ID</span>
+                            <strong>${formatProjectId(project.id)}</strong>
+                        </div>
+                        <div class="project-meta-row">
+                            <span>Type</span>
+                            <strong>${safeType}</strong>
+                        </div>
+                        <div class="project-meta-row">
+                            <span>Progress</span>
+                            <strong>${progress}%</strong>
+                        </div>
+                    </div>
+
+                    <div class="project-actions">
+                        <a class="action-btn primary"
+                           href="project_details.html?id=${safeId}"
+                           onclick="event.stopPropagation()">
+                            <i class="fas fa-arrow-right"></i> Open Details
+                        </a>
+
+                        <button class="action-btn"
+                                onclick="event.stopPropagation(); openProjectOnMap(${numericId})">
+                            <i class="fas fa-crosshairs"></i> Focus
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function filterProjects() {
+        const searchInput = document.getElementById("projectSearch");
+        const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+        if (!q) {
+            renderProjectList(allProjects);
+            renderMarkers(allProjects);
+            return;
+        }
+
+        const filtered = allProjects.filter(project =>
+            String(project.title || "").toLowerCase().includes(q) ||
+            String(project.location || "").toLowerCase().includes(q) ||
+            String(project.status || "").toLowerCase().includes(q) ||
+            String(project.project_type || "").toLowerCase().includes(q)
+        );
+
+        renderProjectList(filtered);
+        renderMarkers(filtered);
+    }
+
+    function updateStats(projects) {
+        const trackedProjects = document.getElementById("trackedProjects");
+        const activeSites = document.getElementById("activeSites");
+
+        const safeProjects = Array.isArray(projects) ? projects : [];
+
+        if (trackedProjects) {
+            trackedProjects.innerText = safeProjects.length;
+        }
+
+        if (activeSites) {
+            activeSites.innerText = safeProjects.filter(project => {
+                return normalizeStatus(project.status) === "Active";
+            }).length;
+        }
+    }
+
+    async function loadRadarData() {
+        const list = document.getElementById("radarList");
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/projects/`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
                 }
             });
-        }
 
-        function openProjectOnMap(projectId) {
-            const project = allProjects.find(p => String(p.id) === String(projectId));
-            if (!project) return;
-
-            activeProjectId = project.id;
-            highlightProjectCard(project.id);
-
-            const markerObj = markers.find(m => String(m.id) === String(projectId));
-            if (markerObj) {
-                const [lat, lng] = getLocationCoords(project.location);
-                map.setView([lat, lng], 6, { animate: true });
-                markerObj.marker.openPopup();
+            if (res.status === 401 || res.status === 403) {
+                handleUnauthorized();
+                return;
             }
-        }
 
-        function renderProjectList(projects) {
-            const list = document.getElementById("radarList");
+            if (!res.ok) {
+                throw new Error("Failed to load projects");
+            }
 
-            if (!projects.length) {
+            const projects = await res.json();
+
+            allProjects = Array.isArray(projects) ? projects : [];
+            activeProjectId = allProjects.length ? allProjects[0].id : null;
+
+            updateStats(allProjects);
+            renderProjectList(allProjects);
+            renderMarkers(allProjects);
+
+            if (allProjects.length) {
+                showToast("Radar data loaded successfully.", "success");
+            }
+
+        } catch (error) {
+            console.error("Radar loading error:", error);
+
+            if (list) {
                 list.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        No matching projects found.
-                    </div>
-                `;
-                return;
-            }
-
-            list.innerHTML = projects.map(project => {
-                const progress = getProgressFromStatus(project.status);
-                const isActive = String(activeProjectId) === String(project.id);
-
-                return `
-                    <div class="project-card ${isActive ? "active" : ""}" data-id="${project.id}" onclick="openProjectOnMap(${project.id})">
-                        <div class="project-card-top">
-                            <div>
-                                <div class="project-card-title">${project.title}</div>
-                                <div class="project-card-sub">
-                                    <i class="fas fa-location-dot"></i>
-                                    ${project.location || "Unknown"}
-                                </div>
-                            </div>
-
-                            <span class="status-badge ${getStatusClass(project.status)}">
-                                <i class="fas ${getStatusIcon(project.status)}"></i>
-                                ${project.status}
-                            </span>
-                        </div>
-
-                        <div class="project-meta">
-                            <div class="project-meta-row">
-                                <span>Project ID</span>
-                                <strong>${formatProjectId(project.id)}</strong>
-                            </div>
-                            <div class="project-meta-row">
-                                <span>Type</span>
-                                <strong>${project.project_type || "General"}</strong>
-                            </div>
-                            <div class="project-meta-row">
-                                <span>Progress</span>
-                                <strong>${progress}%</strong>
-                            </div>
-                        </div>
-
-                        <div class="project-actions">
-                            <a class="action-btn primary" href="project_details.html?id=${project.id}" onclick="event.stopPropagation()">
-                                <i class="fas fa-arrow-right"></i> Open Details
-                            </a>
-                            <button class="action-btn" onclick="event.stopPropagation(); openProjectOnMap(${project.id})">
-                                <i class="fas fa-crosshairs"></i> Focus
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join("");
-        }
-
-        function filterProjects() {
-            const q = document.getElementById("projectSearch").value.trim().toLowerCase();
-
-            if (!q) {
-                renderProjectList(allProjects);
-                renderMarkers(allProjects);
-                return;
-            }
-
-            const filtered = allProjects.filter(project =>
-                (project.title || "").toLowerCase().includes(q) ||
-                (project.location || "").toLowerCase().includes(q) ||
-                (project.status || "").toLowerCase().includes(q) ||
-                (project.project_type || "").toLowerCase().includes(q)
-            );
-
-            renderProjectList(filtered);
-            renderMarkers(filtered);
-        }
-
-        function updateStats(projects) {
-            document.getElementById("trackedProjects").innerText = projects.length;
-            document.getElementById("activeSites").innerText =
-                projects.filter(p => p.status === "Active").length;
-        }
-
-        async function loadRadarData() {
-            try {
-                const res = await fetch(`${API_BASE_URL}/projects/`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
-
-                if (!res.ok) {
-                    throw new Error("Failed to load projects");
-                }
-
-                const projects = await res.json();
-                allProjects = projects;
-                activeProjectId = projects.length ? projects[0].id : null;
-
-                updateStats(projects);
-                renderProjectList(projects);
-                renderMarkers(projects);
-
-            } catch (error) {
-                console.error(error);
-                document.getElementById("radarList").innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-triangle-exclamation"></i>
                         Failed to load radar data.
                     </div>
                 `;
-                showToast("Failed to load project radar.", "error");
             }
-        }
 
-        applySavedTheme();
-        initMap();
-        loadRadarData();
-    </script>
+            updateStats([]);
+            showToast("Failed to load project radar.", "error");
+        }
+    }
+
+    applySavedTheme();
+    initMap();
+    loadRadarData();
+</script>
 </body>
 </html>

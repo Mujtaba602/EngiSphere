@@ -508,8 +508,9 @@
 
             <div class="nav-section">Management</div>
             <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
-            <a href="#" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
-            <a href="#" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+            <a href="profile.html" class="nav-link"><i class="fas fa-user-astronaut"></i> My Profile</a>
+            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
+           <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
         </nav>
 
         <a href="#" onclick="logout()" class="nav-link exit-link">
@@ -590,213 +591,310 @@
         </div>
     </div>
 
-    <script>
-        const API_BASE_URL = "http://127.0.0.1:8000";
-        const token = localStorage.getItem("access_token");
+   <script>
+    const API_BASE_URL = "http://127.0.0.1:8000";
+    const token = localStorage.getItem("access_token");
 
-        if (!token) {
-            window.location.href = "login.html";
+    if (!token) {
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    const chatBox = document.getElementById("chatBox");
+    const userInput = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    let isSending = false;
+
+    function clearAuthData() {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+        localStorage.removeItem("token_type");
+        localStorage.removeItem("user_email");
+    }
+
+    function handleUnauthorized() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    function logout() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    setInterval(() => {
+        const latencyEl = document.getElementById("latency");
+
+        if (latencyEl) {
+            latencyEl.innerText = Math.floor(Math.random() * 15 + 8) + "ms";
         }
+    }, 3000);
 
-        const chatBox = document.getElementById("chatBox");
-        const userInput = document.getElementById("userInput");
-        const sendBtn = document.getElementById("sendBtn");
+    function applySavedTheme() {
+        const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
+        const btn = document.getElementById("themeToggleBtn");
 
-        setInterval(() => {
-            document.getElementById("latency").innerText =
-                Math.floor(Math.random() * 15 + 8) + "ms";
-        }, 3000);
-
-        function applySavedTheme() {
-            const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
-            const btn = document.getElementById("themeToggleBtn");
-
-            if (savedTheme === "light") {
-                document.body.classList.add("light-mode");
-                btn.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                document.body.classList.remove("light-mode");
-                btn.innerHTML = '<i class="fas fa-moon"></i>';
-            }
+        if (savedTheme === "light") {
+            document.body.classList.add("light-mode");
+            if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            document.body.classList.remove("light-mode");
+            if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
         }
+    }
 
-        function toggleTheme() {
-            const isLight = document.body.classList.toggle("light-mode");
-            localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+    function toggleTheme() {
+        const isLight = document.body.classList.toggle("light-mode");
+        localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
 
-            const btn = document.getElementById("themeToggleBtn");
+        const btn = document.getElementById("themeToggleBtn");
+
+        if (btn) {
             btn.innerHTML = isLight
                 ? '<i class="fas fa-sun"></i>'
                 : '<i class="fas fa-moon"></i>';
         }
+    }
 
-        function handleEnter(e) {
-            if (e.key === "Enter") sendMessage();
+    function handleEnter(e) {
+        if (e.key === "Enter") {
+            sendMessage();
+        }
+    }
+
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = String(text ?? "");
+        return div.innerHTML;
+    }
+
+    function formatAIResponse(text) {
+        if (!text) return "<p>No response returned.</p>";
+
+        let safe = String(text)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+
+        safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        safe = safe.replace(/^###\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
+        safe = safe.replace(/^##\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
+        safe = safe.replace(/^#\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
+        safe = safe.replace(/^\s*[-*]\s+(.*)$/gm, "<li>$1</li>");
+        safe = safe.replace(/(<li>.*<\/li>)/gs, '<ul class="ai-list">$1</ul>');
+        safe = safe.replace(/\n\n/g, "</p><p>");
+        safe = `<div class="ai-response"><p>${safe}</p></div>`;
+
+        safe = safe.replace(/<p>\s*<\/p>/g, "");
+        safe = safe.replace(/<\/ul>\s*<ul class="ai-list">/g, "");
+        safe = safe.replace(/<p>(\s*<h3 class="ai-section-title">)/g, "$1");
+        safe = safe.replace(/(<\/h3>)<\/p>/g, "$1");
+        safe = safe.replace(/<p>(\s*<ul class="ai-list">)/g, "$1");
+        safe = safe.replace(/(<\/ul>)<\/p>/g, "$1");
+
+        return safe;
+    }
+
+    function scrollToBottom() {
+        if (!chatBox) return;
+
+        chatBox.scrollTo({
+            top: chatBox.scrollHeight,
+            behavior: "smooth"
+        });
+    }
+
+    function appendUserMessage(text) {
+        const msgHtml = `
+            <div class="msg-row user">
+                <div class="msg-bubble">${escapeHtml(text)}</div>
+            </div>
+        `;
+
+        chatBox.insertAdjacentHTML("beforeend", msgHtml);
+        scrollToBottom();
+    }
+
+    function appendTypingIndicator() {
+        const id = "typing-" + Date.now();
+
+        const msgHtml = `
+            <div class="msg-row bot" id="${id}">
+                <div class="msg-bubble" style="padding: 15px 25px;">
+                    <div class="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        chatBox.insertAdjacentHTML("beforeend", msgHtml);
+        scrollToBottom();
+
+        return id;
+    }
+
+    function replaceTypingWithBotMessage(typingElement, text, status = "DATA PROCESSED") {
+        if (!typingElement) return;
+
+        typingElement.outerHTML = `
+            <div class="msg-row bot">
+                <div class="msg-bubble">
+                    <div class="bot-header">
+                        <i class="fas fa-radar"></i> ${escapeHtml(status)}
+                    </div>
+                    <div class="msg-content">
+                        ${formatAIResponse(text)}
+                    </div>
+                </div>
+            </div>
+        `;
+
+        scrollToBottom();
+    }
+
+    function clearChat() {
+        if (!chatBox) return;
+
+        chatBox.innerHTML = `
+            <div class="msg-row bot">
+                <div class="msg-bubble">
+                    <div class="bot-header">
+                        <i class="fas fa-terminal"></i> SESSION RESET
+                    </div>
+                    <div class="msg-content">
+                        <div class="ai-response">
+                            <p>Chat session cleared. You can start a new engineering query now.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="quick-prompts">
+                <button class="prompt-chip" onclick="usePrompt('Give me a short risk analysis for my current projects.')">
+                    Risk Analysis
+                </button>
+                <button class="prompt-chip" onclick="usePrompt('Suggest a software architecture for an AI-driven engineering management platform.')">
+                    Architecture Suggestion
+                </button>
+                <button class="prompt-chip" onclick="usePrompt('How can I improve my graduation project presentation?')">
+                    Presentation Help
+                </button>
+                <button class="prompt-chip" onclick="usePrompt('What are the main risks in a software engineering graduation project?')">
+                    Graduation Risks
+                </button>
+            </div>
+        `;
+
+        if (userInput) {
+            userInput.focus();
+        }
+    }
+
+    function usePrompt(text) {
+        if (!userInput) return;
+
+        userInput.value = text;
+        userInput.focus();
+    }
+
+    function setSendingState(value) {
+        isSending = value;
+
+        if (sendBtn) {
+            sendBtn.disabled = value;
+            sendBtn.innerHTML = value
+                ? '<i class="fas fa-spinner fa-spin"></i>'
+                : '<i class="fas fa-paper-plane"></i>';
         }
 
-        function escapeHtml(text) {
-            const div = document.createElement("div");
-            div.textContent = text;
-            return div.innerHTML;
+        if (userInput) {
+            userInput.disabled = value;
         }
+    }
 
-        function formatAIResponse(text) {
-            if (!text) return "<p>No response returned.</p>";
+    async function sendMessage() {
+        if (isSending) return;
 
-            let safe = text
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;");
+        const text = userInput.value.trim();
 
-            safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-            safe = safe.replace(/^###\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
-            safe = safe.replace(/^##\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
-            safe = safe.replace(/^#\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
-            safe = safe.replace(/^\s*[-*]\s+(.*)$/gm, "<li>$1</li>");
-            safe = safe.replace(/(<li>.*<\/li>)/gs, '<ul class="ai-list">$1</ul>');
-            safe = safe.replace(/\n\n/g, "</p><p>");
-            safe = `<div class="ai-response"><p>${safe}</p></div>`;
+        if (!text) return;
 
-            safe = safe.replace(/<p>\s*<\/p>/g, "");
-            safe = safe.replace(/<\/ul>\s*<ul class="ai-list">/g, "");
-            safe = safe.replace(/<p>(\s*<h3 class="ai-section-title">)/g, "$1");
-            safe = safe.replace(/(<\/h3>)<\/p>/g, "$1");
-            safe = safe.replace(/<p>(\s*<ul class="ai-list">)/g, "$1");
-            safe = safe.replace(/(<\/ul>)<\/p>/g, "$1");
+        appendUserMessage(text);
 
-            return safe;
-        }
+        userInput.value = "";
+        setSendingState(true);
 
-        function scrollToBottom() {
-            chatBox.scrollTo({
-                top: chatBox.scrollHeight,
-                behavior: "smooth"
+        const typingId = appendTypingIndicator();
+        const typingElement = document.getElementById(typingId);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/chat`, {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    message: text
+                })
             });
-        }
 
-        function appendUserMessage(text) {
-            const msgHtml = `
-                <div class="msg-row user">
-                    <div class="msg-bubble">${escapeHtml(text)}</div>
-                </div>
-            `;
-            chatBox.insertAdjacentHTML("beforeend", msgHtml);
-            scrollToBottom();
-        }
+            if (response.status === 401 || response.status === 403) {
+                handleUnauthorized();
+                return;
+            }
 
-        function appendTypingIndicator() {
-            const id = "typing-" + Date.now();
-            const msgHtml = `
-                <div class="msg-row bot" id="${id}">
-                    <div class="msg-bubble" style="padding: 15px 25px;">
-                        <div class="typing-indicator"><span></span><span></span><span></span></div>
-                    </div>
-                </div>
-            `;
-            chatBox.insertAdjacentHTML("beforeend", msgHtml);
-            scrollToBottom();
-            return id;
-        }
-
-        function replaceTypingWithBotMessage(typingElement, text, status = "DATA PROCESSED") {
-            typingElement.outerHTML = `
-                <div class="msg-row bot">
-                    <div class="msg-bubble">
-                        <div class="bot-header">
-                            <i class="fas fa-radar"></i> ${status}
-                        </div>
-                        <div class="msg-content">
-                            ${formatAIResponse(text)}
-                        </div>
-                    </div>
-                </div>
-            `;
-            scrollToBottom();
-        }
-
-        function clearChat() {
-            chatBox.innerHTML = `
-                <div class="msg-row bot">
-                    <div class="msg-bubble">
-                        <div class="bot-header"><i class="fas fa-terminal"></i> SESSION RESET</div>
-                        <div class="msg-content">
-                            <div class="ai-response">
-                                <p>Chat session cleared. You can start a new engineering query now.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="quick-prompts">
-                    <button class="prompt-chip" onclick="usePrompt('Give me a short risk analysis for my current projects.')">Risk Analysis</button>
-                    <button class="prompt-chip" onclick="usePrompt('Suggest a software architecture for an AI-driven engineering management platform.')">Architecture Suggestion</button>
-                    <button class="prompt-chip" onclick="usePrompt('How can I improve my graduation project presentation?')">Presentation Help</button>
-                    <button class="prompt-chip" onclick="usePrompt('What are the main risks in a software engineering graduation project?')">Graduation Risks</button>
-                </div>
-            `;
-            userInput.focus();
-        }
-
-        function usePrompt(text) {
-            userInput.value = text;
-            userInput.focus();
-        }
-
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
-
-            appendUserMessage(text);
-            userInput.value = "";
-            sendBtn.disabled = true;
-
-            const typingId = appendTypingIndicator();
-            const typingElement = document.getElementById(typingId);
+            let data = {};
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/chat`, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: text
-                    })
-                });
+                data = await response.json();
+            } catch (_) {
+                data = {};
+            }
 
-                const data = await response.json();
-
-                if (!response.ok) {
-                    replaceTypingWithBotMessage(
-                        typingElement,
-                        data.detail || "AI service error. Please try again.",
-                        "SYSTEM ERROR"
-                    );
-                    return;
-                }
-
-                const reply = data.reply || "No response returned from AI service.";
-                replaceTypingWithBotMessage(typingElement, reply, "DATA PROCESSED");
-
-            } catch (error) {
+            if (!response.ok) {
                 replaceTypingWithBotMessage(
                     typingElement,
-                    "Unable to reach the AI service. Check backend server or network connection.",
-                    "CONNECTION ERROR"
+                    data.detail || "AI service error. Please try again.",
+                    "SYSTEM ERROR"
                 );
-            } finally {
-                sendBtn.disabled = false;
+                return;
+            }
+
+            const reply = data.reply || "No response returned from AI service.";
+
+            replaceTypingWithBotMessage(
+                typingElement,
+                reply,
+                "DATA PROCESSED"
+            );
+
+        } catch (error) {
+            console.error("AI chat error:", error);
+
+            replaceTypingWithBotMessage(
+                typingElement,
+                "Unable to reach the AI service. Check that the backend server is running on http://127.0.0.1:8000.",
+                "CONNECTION ERROR"
+            );
+
+        } finally {
+            setSendingState(false);
+
+            if (userInput) {
                 userInput.focus();
             }
         }
+    }
 
-        function logout() {
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html";
-        }
+    applySavedTheme();
 
-        applySavedTheme();
-    </script>
+    if (userInput) {
+        userInput.focus();
+    }
+</script>
 </body>
 </html>
