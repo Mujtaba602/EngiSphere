@@ -8,6 +8,7 @@ __pycache__/
 .venv/
 venv/
 venv-1/
+.venv-1/
 
 # Secrets
 .env
