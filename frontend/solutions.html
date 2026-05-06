@@ -2031,9 +2031,209 @@ function formatAITextToHTML(text) {
         }
     }
 
-    applySavedTheme();
-    initMap();
-    loadRadarData();
+    function getProjectIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return params.get("projectId");
+    }
+
+    async function fetchProjectById(projectId) {
+        const directEndpoints = [
+            `/projects/${projectId}`,
+            `/projects/${projectId}/`,
+            `/api/projects/${projectId}`,
+            `/api/projects/${projectId}/`
+        ];
+
+        for (const ep of directEndpoints) {
+            try {
+                console.log(`[Radar] Trying direct fetch at: ${ep}`);
+                const res = await fetch(`${API_BASE_URL}${ep}`, {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log(`[Radar] Direct fetch success at: ${ep}`);
+                    return data;
+                } else {
+                    console.warn(`[Radar] Direct fetch failed at: ${ep} (Status: ${res.status})`);
+                }
+            } catch (err) {
+                console.warn(`[Radar] Direct fetch error at: ${ep}`, err);
+            }
+        }
+
+        console.log(`[Radar] All direct fetch attempts failed. Falling back to list fetch...`);
+
+        const listEndpoints = [
+            `/projects/`,
+            `/projects`,
+            `/api/projects/`,
+            `/api/projects`
+        ];
+
+        for (const ep of listEndpoints) {
+            try {
+                console.log(`[Radar] Trying list fetch at: ${ep}`);
+                const res = await fetch(`${API_BASE_URL}${ep}`, {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    let items = [];
+                    if (Array.isArray(data)) {
+                        items = data;
+                    } else if (data && Array.isArray(data.projects)) {
+                        items = data.projects;
+                    } else if (data && Array.isArray(data.data)) {
+                        items = data.data;
+                    } else if (data && Array.isArray(data.items)) {
+                        items = data.items;
+                    }
+
+                    const targetId = String(projectId);
+                    const matched = items.find(p => 
+                        String(p.id) === targetId ||
+                        String(p.project_id) === targetId ||
+                        String(p.projectId) === targetId ||
+                        String(p.code) === targetId ||
+                        String(p.project_code) === targetId ||
+                        String(p.title) === targetId
+                    );
+
+                    if (matched) {
+                        console.log(`[Radar] List fetch matched project from: ${ep}`);
+                        return matched;
+                    } else {
+                        console.warn(`[Radar] List fetch succeeded at ${ep} but project ${targetId} not found in results.`);
+                    }
+                } else {
+                    console.warn(`[Radar] List fetch failed at: ${ep} (Status: ${res.status})`);
+                }
+            } catch (err) {
+                console.warn(`[Radar] List fetch error at: ${ep}`, err);
+            }
+        }
+
+        throw new Error(`Failed to fetch project ${projectId} after trying all endpoints.`);
+    }
+
+    function renderProjectContext(project) {
+        const status = normalizeStatus(project.status);
+        const bannerHtml = `
+            <div id="projectDeepLinkBanner" style="position:absolute; top:18px; left:50%; transform:translateX(-50%); z-index:1500; background:var(--panel); border:1px solid var(--primary); padding:16px 24px; border-radius:16px; box-shadow:var(--shadow); display:flex; gap:20px; align-items:center; backdrop-filter:blur(12px);">
+                <div>
+                    <h3 style="margin-bottom:4px; font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-satellite-dish" style="color:var(--primary);"></i> Focus: ${escapeHTML(project.title)}
+                    </h3>
+                    <div style="font-size:12px; color:var(--muted); display:flex; gap:12px;">
+                        <span><i class="fas fa-location-dot"></i> ${escapeHTML(project.location)}</span>
+                        <span><i class="fas fa-folder"></i> ${escapeHTML(project.project_type || 'General')}</span>
+                        <span class="status-badge status-${status.toLowerCase()}" style="padding:2px 8px; font-size:10px;">${escapeHTML(status)}</span>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('projectDeepLinkBanner').remove()" style="background:rgba(255,255,255,0.1); border:none; color:white; width:30px; height:30px; border-radius:50%; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', bannerHtml);
+    }
+
+    async function focusMapOnProject(project) {
+        if (!project) return;
+        
+        let lat, lng;
+        let coords = null;
+
+        if (project.lat !== undefined && project.lng !== undefined) {
+            lat = Number(project.lat);
+            lng = Number(project.lng);
+        } else if (project.latitude !== undefined && project.longitude !== undefined) {
+            lat = Number(project.latitude);
+            lng = Number(project.longitude);
+        }
+
+        if ((!Number.isFinite(lat) || !Number.isFinite(lng)) && project.location) {
+            try {
+                coords = await getLocationCoords(project.location);
+                if (coords) {
+                    console.log("[Radar] Project location geocoded successfully:", coords);
+                    lat = Number(coords[0]);
+                    lng = Number(coords[1]);
+                }
+            } catch (err) {
+                console.warn("[Radar] Failed to focus map on project:", err);
+                return;
+            }
+        }
+
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            console.warn("[Radar] Invalid geocoded coordinates for project:", project, coords);
+            return;
+        }
+
+        try {
+            if (map) {
+                map.setView([lat, lng], 12);
+                
+                const markerColor = "#3b82f6";
+                const customIcon = L.divIcon({
+                    className: "custom-marker-icon",
+                    html: `
+                        <div style="background:${markerColor}; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; box-shadow:0 0 10px ${markerColor};">
+                            <i class="fas fa-building" style="color:white; font-size:10px;"></i>
+                        </div>
+                    `,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12],
+                    popupAnchor: [0, -10]
+                });
+
+                L.marker([lat, lng], { icon: customIcon })
+                    .addTo(map)
+                    .bindPopup(`<b>${escapeHTML(project.title)}</b><br/>${escapeHTML(project.location || 'Unknown Location')}`)
+                    .openPopup();
+            }
+        } catch (err) {
+            console.warn("[Radar] Failed to focus map on project:", err);
+        }
+    }
+
+    async function initPage() {
+        applySavedTheme();
+        initMap();
+
+        const projectId = getProjectIdFromUrl();
+        if (projectId) {
+            console.log(`[Radar] Detected projectId in URL: ${projectId}`);
+            try {
+                const project = await fetchProjectById(projectId);
+                if (project) {
+                    console.log("[Radar] Project loaded successfully:", project);
+                    activeProjectId = project.id;
+                    renderProjectContext(project);
+                    
+                    await loadRadarData();
+                    
+                    activeProjectId = project.id;
+                    updateAISelectedProject(project);
+                    await focusMapOnProject(project);
+                } else {
+                    throw new Error("Project fetch returned empty");
+                }
+            } catch (err) {
+                console.warn("[Radar] Project fetch failed:", err);
+                console.log("Project context could not be loaded, showing general geospatial radar.");
+                showToast("Project context could not be loaded, showing general geospatial radar.", "error");
+                await loadRadarData();
+            }
+        } else {
+            console.log("[Radar] No projectId in URL, loading general radar.");
+            await loadRadarData();
+        }
+    }
+
+    initPage();
 </script>
 </body>
 </html>
