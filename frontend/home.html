@@ -585,6 +585,13 @@ body.dark-theme .nav {
   flex-wrap: wrap;
 }
 
+.auth-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
 .nav-link {
   color: var(--muted);
   text-decoration: none;
@@ -688,7 +695,8 @@ body.dark-theme .nav {
 
   .nav-center,
   .nav-right,
-  .auth-btns {
+  .auth-btns,
+  .auth-actions {
     width: 100%;
     gap: 12px;
   }
@@ -698,7 +706,8 @@ body.dark-theme .nav {
   }
 
   .nav-right .btn,
-  .auth-btns .btn {
+  .auth-btns .btn,
+  .auth-actions .btn {
     flex: 1;
   }
 
@@ -907,7 +916,7 @@ body.dark-theme .nav {
     <div class="module-link">View Risk Engine <i class="fas fa-arrow-right"></i></div>
   </div>
 
-  <div class="module-card" onclick="requireAuth('team.html')" data-aos="fade-up" data-aos-delay="200">
+  <div class="module-card" onclick="requireAuth('team_access.html')" data-aos="fade-up" data-aos-delay="200">
     <div class="module-icon"><i class="fas fa-users-gear"></i></div>
     <h3>Team & Tasks</h3>
     <p>Manage team members, assign them to projects, create tasks, and monitor execution progress across your workflow.</p>
@@ -1041,18 +1050,18 @@ team coordination, task management, risk assessment, and secure workflow control
 
     window.logout = function () {
       clearAuthData();
-      window.location.href = "login.html";
+      window.location.assign(new URL("login.html", window.location.href).href);
     };
 
     window.requireAuth = function (page) {
       const currentToken = localStorage.getItem("access_token");
 
       if (!currentToken) {
-        window.location.href = "login.html";
+        window.location.assign(new URL("login.html", window.location.href).href);
         return;
       }
 
-      window.location.href = page;
+      window.location.assign(new URL(page, window.location.href).href);
     };
 
     function renderLoggedOutButtons() {
@@ -1181,6 +1190,7 @@ authActions.innerHTML = `
 
         if (response.status === 401 || response.status === 403) {
           clearAuthData();
+          renderLoggedOutButtons();
           return;
         }
 
