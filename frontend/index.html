@@ -4,20 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EngiSphere | Dashboard</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-soft: rgba(59, 130, 246, 0.14);
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-soft: rgba(37, 99, 235, 0.14);
             --bg: #020617;
             --sidebar: #0f172a;
             --panel: rgba(15, 23, 42, 0.68);
             --panel-2: rgba(30, 41, 59, 0.45);
             --border: rgba(255, 255, 255, 0.08);
             --text: #f8fafc;
-            --muted: #94a3b8;
+            --muted: #cbd5e1;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
@@ -40,9 +43,18 @@
             transition: background 0.3s, color 0.3s;
         }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+        }
 
         .sidebar {
             width: 260px;
@@ -113,8 +125,8 @@
             overflow-y: auto;
             padding: 28px 34px 34px;
             background:
-                radial-gradient(circle at top left, rgba(59,130,246,0.09), transparent 30%),
-                radial-gradient(circle at top right, rgba(99,102,241,0.06), transparent 24%),
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.09), transparent 30%),
+                radial-gradient(circle at top right, rgba(99, 102, 241, 0.06), transparent 24%),
                 linear-gradient(180deg, #071225 0%, #020617 100%);
             transition: background 0.3s;
         }
@@ -150,7 +162,7 @@
         .theme-toggle,
         .new-project-btn {
             border: 1px solid var(--border);
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text);
             height: 42px;
             padding: 0 14px;
@@ -181,7 +193,7 @@
             background: var(--primary);
             border-color: var(--primary);
             color: white;
-            box-shadow: 0 10px 24px rgba(59,130,246,0.24);
+            box-shadow: 0 10px 24px rgba(59, 130, 246, 0.24);
         }
 
         .new-project-btn:hover {
@@ -238,8 +250,9 @@
             font-weight: 700;
             border: 1px solid var(--border);
             color: white;
-            background: rgba(255,255,255,0.05);
+            background: rgba(255, 255, 255, 0.05);
             transition: 0.25s;
+            cursor: pointer;
         }
 
         .hero-action.primary {
@@ -314,6 +327,217 @@
             color: var(--primary);
         }
 
+        .dashboard-risk-section {
+            margin: 28px 0;
+            padding: 24px;
+            border-radius: 24px;
+            background: rgba(15, 23, 42, 0.82);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+        }
+
+        .risk-overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .risk-overview-header h2 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 900;
+        }
+
+        .risk-overview-header p {
+            margin: 7px 0 0;
+            color: #94a3b8;
+            font-size: 14px;
+        }
+
+        .portfolio-risk-badge {
+            padding: 10px 16px;
+            border-radius: 999px;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 13px;
+            background: #f59e0b;
+            white-space: nowrap;
+        }
+
+        .risk-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .risk-summary-card {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .risk-summary-card span {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .risk-summary-card strong {
+            display: block;
+            color: #ffffff;
+            font-size: 30px;
+            font-weight: 950;
+            margin-bottom: 6px;
+        }
+
+        .risk-summary-card small {
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .risk-summary-card.high {
+            border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .risk-summary-card.high strong {
+            color: #ef4444;
+        }
+
+        .risk-summary-card.medium {
+            border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .risk-summary-card.medium strong {
+            color: #f59e0b;
+        }
+
+        .risk-summary-card.low {
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .risk-summary-card.low strong {
+            color: #10b981;
+        }
+
+        .risk-summary-card.critical {
+            border-color: rgba(59, 130, 246, 0.35);
+        }
+
+        .risk-summary-card.critical strong {
+            color: #3b82f6;
+        }
+
+        .top-risk-panel {
+            padding: 20px;
+            border-radius: 20px;
+            background: rgba(2, 6, 23, 0.35);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .top-risk-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .top-risk-title h3 {
+            margin: 0;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        .top-risk-title p {
+            margin: 5px 0 0;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .top-risk-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .top-risk-item {
+            display: grid;
+            grid-template-columns: 1.5fr 120px 100px 1.7fr 110px;
+            gap: 14px;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .top-risk-project-name {
+            color: #ffffff;
+            font-weight: 850;
+        }
+
+        .top-risk-project-name small {
+            display: block;
+            color: #94a3b8;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .risk-score-pill {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 999px;
+            color: #ffffff;
+            font-weight: 900;
+            font-size: 13px;
+        }
+
+        .risk-level-label {
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        .risk-main-factor {
+            color: #94a3b8;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .open-risk-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            padding: 9px 12px;
+            border-radius: 10px;
+            background: #2563eb;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 850;
+            font-size: 13px;
+        }
+
+        .open-risk-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .top-risk-empty {
+            padding: 18px;
+            border-radius: 14px;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.035);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
         .content-grid {
             display: grid;
             grid-template-columns: 1.65fr 1fr;
@@ -348,9 +572,9 @@
             border-radius: 999px;
             font-size: 11px;
             font-weight: 800;
-            background: rgba(59,130,246,0.12);
+            background: rgba(59, 130, 246, 0.12);
             color: var(--primary);
-            border: 1px solid rgba(59,130,246,0.18);
+            border: 1px solid rgba(59, 130, 246, 0.18);
         }
 
         .operations-table {
@@ -365,12 +589,12 @@
             font-weight: 800;
             text-transform: uppercase;
             padding: 12px 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
 
         .operations-table td {
             padding: 16px 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             vertical-align: middle;
             font-size: 13px;
         }
@@ -398,17 +622,17 @@
         }
 
         .status-active {
-            background: rgba(16,185,129,0.12);
+            background: rgba(16, 185, 129, 0.12);
             color: var(--success);
         }
 
         .status-pending {
-            background: rgba(245,158,11,0.12);
+            background: rgba(245, 158, 11, 0.12);
             color: var(--warning);
         }
 
         .status-completed {
-            background: rgba(148,163,184,0.12);
+            background: rgba(148, 163, 184, 0.12);
             color: #cbd5e1;
         }
 
@@ -423,7 +647,7 @@
             width: 84px;
             height: 6px;
             border-radius: 999px;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
             overflow: hidden;
         }
 
@@ -446,15 +670,26 @@
             font-weight: 700;
             text-decoration: none;
             border: 1px solid var(--border);
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             color: white;
             cursor: pointer;
         }
 
         .table-btn.primary {
-            background: rgba(59,130,246,0.14);
-            border-color: rgba(59,130,246,0.22);
+            background: rgba(59, 130, 246, 0.14);
+            border-color: rgba(59, 130, 246, 0.22);
             color: #bfdbfe;
+        }
+
+        .table-btn.danger {
+            background: rgba(239, 68, 68, 0.14);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.35);
+        }
+
+        .table-btn.danger:hover {
+            background: rgba(239, 68, 68, 0.24);
+            color: #fecaca;
         }
 
         .table-btn:hover {
@@ -485,7 +720,7 @@
         .ratio-bar {
             height: 7px;
             border-radius: 999px;
-            background: rgba(255,255,255,0.06);
+            background: rgba(255, 255, 255, 0.06);
             overflow: hidden;
         }
 
@@ -545,7 +780,7 @@
             height: 38px;
             border-radius: 10px;
             border: 1px solid var(--border);
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text);
             cursor: pointer;
         }
@@ -575,7 +810,7 @@
         .field input,
         .field select,
         .field textarea {
-            background: rgba(255,255,255,0.04);
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border);
             border-radius: 12px;
             color: var(--text);
@@ -595,7 +830,7 @@
         .field select:focus,
         .field textarea:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.08);
         }
 
         .modal-actions {
@@ -629,22 +864,22 @@
         }
 
         .toast.success {
-            background: rgba(16,185,129,0.96);
+            background: rgba(16, 185, 129, 0.96);
             border: 1px solid #10b981;
-            box-shadow: 0 10px 30px rgba(16,185,129,0.25);
+            box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25);
         }
 
         .toast.error {
-            background: rgba(239,68,68,0.96);
+            background: rgba(239, 68, 68, 0.96);
             border: 1px solid #ef4444;
-            box-shadow: 0 10px 30px rgba(239,68,68,0.25);
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.25);
         }
 
         body.light-mode {
             --bg: #f3f7fc;
             --sidebar: #ffffff;
-            --panel: rgba(255,255,255,0.92);
-            --panel-2: rgba(255,255,255,0.88);
+            --panel: rgba(255, 255, 255, 0.92);
+            --panel-2: rgba(255, 255, 255, 0.88);
             --border: rgba(15, 23, 42, 0.08);
             --text: #0f172a;
             --muted: #64748b;
@@ -660,40 +895,52 @@
 
         body.light-mode .main {
             background:
-                radial-gradient(circle at top left, rgba(59,130,246,0.07), transparent 26%),
-                linear-gradient(180deg, #ffffff 0%, #eef4fb 100%);
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 32%),
+                radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.08), transparent 28%),
+                #f8fafc;
         }
 
         body.light-mode .hero-card,
         body.light-mode .mini-card,
         body.light-mode .stat-card,
         body.light-mode .card,
-        body.light-mode .modal-content {
-            background: rgba(255,255,255,0.94);
+        body.light-mode .modal-content,
+        body.light-mode .dashboard-risk-section {
+            background: rgba(255, 255, 255, 0.94);
             border-color: rgba(15, 23, 42, 0.08);
             box-shadow: var(--shadow);
+        }
+
+        body.light-mode .top-risk-panel,
+        body.light-mode .risk-summary-card,
+        body.light-mode .top-risk-item {
+            background: rgba(15, 23, 42, 0.03);
+            border-color: rgba(15, 23, 42, 0.08);
         }
 
         body.light-mode .project-name,
         body.light-mode .hero-card h2,
         body.light-mode .topbar-left h1,
-        body.light-mode .mini-card .value {
+        body.light-mode .mini-card .value,
+        body.light-mode .risk-overview-header h2,
+        body.light-mode .top-risk-title h3,
+        body.light-mode .top-risk-project-name,
+        body.light-mode .risk-summary-card strong {
             color: #0f172a;
         }
 
         body.light-mode .top-btn,
         body.light-mode .theme-toggle,
         body.light-mode .table-btn,
-        body.light-mode .hero-action:not(.primary),
-        body.light-mode .back-btn {
-            background: rgba(15,23,42,0.04);
+        body.light-mode .hero-action:not(.primary) {
+            background: rgba(15, 23, 42, 0.04);
             color: #0f172a;
         }
 
         body.light-mode .field input,
         body.light-mode .field select,
         body.light-mode .field textarea {
-            background: rgba(15,23,42,0.03);
+            background: rgba(15, 23, 42, 0.03);
             color: #0f172a;
         }
 
@@ -702,7 +949,13 @@
         body.light-mode .project-id,
         body.light-mode .ratio-label,
         body.light-mode .hero-card p,
-        body.light-mode .topbar-left p {
+        body.light-mode .topbar-left p,
+        body.light-mode .risk-overview-header p,
+        body.light-mode .top-risk-title p,
+        body.light-mode .risk-main-factor,
+        body.light-mode .top-risk-project-name small,
+        body.light-mode .risk-summary-card span,
+        body.light-mode .risk-summary-card small {
             color: #64748b;
         }
 
@@ -714,6 +967,14 @@
 
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+
+            .risk-summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .top-risk-item {
+                grid-template-columns: 1fr;
             }
         }
 
@@ -730,16 +991,20 @@
                 grid-template-columns: 1fr;
             }
 
-            .stats-grid {
+            .stats-grid,
+            .mini-grid,
+            .risk-summary-grid {
                 grid-template-columns: 1fr;
             }
 
-            .mini-grid {
-                grid-template-columns: 1fr;
+            .risk-overview-header {
+                flex-direction: column;
+                align-items: flex-start;
             }
         }
     </style>
 </head>
+
 <body>
     <div id="toast" class="toast success">
         <i class="fas fa-circle-check"></i>
@@ -747,22 +1012,55 @@
     </div>
 
     <aside class="sidebar">
-        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
+        <div class="logo">
+            <i class="fas fa-shield-halved"></i>
+            ENGISPHERE
+        </div>
 
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
-            <a href="index.html" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a>
-            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i> Geospatial Radar</a>
-            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i> AI EngiBot</a>
+
+            <a href="index.html" class="nav-link active">
+                <i class="fas fa-chart-line"></i>
+                Dashboard
+            </a>
+
+            <a href="solutions.html" class="nav-link">
+                <i class="fas fa-satellite"></i>
+                Geospatial Radar
+            </a>
+
+            <a href="ai_chat.html" class="nav-link">
+                <i class="fas fa-brain"></i>
+                AI EngiBot
+            </a>
 
             <div class="nav-section">Management</div>
-            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
-            <a href="#" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
-            <a href="#" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+
+            <a href="#" class="nav-link" onclick="showToast('Select a project from the table first.', 'error'); return false;">
+                <i class="fas fa-folder-open"></i>
+                Project Details
+            </a>
+
+            <a href="profile.html" class="nav-link">
+                <i class="fas fa-user-astronaut"></i>
+                My Profile
+            </a>
+
+            <a href="team_access.html" class="nav-link">
+                <i class="fas fa-users-gear"></i>
+                Team Access
+            </a>
+
+            <a href="reports.html" class="nav-link">
+                <i class="fas fa-file-invoice"></i>
+                Reports
+            </a>
         </nav>
 
-        <a href="#" onclick="logout()" class="nav-link exit-link">
-            <i class="fas fa-power-off"></i> Exit System
+        <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i>
+            Exit System
         </a>
     </aside>
 
@@ -774,12 +1072,18 @@
             </div>
 
             <div class="topbar-right">
-                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
+                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" type="button">
                     <i class="fas fa-moon"></i>
                 </button>
-                <a href="ai_chat.html" class="top-btn"><i class="fas fa-brain"></i> Open EngiBot</a>
-                <button class="new-project-btn" onclick="openModal()">
-                    <i class="fas fa-plus"></i> New Project
+
+                <a href="ai_chat.html" class="top-btn">
+                    <i class="fas fa-brain"></i>
+                    Open EngiBot
+                </a>
+
+                <button class="new-project-btn" onclick="openModal()" type="button">
+                    <i class="fas fa-plus"></i>
+                    New Project
                 </button>
             </div>
         </div>
@@ -793,9 +1097,17 @@
                 </p>
 
                 <div class="hero-actions">
-                    <button class="hero-action primary" onclick="openModal()">Create Project</button>
-                    <a class="hero-action" href="ai_chat.html">Open EngiBot</a>
-                    <a class="hero-action" href="solutions.html">View Project Map</a>
+                    <button class="hero-action primary" onclick="openModal()" type="button">
+                        Create Project
+                    </button>
+
+                    <a class="hero-action" href="ai_chat.html">
+                        Open EngiBot
+                    </a>
+
+                    <a class="hero-action" href="solutions.html">
+                        View Project Map
+                    </a>
                 </div>
             </div>
 
@@ -804,14 +1116,17 @@
                     <div class="label">AI Status</div>
                     <div class="value">Online</div>
                 </div>
+
                 <div class="mini-card">
                     <div class="label">Auth Security</div>
                     <div class="value">JWT Active</div>
                 </div>
+
                 <div class="mini-card">
                     <div class="label">Last Sync</div>
                     <div class="value" id="lastSyncText">--:--</div>
                 </div>
+
                 <div class="mini-card">
                     <div class="label">Project Portfolio</div>
                     <div class="value" id="latestProjectText">None</div>
@@ -824,17 +1139,78 @@
                 <div class="stat-label">Total Projects</div>
                 <div class="stat-value" id="totalProjects">0</div>
             </div>
+
             <div class="stat-card">
                 <div class="stat-label">Active Projects</div>
                 <div class="stat-value" id="activeProjects">0</div>
             </div>
+
             <div class="stat-card">
                 <div class="stat-label">Pending Projects</div>
                 <div class="stat-value" id="pendingProjects">0</div>
             </div>
+
             <div class="stat-card">
                 <div class="stat-label">Completed Projects</div>
                 <div class="stat-value" id="completedProjects">0</div>
+            </div>
+        </section>
+
+        <section class="dashboard-risk-section">
+            <div class="risk-overview-header">
+                <div>
+                    <h2>Portfolio Risk Overview</h2>
+                    <p>Live risk intelligence across all engineering projects.</p>
+                </div>
+
+                <div class="portfolio-risk-badge" id="portfolioRiskBadge">
+                    Loading...
+                </div>
+            </div>
+
+            <div class="risk-summary-grid">
+                <div class="risk-summary-card">
+                    <span>Average Risk Score</span>
+                    <strong id="avgRiskScore">--%</strong>
+                    <small id="portfolioRiskLevel">Loading...</small>
+                </div>
+
+                <div class="risk-summary-card high">
+                    <span>High Risk Projects</span>
+                    <strong id="highRiskCount">--</strong>
+                    <small>Immediate attention</small>
+                </div>
+
+                <div class="risk-summary-card medium">
+                    <span>Medium Risk Projects</span>
+                    <strong id="mediumRiskCount">--</strong>
+                    <small>Monitor closely</small>
+                </div>
+
+                <div class="risk-summary-card low">
+                    <span>Low Risk Projects</span>
+                    <strong id="lowRiskCount">--</strong>
+                    <small>Stable projects</small>
+                </div>
+
+                <div class="risk-summary-card critical">
+                    <span>Critical Actions</span>
+                    <strong id="criticalActionsCount">--</strong>
+                    <small>Recommended actions</small>
+                </div>
+            </div>
+
+            <div class="top-risk-panel">
+                <div class="top-risk-title">
+                    <div>
+                        <h3>Top Risk Projects</h3>
+                        <p>Projects ranked by calculated risk score.</p>
+                    </div>
+                </div>
+
+                <div id="topRiskProjectsList" class="top-risk-list">
+                    <div class="top-risk-empty">Loading risk data...</div>
+                </div>
             </div>
         </section>
 
@@ -845,6 +1221,7 @@
                         <i class="fas fa-server" style="color:var(--primary);"></i>
                         Project Operations
                     </div>
+
                     <div class="chip">Live Project Data</div>
                 </div>
 
@@ -859,6 +1236,7 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
+
                         <tbody id="projectsTableBody">
                             <tr>
                                 <td colspan="5" style="text-align:center; color:var(--muted); padding:26px;">
@@ -876,6 +1254,7 @@
                         <i class="fas fa-chart-pie" style="color:var(--primary);"></i>
                         Project Distribution
                     </div>
+
                     <div class="chip">Data Linked</div>
                 </div>
 
@@ -885,6 +1264,7 @@
                             <span>Active Project Ratio</span>
                             <span id="activeRatioText">0%</span>
                         </div>
+
                         <div class="ratio-bar">
                             <div class="ratio-fill" id="activeRatioBar" style="width:0%; background:var(--success);"></div>
                         </div>
@@ -895,6 +1275,7 @@
                             <span>Pending Project Ratio</span>
                             <span id="pendingRatioText">0%</span>
                         </div>
+
                         <div class="ratio-bar">
                             <div class="ratio-fill" id="pendingRatioBar" style="width:0%; background:linear-gradient(90deg, var(--warning), #fb7185);"></div>
                         </div>
@@ -912,7 +1293,10 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Create New Project</h3>
-                <button class="close-btn" onclick="closeModal()"><i class="fas fa-xmark"></i></button>
+
+                <button class="close-btn" onclick="closeModal()" type="button">
+                    <i class="fas fa-xmark"></i>
+                </button>
             </div>
 
             <div class="form-grid">
@@ -954,9 +1338,13 @@
             </div>
 
             <div class="modal-actions">
-                <button class="top-btn" onclick="closeModal()">Cancel</button>
-                <button class="new-project-btn" onclick="addProject()" id="createProjectBtn">
-                    <i class="fas fa-plus"></i> Create Project
+                <button class="top-btn" onclick="closeModal()" type="button">
+                    Cancel
+                </button>
+
+                <button class="new-project-btn" onclick="addProject()" id="createProjectBtn" type="button">
+                    <i class="fas fa-plus"></i>
+                    Create Project
                 </button>
             </div>
         </div>
@@ -967,14 +1355,32 @@
         const token = localStorage.getItem("access_token");
 
         if (!token) {
-            window.location.href = "login.html";
+            window.location.assign(new URL("login.html", window.location.href).href);
         }
 
         let distributionChart = null;
 
+        function clearAuthData() {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("token");
+            localStorage.removeItem("token_type");
+            localStorage.removeItem("user_email");
+        }
+
+        function handleUnauthorized() {
+            clearAuthData();
+            window.location.assign(new URL("login.html", window.location.href).href);
+        }
+
         function showToast(message, type = "success") {
             const toast = document.getElementById("toast");
             const toastMessage = document.getElementById("toastMessage");
+
+            if (!toast || !toastMessage) {
+                alert(message);
+                return;
+            }
+
             toast.className = `toast ${type}`;
             toastMessage.textContent = message;
             toast.classList.add("show");
@@ -984,8 +1390,25 @@
             }, 3000);
         }
 
+        function escapeHTML(value) {
+            return String(value ?? "")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")
+                .replaceAll('"', "&quot;")
+                .replaceAll("'", "&#039;");
+        }
+
+        function normalizeStatus(status) {
+            const value = String(status || "Pending").toLowerCase();
+
+            if (value === "active") return "Active";
+            if (value === "completed") return "Completed";
+            return "Pending";
+        }
+
         function applySavedTheme() {
-            const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
+            const savedTheme = localStorage.getItem("theme") || "dark";
             const btn = document.getElementById("themeToggleBtn");
 
             if (savedTheme === "light") {
@@ -999,27 +1422,35 @@
 
         function toggleTheme() {
             const isLight = document.body.classList.toggle("light-mode");
-            localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+            localStorage.setItem("theme", isLight ? "light" : "dark");
 
             const btn = document.getElementById("themeToggleBtn");
+
             if (btn) {
                 btn.innerHTML = isLight
                     ? '<i class="fas fa-sun"></i>'
                     : '<i class="fas fa-moon"></i>';
             }
+
+            if (distributionChart) {
+                distributionChart.options.plugins.legend.labels.color = isLight ? "#64748b" : "#94a3b8";
+                distributionChart.update();
+            }
         }
 
         function logout() {
-            localStorage.removeItem("access_token");
-            window.location.href = "login.html";
+            clearAuthData();
+            window.location.assign(new URL("login.html", window.location.href).href);
         }
 
         function openModal() {
-            document.getElementById("projectModal").classList.add("show");
+            const modal = document.getElementById("projectModal");
+            if (modal) modal.classList.add("show");
         }
 
         function closeModal() {
-            document.getElementById("projectModal").classList.remove("show");
+            const modal = document.getElementById("projectModal");
+            if (modal) modal.classList.remove("show");
         }
 
         function formatProjectId(id) {
@@ -1027,25 +1458,52 @@
         }
 
         function getProgressFromStatus(status) {
-            if (status === "Completed") return 100;
-            if (status === "Active") return 65;
+            const normalized = normalizeStatus(status);
+
+            if (normalized === "Completed") return 100;
+            if (normalized === "Active") return 65;
             return 25;
         }
 
         function getStatusBadge(status) {
-            if (status === "Active") {
+            const normalized = normalizeStatus(status);
+
+            if (normalized === "Active") {
                 return `<span class="status-badge status-active"><i class="fas fa-circle"></i> Active</span>`;
             }
-            if (status === "Completed") {
+
+            if (normalized === "Completed") {
                 return `<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> Completed</span>`;
             }
+
             return `<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>`;
         }
 
         function updateLastSync() {
+            const el = document.getElementById("lastSyncText");
+            if (!el) return;
+
             const now = new Date();
-            const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-            document.getElementById("lastSyncText").innerText = time;
+            const time = now.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+            el.innerText = time;
+        }
+
+        function resetProjectForm() {
+            const title = document.getElementById("projectTitle");
+            const location = document.getElementById("projectLocation");
+            const description = document.getElementById("projectDescription");
+            const status = document.getElementById("projectStatus");
+            const type = document.getElementById("projectType");
+
+            if (title) title.value = "";
+            if (location) location.value = "";
+            if (description) description.value = "";
+            if (status) status.value = "Pending";
+            if (type) type.value = "Residential";
         }
 
         async function addProject() {
@@ -1061,8 +1519,11 @@
             }
 
             const btn = document.getElementById("createProjectBtn");
-            btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            }
 
             try {
                 const response = await fetch(`${API_BASE_URL}/projects/`, {
@@ -1080,6 +1541,11 @@
                     })
                 });
 
+                if (response.status === 401 || response.status === 403) {
+                    handleUnauthorized();
+                    return;
+                }
+
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -1089,12 +1555,7 @@
 
                 showToast("Project created successfully.", "success");
                 closeModal();
-
-                document.getElementById("projectTitle").value = "";
-                document.getElementById("projectLocation").value = "";
-                document.getElementById("projectDescription").value = "";
-                document.getElementById("projectStatus").value = "Pending";
-                document.getElementById("projectType").value = "Residential";
+                resetProjectForm();
 
                 await init();
 
@@ -1102,15 +1563,63 @@
                 console.error(error);
                 showToast("Unable to connect to server.", "error");
             } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-plus"></i> Create Project';
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-plus"></i> Create Project';
+                }
+            }
+        }
+
+        function viewProject(projectId) {
+            window.location.href = `project_details.html?id=${projectId}`;
+        }
+
+        function editProject(projectId) {
+            window.location.href = `project_details.html?id=${projectId}&edit=true`;
+        }
+
+        async function deleteProject(projectId) {
+            const confirmDelete = confirm("Are you sure you want to delete this project? This action cannot be undone.");
+
+            if (!confirmDelete) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/projects/${projectId}`, {
+                    method: "DELETE",
+                    headers: {
+                        "Authorization": `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401 || response.status === 403) {
+                    handleUnauthorized();
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    showToast(data.detail || "Failed to delete project.", "error");
+                    return;
+                }
+
+                showToast("Project deleted successfully.", "success");
+
+                await init();
+
+            } catch (error) {
+                console.error(error);
+                showToast("Unable to delete project. Please check the server.", "error");
             }
         }
 
         function renderProjects(projects) {
             const tbody = document.getElementById("projectsTableBody");
+            if (!tbody) return;
 
-            if (!projects.length) {
+            if (!Array.isArray(projects) || projects.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5" style="text-align:center; color:var(--muted); padding:26px;">
@@ -1123,14 +1632,20 @@
 
             tbody.innerHTML = projects.map(project => {
                 const progress = getProgressFromStatus(project.status);
+                const safeTitle = escapeHTML(project.title || "Untitled Project");
+                const safeLocation = escapeHTML(project.location || "Unknown");
+                const safeType = escapeHTML(project.project_type || "General");
+                const projectId = Number(project.id);
 
                 return `
                     <tr>
                         <td>
-                            <div class="project-name">${project.title}</div>
-                            <div class="project-id">ID: ${formatProjectId(project.id)}</div>
+                            <div class="project-name">${safeTitle}</div>
+                            <div class="project-id">ID: ${formatProjectId(projectId)}</div>
                         </td>
-                        <td>${project.location || "Unknown"}</td>
+
+                        <td>${safeLocation}</td>
+
                         <td>
                             <div class="progress-wrap">
                                 ${getStatusBadge(project.status)}
@@ -1139,12 +1654,22 @@
                                 </div>
                             </div>
                         </td>
-                        <td>${project.project_type || "General"}</td>
+
+                        <td>${safeType}</td>
+
                         <td>
                             <div class="table-btns">
-                                <a class="table-btn primary" href="project_details.html?id=${project.id}">
+                                <button class="table-btn primary" type="button" onclick="viewProject(${projectId})">
                                     View
-                                </a>
+                                </button>
+
+                                <button class="table-btn" type="button" onclick="editProject(${projectId})">
+                                    Edit
+                                </button>
+
+                                <button class="table-btn danger" type="button" onclick="deleteProject(${projectId})">
+                                    Delete
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -1161,13 +1686,19 @@
 
         function updatePortfolioText(projects) {
             const el = document.getElementById("latestProjectText");
+            if (!el) return;
 
-            if (!projects.length) {
+            if (!Array.isArray(projects) || projects.length === 0) {
                 el.innerText = "None";
-            } else if (projects.length === 1) {
-                el.innerText = projects[0].title;
+                return;
+            }
+
+            const latest = projects[projects.length - 1];
+
+            if (projects.length === 1) {
+                el.innerText = latest.title || "Project";
             } else {
-                el.innerText = `${projects[projects.length - 1].title} + ${projects.length - 1} more`;
+                el.innerText = `${latest.title || "Project"} + ${projects.length - 1} more`;
             }
         }
 
@@ -1180,39 +1711,189 @@
             const activeRatio = total ? Math.round((active / total) * 100) : 0;
             const pendingRatio = total ? Math.round((pending / total) * 100) : 0;
 
-            document.getElementById("activeRatioText").innerText = `${activeRatio}%`;
-            document.getElementById("pendingRatioText").innerText = `${pendingRatio}%`;
-            document.getElementById("activeRatioBar").style.width = `${activeRatio}%`;
-            document.getElementById("pendingRatioBar").style.width = `${pendingRatio}%`;
+            const activeRatioText = document.getElementById("activeRatioText");
+            const pendingRatioText = document.getElementById("pendingRatioText");
+            const activeRatioBar = document.getElementById("activeRatioBar");
+            const pendingRatioBar = document.getElementById("pendingRatioBar");
 
-            const ctx = document.getElementById("distributionChart").getContext("2d");
+            if (activeRatioText) activeRatioText.innerText = `${activeRatio}%`;
+            if (pendingRatioText) pendingRatioText.innerText = `${pendingRatio}%`;
+            if (activeRatioBar) activeRatioBar.style.width = `${activeRatio}%`;
+            if (pendingRatioBar) pendingRatioBar.style.width = `${pendingRatio}%`;
+
+            const canvas = document.getElementById("distributionChart");
+            if (!canvas) return;
+
+            const ctx = canvas.getContext("2d");
 
             if (distributionChart) {
                 distributionChart.destroy();
             }
+
+            const isLight = document.body.classList.contains("light-mode");
+            const legendColor = isLight ? "#64748b" : "#94a3b8";
 
             distributionChart = new Chart(ctx, {
                 type: "doughnut",
                 data: {
                     labels: ["Active", "Pending", "Completed"],
                     datasets: [{
-                        data: [active, pending, completed],
-                        backgroundColor: ["#10b981", "#f59e0b", "#64748b"],
+                        data: total ? [active, pending, completed] : [1],
+                        backgroundColor: total
+                            ? ["#10b981", "#f59e0b", "#64748b"]
+                            : ["rgba(148,163,184,0.25)"],
                         borderWidth: 0
                     }]
                 },
                 options: {
+                    cutout: "62%",
                     plugins: {
                         legend: {
+                            display: total > 0,
                             position: "bottom",
                             labels: {
-                                color: "#94a3b8",
-                                font: { size: 11, weight: "700" }
+                                color: legendColor,
+                                font: {
+                                    size: 11,
+                                    weight: "700"
+                                }
                             }
+                        },
+                        tooltip: {
+                            enabled: total > 0
                         }
                     }
                 }
             });
+        }
+
+async function loadDashboardRiskSummary() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/projects/risk-summary`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Accept": "application/json"
+            }
+        });
+
+        if (response.status === 401 || response.status === 403) {
+            handleUnauthorized();
+            return;
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text().catch(() => "");
+            console.error("Risk Summary HTTP Error:");
+            console.error("Status:", response.status);
+            console.error("Response:", errorText);
+
+            throw new Error(`Failed to load dashboard risk summary. Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Risk Summary Data:", data);
+        renderDashboardRiskSummary(data);
+
+    } catch (error) {
+        console.error("Dashboard Risk Summary Error:", error);
+
+        const badge = document.getElementById("portfolioRiskBadge");
+        if (badge) {
+            badge.textContent = "Unavailable";
+            badge.style.background = "#ef4444";
+        }
+
+        const list = document.getElementById("topRiskProjectsList");
+        if (list) {
+            list.innerHTML = `
+                <div class="top-risk-empty">
+                    Unable to load portfolio risk summary.
+                </div>
+            `;
+        }
+    }
+}
+
+        function renderDashboardRiskSummary(data) {
+            const avgRiskScore = document.getElementById("avgRiskScore");
+            const portfolioRiskLevel = document.getElementById("portfolioRiskLevel");
+            const portfolioRiskBadge = document.getElementById("portfolioRiskBadge");
+
+            const highRiskCount = document.getElementById("highRiskCount");
+            const mediumRiskCount = document.getElementById("mediumRiskCount");
+            const lowRiskCount = document.getElementById("lowRiskCount");
+            const criticalActionsCount = document.getElementById("criticalActionsCount");
+
+            if (avgRiskScore) {
+                avgRiskScore.textContent = `${data.average_risk_score}%`;
+            }
+
+            if (portfolioRiskLevel) {
+                portfolioRiskLevel.textContent = `${data.portfolio_risk_level} portfolio risk`;
+            }
+
+            if (portfolioRiskBadge) {
+                portfolioRiskBadge.textContent = `${data.portfolio_risk_level} Risk`;
+                portfolioRiskBadge.style.background = data.portfolio_risk_color || "#f59e0b";
+            }
+
+            if (highRiskCount) highRiskCount.textContent = data.high_risk;
+            if (mediumRiskCount) mediumRiskCount.textContent = data.medium_risk;
+            if (lowRiskCount) lowRiskCount.textContent = data.low_risk;
+            if (criticalActionsCount) criticalActionsCount.textContent = data.critical_actions_count;
+
+            renderTopRiskProjects(data.top_risky_projects || []);
+        }
+
+        function renderTopRiskProjects(projects) {
+            const list = document.getElementById("topRiskProjectsList");
+            if (!list) return;
+
+            if (!Array.isArray(projects) || projects.length === 0) {
+                list.innerHTML = `
+                    <div class="top-risk-empty">
+                        No risk data available yet.
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = projects.map(project => {
+                const title = escapeHTML(project.title || "Untitled Project");
+                const status = escapeHTML(project.status || "Unknown");
+                const factor = escapeHTML(project.main_factor || "No major risk factor.");
+                const riskColor = project.risk_color || "#f59e0b";
+                const riskLevel = escapeHTML(project.risk_level || "Medium");
+                const projectId = Number(project.project_id);
+
+                return `
+                    <div class="top-risk-item">
+                        <div class="top-risk-project-name">
+                            ${title}
+                            <small>${formatProjectId(projectId)} · ${status}</small>
+                        </div>
+
+                        <div>
+                            <span class="risk-score-pill" style="background:${riskColor};">
+                                ${project.risk_score}%
+                            </span>
+                        </div>
+
+                        <div class="risk-level-label" style="color:${riskColor};">
+                            ${riskLevel}
+                        </div>
+
+                        <div class="risk-main-factor">
+                            ${factor}
+                        </div>
+
+                        <a class="open-risk-btn" href="project_details.html?id=${encodeURIComponent(projectId)}">
+                            Open
+                        </a>
+                    </div>
+                `;
+            }).join("");
         }
 
         async function init() {
@@ -1221,15 +1902,30 @@
 
                 const [userRes, projectsRes, statsRes] = await Promise.all([
                     fetch(`${API_BASE_URL}/users/me`, {
-                        headers: { "Authorization": `Bearer ${token}` }
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
                     }),
                     fetch(`${API_BASE_URL}/projects/`, {
-                        headers: { "Authorization": `Bearer ${token}` }
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
                     }),
                     fetch(`${API_BASE_URL}/projects/stats`, {
-                        headers: { "Authorization": `Bearer ${token}` }
+                        headers: {
+                            "Authorization": `Bearer ${token}`
+                        }
                     })
                 ]);
+
+                if (
+                    userRes.status === 401 || userRes.status === 403 ||
+                    projectsRes.status === 401 || projectsRes.status === 403 ||
+                    statsRes.status === 401 || statsRes.status === 403
+                ) {
+                    handleUnauthorized();
+                    return;
+                }
 
                 if (!userRes.ok || !projectsRes.ok || !statsRes.ok) {
                     throw new Error("Failed to load dashboard data");
@@ -1239,21 +1935,37 @@
                 const projects = await projectsRes.json();
                 const stats = await statsRes.json();
 
-                document.getElementById("userWelcome").innerText = user.full_name || "Engineer";
+                const userWelcome = document.getElementById("userWelcome");
+                if (userWelcome) {
+                    userWelcome.innerText = user.full_name || user.email || "Engineer";
+                }
 
                 updateStats(stats);
                 renderProjects(projects);
                 updatePortfolioText(projects);
                 updateDistribution(stats);
+                await loadDashboardRiskSummary();
 
             } catch (error) {
                 console.error(error);
                 showToast("Failed to load dashboard data.", "error");
+
+                const tbody = document.getElementById("projectsTableBody");
+                if (tbody) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align:center; color:var(--muted); padding:26px;">
+                                Failed to load projects.
+                            </td>
+                        </tr>
+                    `;
+                }
             }
         }
 
         window.onclick = function(event) {
             const modal = document.getElementById("projectModal");
+
             if (event.target === modal) {
                 closeModal();
             }
