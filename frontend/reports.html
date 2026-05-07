@@ -31,7 +31,8 @@
             color: var(--text);
             display: flex;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             transition: background 0.3s, color 0.3s;
         }
 
@@ -47,6 +48,10 @@
             flex-direction: column;
             padding: 28px 18px;
             z-index: 100;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
         }
 
         .logo {
