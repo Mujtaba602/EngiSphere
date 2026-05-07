@@ -1198,6 +1198,7 @@ body.dark-theme .profile-side {
     </div>
 
     <div class="nav-right">
+      <div id="notificationCenter"></div>
       <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
         <i class="fas fa-moon"></i>
       </button>
@@ -1314,6 +1315,8 @@ body.dark-theme .profile-side {
 
 
 
+  <script src="assets/js/audit.js"></script>
+  <script src="assets/js/notifications.js"></script>
   <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     let token = localStorage.getItem("access_token");
@@ -1360,6 +1363,10 @@ body.dark-theme .profile-side {
 
       if (themeBtn) {
         themeBtn.addEventListener("click", toggleTheme);
+      }
+
+      if (window.EngiSphereNotifications) {
+          window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
       }
     });
 
@@ -1491,7 +1498,6 @@ body.dark-theme .profile-side {
         showToast("errorToast", "SYSTEM ERROR: Backend is offline!");
       }
     }
-
 
   </script>
 </body>

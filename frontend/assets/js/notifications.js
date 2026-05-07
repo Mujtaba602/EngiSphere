@@ -20,11 +20,12 @@ window.EngiSphereNotifications = (function () {
             "project_created",
             "project_updated",
             "project_deleted",
-            "project_details_opened",
-            "reports_loaded",
             "team_member_invited",
             "pdf_export_clicked",
-            "dashboard_loaded"
+            "project_progress_updated",
+            "project_status_changed",
+            "project_risk_changed",
+            "ai_analysis_completed"
         ];
         return getLogs().filter(log => importantActions.includes(log.action));
     }
@@ -45,6 +46,46 @@ window.EngiSphereNotifications = (function () {
         const div = document.createElement("div");
         div.textContent = String(text ?? "");
         return div.innerHTML;
+    }
+
+    function getNotificationUrl(log) {
+        const id = log.project_id || log.entity_id;
+        switch (log.action) {
+            case "ai_radar_opened":
+            case "ai_radar_project_loaded":
+            case "project_risk_changed":
+            case "ai_analysis_completed":
+                return id ? `solutions.html?projectId=${id}` : "solutions.html";
+            case "project_created":
+            case "project_updated":
+            case "project_progress_updated":
+            case "project_status_changed":
+                return id ? `project_details.html?projectId=${id}` : "project_details.html";
+            case "project_deleted":
+            case "pdf_export_clicked":
+                return "reports.html";
+            case "team_member_invited":
+                return "team_access.html";
+            default:
+                return "index.html";
+        }
+    }
+
+    function getNotificationMessage(log) {
+        if (log.action === "ai_radar_opened" || log.action === "ai_radar_project_loaded") {
+            const match = log.message.match(/:\s*(.*)/);
+            const projName = match ? match[1] : "the project";
+            return `AI Radar is ready for ${projName}`;
+        }
+        if (log.action === "team_member_invited") {
+            const match = log.message.match(/:\s*(.*)/);
+            const invited = match ? match[1] : "a new member";
+            return `Team invitation sent to ${invited}`;
+        }
+        if (log.action === "pdf_export_clicked") {
+            return "PDF report exported successfully";
+        }
+        return log.message;
     }
 
     let currentContainerId = null;
@@ -94,9 +135,10 @@ window.EngiSphereNotifications = (function () {
                 .notif-body { max-height: 340px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
                 .notif-item {
                     padding: 12px 16px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.05));
-                    display: flex; gap: 12px; align-items: flex-start;
+                    display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.2s;
                 }
                 .notif-item:last-child { border-bottom: none; }
+                .notif-item:hover { background: rgba(255,255,255,0.04) !important; }
                 .notif-icon {
                     width: 28px; height: 28px; border-radius: 50%; display: flex;
                     align-items: center; justify-content: center; flex-shrink: 0;
@@ -104,6 +146,7 @@ window.EngiSphereNotifications = (function () {
                 .notif-content { flex: 1; min-width: 0; }
                 .notif-msg { font-size: 13px; color: var(--text, #fff); line-height: 1.4; margin-bottom: 4px; }
                 .notif-time { font-size: 11px; color: var(--muted, #94a3b8); }
+                .notif-arrow { color: var(--muted); align-self: center; margin-left: auto; }
                 .notif-empty { padding: 20px; text-align: center; color: var(--muted); font-size: 13px; }
             `;
             document.head.appendChild(style);
@@ -165,7 +208,7 @@ window.EngiSphereNotifications = (function () {
 
         const logs = getImportantLogs().slice(0, 8);
         if (logs.length === 0) {
-            list.innerHTML = `<li class="notif-empty">No notifications yet.</li>`;
+            list.innerHTML = `<li class="notif-empty">No important notifications yet.</li>`;
             return;
         }
 
@@ -177,15 +220,21 @@ window.EngiSphereNotifications = (function () {
             const time = getRelativeTime(log.created_at);
             const isUnread = new Date(log.created_at).getTime() > readTimestamp;
             const unreadDot = isUnread ? `<span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--primary); margin-left:6px;"></span>` : '';
+            
+            const url = getNotificationUrl(log);
+            const msg = getNotificationMessage(log);
 
             return `
-                <li class="notif-item" style="${isUnread ? 'background: rgba(255,255,255,0.02);' : ''}">
+                <li class="notif-item" style="${isUnread ? 'background: rgba(255,255,255,0.02);' : ''}" data-url="${escapeHtml(url)}">
                     <div class="notif-icon" style="background: ${props.color}15; color: ${props.color};">
                         <i class="fas ${props.icon} fa-sm"></i>
                     </div>
                     <div class="notif-content">
-                        <div class="notif-msg">${escapeHtml(log.message)}${unreadDot}</div>
+                        <div class="notif-msg">${escapeHtml(msg)}${unreadDot}</div>
                         <div class="notif-time">${time}</div>
+                    </div>
+                    <div class="notif-arrow">
+                        <i class="fas fa-chevron-right fa-xs"></i>
                     </div>
                 </li>
             `;
@@ -210,6 +259,19 @@ window.EngiSphereNotifications = (function () {
             readAllBtn.addEventListener("click", (e) => {
                 e.stopPropagation();
                 markAllAsRead();
+            });
+        }
+
+        if (dropdown) {
+            dropdown.addEventListener("click", (e) => {
+                const item = e.target.closest(".notif-item");
+                if (item) {
+                    const url = item.getAttribute("data-url");
+                    if (url) {
+                        markAllAsRead();
+                        window.location.href = url;
+                    }
+                }
             });
         }
 
