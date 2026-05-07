@@ -1142,6 +1142,7 @@
             </div>
 
             <div class="topbar-right">
+                <div id="notificationCenter"></div>
                 <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" type="button">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -1490,6 +1491,7 @@
     </div>
 
     <script src="assets/js/audit.js"></script>
+    <script src="assets/js/notifications.js"></script>
     <script>
         const API_BASE_URL = "http://127.0.0.1:8000";
         const token = localStorage.getItem("access_token");
@@ -2200,6 +2202,10 @@ async function loadDashboardRiskSummary() {
                 severity: "info"
             });
             window.EngiSphereAudit.renderRecentActivity("dashboardAuditContainer", 5);
+        }
+
+        if (window.EngiSphereNotifications) {
+            window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
         }
     </script>
 </body>

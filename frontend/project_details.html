@@ -1112,6 +1112,7 @@
                 <a href="index.html" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Control Center</a>
 
                 <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                    <div id="notificationCenter"></div>
                     <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtnDetails">
                         <i class="fas fa-moon"></i>
                     </button>
@@ -1417,6 +1418,7 @@
     </div>
 
    <script src="assets/js/audit.js"></script>
+   <script src="assets/js/notifications.js"></script>
    <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -3144,6 +3146,10 @@ function showRiskError(message) {
             ${message}
         </div>
     `;
+}
+
+if (window.EngiSphereNotifications) {
+    window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
 }
 </script>
 </body>

@@ -878,6 +878,7 @@
             </div>
 
             <div class="top-actions">
+                <div id="notificationCenter"></div>
                 <button class="theme-toggle" id="themeToggleBtn" onclick="toggleTheme()">
                     <i class="fas fa-moon"></i>
                 </button>
@@ -1058,6 +1059,7 @@
     </div>
 
    <script src="assets/js/audit.js"></script>
+   <script src="assets/js/notifications.js"></script>
    <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -1839,6 +1841,10 @@
     applySavedTheme();
     renderMembers();
     loadInitialData();
+
+    if (window.EngiSphereNotifications) {
+        window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
+    }
 </script>
 </body>
 </html>
