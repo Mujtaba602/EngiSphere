@@ -1490,8 +1490,9 @@
         </div>
     </div>
 
-    <script src="assets/js/audit.js"></script>
-    <script src="assets/js/notifications.js"></script>
+<script src="assets/js/audit.js"></script>
+<script src="assets/js/notifications.js"></script>
+<script src="assets/js/project_progress.js"></script>
     <script>
         const API_BASE_URL = "http://127.0.0.1:8000";
         const token = localStorage.getItem("access_token");
@@ -1844,8 +1845,9 @@
                 return;
             }
 
-            tbody.innerHTML = projects.map(project => {
-                const progress = getProgressFromStatus(project.status);
+            tbody.innerHTML = projects.map(p => {
+                const project = window.EngiSphereProgress ? window.EngiSphereProgress.mergeProjectProgress(p) : p;
+                const progress = project.progress !== undefined ? project.progress : getProgressFromStatus(project.status);
                 const safeTitle = escapeHTML(project.title || "Untitled Project");
                 const safeLocation = escapeHTML(project.location || "Unknown");
                 const safeType = escapeHTML(project.project_type || "General");
@@ -2077,13 +2079,21 @@ async function loadDashboardRiskSummary() {
                 return;
             }
 
-            list.innerHTML = projects.map(project => {
+            list.innerHTML = projects.map(p => {
+                const project = window.EngiSphereProgress ? window.EngiSphereProgress.mergeProjectProgress(p) : p;
                 const title = escapeHTML(project.title || "Untitled Project");
                 const status = escapeHTML(project.status || "Unknown");
                 const factor = escapeHTML(project.main_factor || "No major risk factor.");
-                const riskColor = project.risk_color || "#f59e0b";
-                const riskLevel = escapeHTML(project.risk_level || "Medium");
-                const projectId = Number(project.project_id);
+                
+                let riskColor = project.risk_color || "#f59e0b";
+                let riskLevel = project.risk_level || "Medium";
+                if (window.EngiSphereProgress) {
+                    if (riskLevel.toLowerCase() === 'low') riskColor = "#10b981";
+                    if (riskLevel.toLowerCase() === 'high') riskColor = "#ef4444";
+                }
+                
+                riskLevel = escapeHTML(riskLevel.charAt(0).toUpperCase() + riskLevel.slice(1));
+                const projectId = Number(project.project_id || project.id);
 
                 return `
                     <div class="top-risk-item">
@@ -2207,6 +2217,10 @@ async function loadDashboardRiskSummary() {
         if (window.EngiSphereNotifications) {
             window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
         }
+
+        window.addEventListener('engisphereProjectUpdated', () => {
+            loadProjects();
+        });
     </script>
 </body>
 </html>

@@ -880,8 +880,9 @@
             </div>
     </section>
     </main>
-  <script src="assets/js/audit.js"></script>
-  <script src="assets/js/notifications.js"></script>
+<script src="assets/js/audit.js"></script>
+<script src="assets/js/notifications.js"></script>
+<script src="assets/js/project_progress.js"></script>
   <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -2035,10 +2036,10 @@ function formatAITextToHTML(text) {
         }
     }
 
-    function getProjectIdFromUrl() {
-        const params = new URLSearchParams(window.location.search);
-        return params.get("projectId");
-    }
+  function getProjectIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("projectId") || params.get("projectid") || params.get("id");
+}
 
     async function fetchProjectById(projectId) {
         const directEndpoints = [
