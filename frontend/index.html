@@ -1371,6 +1371,20 @@
                 </div>
             </div>
         </section>
+
+        <section class="activity-section" style="margin-top: 24px;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-history" style="color:var(--primary);"></i>
+                        Recent Activity
+                    </div>
+                </div>
+                <div id="dashboardAuditContainer">
+                    <!-- Audit logs will be rendered here -->
+                </div>
+            </div>
+        </section>
     </main>
 
     <div class="modal" id="projectModal">
@@ -1475,6 +1489,7 @@
         </div>
     </div>
 
+    <script src="assets/js/audit.js"></script>
     <script>
         const API_BASE_URL = "http://127.0.0.1:8000";
         const token = localStorage.getItem("access_token");
@@ -1864,7 +1879,7 @@
                                     Edit
                                 </button>
                                 
-                                <a class="table-btn radar" href="solutions.html?projectId=${projectId}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 7px;">
+                                <a class="table-btn radar" href="solutions.html?projectId=${projectId}" onclick="if(window.EngiSphereAudit){window.EngiSphereAudit.logAuditEvent({action: 'ai_radar_opened', entity_type: 'project', entity_id: '${projectId}', project_id: '${projectId}', message: 'AI Radar opened for project: ${safeTitle}', severity: 'info'});}" style="text-decoration: none; display: inline-flex; align-items: center; gap: 7px;">
                                     <i class="fas fa-satellite-dish"></i> AI Radar
                                 </a>
 
@@ -2175,6 +2190,17 @@ async function loadDashboardRiskSummary() {
 
         applySavedTheme();
         init();
+
+        if (window.EngiSphereAudit) {
+            window.EngiSphereAudit.logAuditEvent({
+                action: "dashboard_loaded",
+                entity_type: "page",
+                entity_id: "index",
+                message: "Dashboard opened",
+                severity: "info"
+            });
+            window.EngiSphereAudit.renderRecentActivity("dashboardAuditContainer", 5);
+        }
     </script>
 </body>
 </html>

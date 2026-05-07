@@ -1416,6 +1416,7 @@
         </div>
     </div>
 
+   <script src="assets/js/audit.js"></script>
    <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -2985,6 +2986,17 @@ loadRiskAssessmentForProject(currentProject.id);
             }
 
             currentProjectData = await projectRes.json();
+
+            if (window.EngiSphereAudit && currentProjectData) {
+                window.EngiSphereAudit.logAuditEvent({
+                    action: "project_details_opened",
+                    entity_type: "project",
+                    entity_id: currentProjectData.id,
+                    project_id: currentProjectData.id,
+                    message: `Project details opened: ${currentProjectData.title || 'Unknown'}`,
+                    severity: "info"
+                });
+            }
 
             renderCurrentProject();
 

@@ -1057,6 +1057,7 @@
         </div>
     </div>
 
+   <script src="assets/js/audit.js"></script>
    <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -1605,6 +1606,15 @@
             await loadTeamMembers();
 
             showToast("Team member added successfully.", "success");
+
+            if (window.EngiSphereAudit) {
+                window.EngiSphereAudit.logAuditEvent({
+                    action: "team_member_invited",
+                    entity_type: "team",
+                    message: `Team member invited: ${name} (${email})`,
+                    severity: "success"
+                });
+            }
 
         } catch (error) {
             console.error("Add member error:", error);

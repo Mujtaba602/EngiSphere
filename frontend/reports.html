@@ -611,8 +611,20 @@
                     </tbody>
                 </table>
             </div>
+            <div class="card" style="margin-bottom: 22px;">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-list-check" style="color:var(--primary);"></i>
+                        Operations Log
+                    </div>
+                </div>
+                <div id="reportsAuditContainer">
+                    <!-- Audit logs will be rendered here -->
+                </div>
+            </div>
         </div>
     </main>
+    <script src="assets/js/audit.js"></script>
  <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -1203,6 +1215,17 @@
 
     applySavedTheme();
     init();
+
+    if (window.EngiSphereAudit) {
+        window.EngiSphereAudit.logAuditEvent({
+            action: "reports_loaded",
+            entity_type: "page",
+            entity_id: "reports",
+            message: "Reports page opened",
+            severity: "info"
+        });
+        window.EngiSphereAudit.renderRecentActivity("reportsAuditContainer", 10);
+    }
 </script>
 </body>
 </html>

@@ -879,6 +879,7 @@
             </div>
     </section>
     </main>
+  <script src="assets/js/audit.js"></script>
   <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -2211,6 +2212,16 @@ function formatAITextToHTML(text) {
                 const project = await fetchProjectById(projectId);
                 if (project) {
                     console.log("[Radar] Project loaded successfully:", project);
+                    if (window.EngiSphereAudit) {
+                        window.EngiSphereAudit.logAuditEvent({
+                            action: "ai_radar_project_loaded",
+                            entity_type: "project",
+                            entity_id: project.id,
+                            project_id: project.id,
+                            message: `AI Radar loaded project: ${project.title || 'Unknown'}`,
+                            severity: "success"
+                        });
+                    }
                     activeProjectId = project.id;
                     renderProjectContext(project);
                     
