@@ -20,19 +20,121 @@
             .replaceAll('"', "&quot;")
             .replaceAll("'", "&#039;");
     }
+function normalizeId(value) {
+    return String(value ?? "").trim();
+}
 
-    function getProjectProgressRows() {
-        const data = safeParse(localStorage.getItem(PROGRESS_KEY), {});
-        return Object.entries(data).map(([id, item]) => ({
+function getStoredProjectName(projectId) {
+    const normalizedProjectId = normalizeId(projectId);
+
+    const possibleKeys = [
+        "engisphere_projects",
+        "projects",
+        "engisphere_all_projects",
+        "engisphere_project_list",
+    ];
+
+    for (const key of possibleKeys) {
+        const value = safeParse(localStorage.getItem(key), null);
+
+        if (!value) continue;
+
+        const projects = Array.isArray(value)
+            ? value
+            : Array.isArray(value.projects)
+              ? value.projects
+              : Array.isArray(value.data)
+                ? value.data
+                : [];
+
+        const matchedProject = projects.find((project) => {
+            const candidateIds = [
+                project.id,
+                project.project_id,
+                project.projectId,
+                project._id,
+            ].map(normalizeId);
+
+            return candidateIds.includes(normalizedProjectId);
+        });
+
+        if (matchedProject) {
+            return (
+                matchedProject.name ||
+                matchedProject.project_name ||
+                matchedProject.projectName ||
+                matchedProject.title ||
+                matchedProject.project_title ||
+                ""
+            );
+        }
+    }
+
+    return "";
+}
+
+function getProjectNameFromAudit(projectId, auditEvents) {
+    if (!auditEvents || !auditEvents.length) return "";
+
+    const projectIdText = normalizeId(projectId);
+
+    const projectMessages = auditEvents
+        .map((event) =>
+            String(
+                event.message ||
+                    event.action ||
+                    event.event ||
+                    event.description ||
+                    ""
+            )
+        )
+        .filter(Boolean);
+
+    for (const message of projectMessages) {
+        const detailsMatch = message.match(/project details opened:\s*(.+)$/i);
+        if (detailsMatch && detailsMatch[1]) {
+            return detailsMatch[1].trim();
+        }
+
+        const radarMatch = message.match(/AI Radar loaded project:\s*(.+)$/i);
+        if (radarMatch && radarMatch[1]) {
+            return radarMatch[1].trim();
+        }
+    }
+
+    return projectIdText ? `Project ${projectIdText}` : "Unknown Project";
+}
+
+function resolveProjectName(projectId, item, auditEvents) {
+    return (
+        item.project_name ||
+        item.projectName ||
+        item.name ||
+        item.title ||
+        getStoredProjectName(projectId) ||
+        getProjectNameFromAudit(projectId, auditEvents) ||
+        `Project ${projectId}`
+    );
+}
+
+function getProjectProgressRows(auditEvents = []) {
+    const data = safeParse(localStorage.getItem(PROGRESS_KEY), {});
+
+    return Object.entries(data).map(([id, item]) => {
+        const projectId = item.project_id || item.projectId || id;
+
+        return {
             id,
-            project_id: item.project_id || id,
+            project_id: projectId,
+            project_name: resolveProjectName(projectId, item, auditEvents),
             progress: Number(item.progress || 0),
             status: item.status || "Unknown",
-            risk_level: item.risk_level || "Unknown",
-            updated_at: item.updated_at || "",
-            updated_by: item.updated_by || "Unknown",
-        }));
-    }
+            risk_level: item.risk_level || item.riskLevel || "Unknown",
+            updated_at: item.updated_at || item.updatedAt || "",
+            updated_by: item.updated_by || item.updatedBy || "Unknown",
+        };
+    });
+}
 
     function getAuditEvents() {
         const candidates = [];
@@ -99,9 +201,151 @@
         }
     }
 
-    function buildReportHtml() {
-        const rows = getProjectProgressRows();
-        const auditEvents = getAuditEvents();
+    // ── Project Health helpers ──────────────────────────────────────────────
+
+    function getRiskPriority(row) {
+        const risk   = String(row.risk_level || "").toLowerCase();
+        const status = String(row.status     || "").toLowerCase();
+        const prog   = Number(row.progress   || 0);
+
+        if (risk.includes("high"))        return "high";
+        if (status.includes("pending"))   return "medium";
+        if (prog < 50)                    return "medium";
+        if (prog >= 80)                   return "medium";
+        return "normal";
+    }
+
+    function getProjectIssue(row) {
+        const risk   = String(row.risk_level || "").toLowerCase();
+        const status = String(row.status     || "").toLowerCase();
+        const prog   = Number(row.progress   || 0);
+
+        if (risk.includes("high"))
+            return "High risk level requires immediate mitigation review.";
+        if (status.includes("pending"))
+            return "Project is pending and may require unblock actions.";
+        if (prog < 50)
+            return "Progress is below expected delivery level.";
+        if (prog >= 80)
+            return "Project is close to completion and needs final delivery focus.";
+        return "No critical issues detected at this time.";
+    }
+
+    function getRecommendedAction(row) {
+        const risk   = String(row.risk_level || "").toLowerCase();
+        const status = String(row.status     || "").toLowerCase();
+        const prog   = Number(row.progress   || 0);
+
+        if (risk.includes("high"))
+            return "Review risks, assign mitigation owner, and define recovery actions.";
+        if (status.includes("pending"))
+            return "Confirm blocker reason, update next milestone, and assign responsible owner.";
+        if (prog < 50)
+            return "Review schedule, resource allocation, and planned deliverables.";
+        if (prog >= 80)
+            return "Focus on closure checklist, final approvals, and handover readiness.";
+        return "Continue monitoring progress and keep status updated.";
+    }
+
+    function getPriorityLabel(row) {
+        const p = getRiskPriority(row);
+        return p === "high" ? "High" : p === "medium" ? "Medium" : "Normal";
+    }
+
+    function getProjectHealthSummary(rows) {
+        const hasHighRisk  = rows.some((r) => String(r.risk_level || "").toLowerCase().includes("high"));
+        const hasPending   = rows.some((r) => String(r.status     || "").toLowerCase().includes("pending"));
+        const avgProgress  = rows.length
+            ? Math.round(rows.reduce((s, r) => s + Number(r.progress || 0), 0) / rows.length)
+            : 0;
+
+        if (hasHighRisk)  return { label: "Needs Attention", note: "High risk project(s) require immediate action" };
+        if (hasPending)   return { label: "Monitor Closely",  note: "Pending project(s) may need unblock decisions"  };
+        if (avgProgress >= 80) return { label: "Strong",      note: "Portfolio above 80% with no critical risks"     };
+        return               { label: "Stable",            note: "All projects progressing within acceptable range" };
+    }
+
+    function renderProjectInsightsHtml(rows) {
+        if (!rows.length) {
+            return `<p class="insight-empty">No project data available to generate insights.</p>`;
+        }
+
+        const health      = getProjectHealthSummary(rows);
+        const highRiskCnt = rows.filter((r) => String(r.risk_level || "").toLowerCase().includes("high")).length;
+        const pendingCnt  = rows.filter((r) => String(r.status     || "").toLowerCase().includes("pending")).length;
+
+        // Priority project: High Risk first → then least progress
+        const priorityProject = [...rows].sort((a, b) => {
+            const aHigh = String(a.risk_level || "").toLowerCase().includes("high") ? 0 : 1;
+            const bHigh = String(b.risk_level || "").toLowerCase().includes("high") ? 0 : 1;
+            if (aHigh !== bHigh) return aHigh - bHigh;
+            return Number(a.progress || 0) - Number(b.progress || 0);
+        })[0];
+
+        const insightCards = `
+<div class="insight-grid">
+    <div class="insight-card">
+        <div class="insight-label">Overall Health</div>
+        <div class="insight-value">${escapeHtml(health.label)}</div>
+        <div class="insight-note">${escapeHtml(health.note)}</div>
+    </div>
+    <div class="insight-card">
+        <div class="insight-label">Priority Project</div>
+        <div class="insight-value">${escapeHtml(priorityProject.project_name || priorityProject.project_id)}</div>
+        <div class="insight-note">${escapeHtml(getPriorityLabel(priorityProject))} priority &mdash; ${escapeHtml(priorityProject.progress)}% complete</div>
+    </div>
+    <div class="insight-card">
+        <div class="insight-label">High Risk Projects</div>
+        <div class="insight-value">${highRiskCnt}</div>
+        <div class="insight-note">${highRiskCnt === 0 ? "No high-risk items" : "Require immediate attention"}</div>
+    </div>
+    <div class="insight-card">
+        <div class="insight-label">Pending Projects</div>
+        <div class="insight-value">${pendingCnt}</div>
+        <div class="insight-note">${pendingCnt === 0 ? "No blocked items" : "May require unblock decisions"}</div>
+    </div>
+</div>`;
+
+        const actionRows = rows
+            .slice()
+            .sort((a, b) => {
+                const order = { high: 0, medium: 1, normal: 2 };
+                return (order[getRiskPriority(a)] ?? 2) - (order[getRiskPriority(b)] ?? 2);
+            })
+            .map((row) => {
+                const priorityVal = getPriorityLabel(row);
+                const cls         = `priority-${getRiskPriority(row)}`;
+                return `
+<tr>
+    <td>${escapeHtml(row.project_name || row.project_id)}</td>
+    <td class="${cls}">${escapeHtml(priorityVal)}</td>
+    <td>${escapeHtml(getProjectIssue(row))}</td>
+    <td>${escapeHtml(getRecommendedAction(row))}</td>
+</tr>`;
+            })
+            .join("");
+
+        const actionTable = `
+<table class="action-table">
+    <thead>
+        <tr>
+            <th>Project</th>
+            <th>Priority</th>
+            <th>Key Issue</th>
+            <th>Recommended Action</th>
+        </tr>
+    </thead>
+    <tbody>${actionRows}</tbody>
+</table>`;
+
+        return insightCards + actionTable;
+    }
+
+    // ── Main HTML builder ───────────────────────────────────────────────────
+
+function buildReportHtml() {
+    const auditEvents = getAuditEvents();
+    const rows = getProjectProgressRows(auditEvents);
         const summary = getSummary(rows);
         const generatedAt = new Date().toLocaleString();
 
@@ -109,165 +353,207 @@
             ? rows
                   .map(
                       (row) => `
-                        <tr>
-                            <td>${escapeHtml(row.project_id)}</td>
-                            <td>${escapeHtml(row.progress)}%</td>
-                            <td>${escapeHtml(row.status)}</td>
-                            <td>${escapeHtml(row.risk_level)}</td>
-                            <td>${escapeHtml(formatDate(row.updated_at))}</td>
-                            <td>${escapeHtml(row.updated_by)}</td>
-                        </tr>
+ <tr>
+    <td>${escapeHtml(row.project_id)}</td>
+    <td>${escapeHtml(row.project_name)}</td>
+    <td>${escapeHtml(row.progress)}%</td>
+    <td>${escapeHtml(row.status)}</td>
+    <td>${escapeHtml(row.risk_level)}</td>
+    <td>${escapeHtml(formatDate(row.updated_at))}</td>
+    <td>${escapeHtml(row.updated_by)}</td>
+</tr>
                     `
                   )
                   .join("")
             : `
                 <tr>
-                    <td colspan="6" class="empty-row">No project progress data found.</td>
+                    <td colspan="7" class="empty-row">No project progress data found.</td>
                 </tr>
             `;
 
-        const auditHtml = auditEvents.length
-            ? auditEvents
-                  .map((event) => {
-                      const message =
-                          event.message ||
-                          event.action ||
-                          event.event ||
-                          event.description ||
-                          JSON.stringify(event);
-
-                      const time =
-                          event.timestamp ||
-                          event.created_at ||
-                          event.time ||
-                          event.date ||
-                          "";
-
-                      return `
-                        <li>
-                            <strong>${escapeHtml(formatDate(time))}</strong>
-                            <span>${escapeHtml(message)}</span>
-                        </li>
-                    `;
-                  })
-                  .join("")
-            : `<li>No audit events found.</li>`;
+        const insightsHtml = renderProjectInsightsHtml(rows);
 
         return `
             <div id="engisphere-pdf-report">
                 <style>
-                    #engisphere-pdf-report {
-                        width: 900px;
-                        padding: 32px;
-                        background: #ffffff;
-                        color: #111827;
-                        font-family: Arial, Helvetica, sans-serif;
-                        line-height: 1.45;
-                    }
+#engisphere-pdf-report {
+    width: 1120px;
+    min-height: 760px;
+    background: #ffffff;
+    color: #111827;
+    padding: 44px;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+}
 
-                    #engisphere-pdf-report .header {
-                        border-bottom: 3px solid #2563eb;
-                        padding-bottom: 18px;
-                        margin-bottom: 24px;
-                    }
+#engisphere-pdf-report .header {
+    border-bottom: 3px solid #2563eb;
+    padding-bottom: 18px;
+    margin-bottom: 24px;
+}
 
-                    #engisphere-pdf-report .brand {
-                        font-size: 28px;
-                        font-weight: 800;
-                        color: #1d4ed8;
-                        letter-spacing: 0.5px;
-                    }
+#engisphere-pdf-report .brand {
+    font-size: 28px;
+    font-weight: 800;
+    color: #1d4ed8;
+    letter-spacing: 0.5px;
+}
 
-                    #engisphere-pdf-report .subtitle {
-                        margin-top: 6px;
-                        color: #4b5563;
-                        font-size: 14px;
-                    }
+#engisphere-pdf-report .subtitle {
+    margin-top: 6px;
+    color: #4b5563;
+    font-size: 14px;
+}
 
-                    #engisphere-pdf-report h2 {
-                        font-size: 18px;
-                        margin: 26px 0 12px;
-                        color: #111827;
-                    }
+#engisphere-pdf-report h2 {
+    font-size: 18px;
+    margin: 26px 0 12px;
+    color: #111827;
+}
 
-                    #engisphere-pdf-report .summary-grid {
-                        display: grid;
-                        grid-template-columns: repeat(4, 1fr);
-                        gap: 12px;
-                        margin-bottom: 22px;
-                    }
+#engisphere-pdf-report .section-subtitle {
+    font-size: 12px;
+    color: #6b7280;
+    margin: -8px 0 14px;
+}
 
-                    #engisphere-pdf-report .summary-card {
-                        border: 1px solid #e5e7eb;
-                        border-radius: 10px;
-                        padding: 14px;
-                        background: #f9fafb;
-                    }
+/* ── Executive Summary Cards ── */
+#engisphere-pdf-report .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 18px 0 28px;
+}
 
-                    #engisphere-pdf-report .summary-card .label {
-                        font-size: 12px;
-                        color: #6b7280;
-                        margin-bottom: 6px;
-                    }
+#engisphere-pdf-report .summary-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
+    background: #f9fafb;
+}
 
-                    #engisphere-pdf-report .summary-card .value {
-                        font-size: 24px;
-                        font-weight: 800;
-                        color: #111827;
-                    }
+#engisphere-pdf-report .summary-label {
+    color: #6b7280;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
 
-                    #engisphere-pdf-report table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 10px;
-                        font-size: 12px;
-                    }
+#engisphere-pdf-report .summary-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+}
 
-                    #engisphere-pdf-report th {
-                        background: #1f2937;
-                        color: #ffffff;
-                        text-align: left;
-                        padding: 10px;
-                    }
+/* ── Project Details Table ── */
+#engisphere-pdf-report table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    font-size: 12px;
+}
 
-                    #engisphere-pdf-report td {
-                        border: 1px solid #e5e7eb;
-                        padding: 9px;
-                        vertical-align: top;
-                    }
+#engisphere-pdf-report th {
+    background: #111827;
+    color: #ffffff;
+    text-align: left;
+    padding: 10px 9px;
+    font-size: 11px;
+    text-transform: uppercase;
+}
 
-                    #engisphere-pdf-report tr:nth-child(even) td {
-                        background: #f9fafb;
-                    }
+#engisphere-pdf-report td {
+    border: 1px solid #e5e7eb;
+    padding: 10px 9px;
+    vertical-align: top;
+    line-height: 1.35;
+}
 
-                    #engisphere-pdf-report .empty-row {
-                        text-align: center;
-                        color: #6b7280;
-                        padding: 18px;
-                    }
+#engisphere-pdf-report tr:nth-child(even) td {
+    background: #f9fafb;
+}
 
-                    #engisphere-pdf-report ul {
-                        padding-left: 18px;
-                        font-size: 12px;
-                    }
+#engisphere-pdf-report .empty-row {
+    text-align: center;
+    color: #6b7280;
+    padding: 18px;
+}
 
-                    #engisphere-pdf-report li {
-                        margin-bottom: 8px;
-                    }
+/* ── Insight Cards (Health & Recommendations) ── */
+#engisphere-pdf-report .insight-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin: 14px 0 22px;
+}
 
-                    #engisphere-pdf-report li span {
-                        display: block;
-                        color: #374151;
-                        margin-top: 2px;
-                    }
+#engisphere-pdf-report .insight-card {
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    padding: 14px 16px;
+    background: #eff6ff;
+}
 
-                    #engisphere-pdf-report .footer {
-                        margin-top: 32px;
-                        padding-top: 14px;
-                        border-top: 1px solid #e5e7eb;
-                        color: #6b7280;
-                        font-size: 11px;
-                    }
+#engisphere-pdf-report .insight-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: #3b82f6;
+    margin-bottom: 6px;
+}
+
+#engisphere-pdf-report .insight-value {
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e3a8a;
+    line-height: 1.2;
+}
+
+#engisphere-pdf-report .insight-note {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 5px;
+}
+
+/* ── Action Table ── */
+#engisphere-pdf-report .action-table th {
+    background: #1e3a8a;
+    color: #ffffff;
+    padding: 9px 10px;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
+#engisphere-pdf-report .action-table td {
+    font-size: 11px;
+    padding: 9px 10px;
+    border: 1px solid #dbeafe;
+    vertical-align: top;
+}
+
+#engisphere-pdf-report .action-table tr:nth-child(even) td {
+    background: #f0f9ff;
+}
+
+#engisphere-pdf-report .priority-high   { color: #dc2626; font-weight: 700; }
+#engisphere-pdf-report .priority-medium { color: #d97706; font-weight: 700; }
+#engisphere-pdf-report .priority-normal { color: #16a34a; font-weight: 700; }
+
+#engisphere-pdf-report .insight-empty {
+    text-align: center;
+    color: #6b7280;
+    font-size: 12px;
+    padding: 16px;
+}
+
+/* ── Footer ── */
+#engisphere-pdf-report .footer {
+    margin-top: 32px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+    color: #6b7280;
+    font-size: 11px;
+}
                 </style>
 
                 <div class="header">
@@ -280,7 +566,7 @@
 
                 <div class="summary-grid">
                     <div class="summary-card">
-                        <div class="label">Tracked Projects</div>
+                        <div class="summary-label">Tracked Projects</div>
                         <div class="value">${summary.total}</div>
                     </div>
 
@@ -304,24 +590,24 @@
 
                 <table>
                     <thead>
-                        <tr>
-                            <th>Project ID</th>
-                            <th>Progress</th>
-                            <th>Status</th>
-                            <th>Risk Level</th>
-                            <th>Updated At</th>
-                            <th>Updated By</th>
-                        </tr>
+<tr>
+    <th>Project ID</th>
+    <th>Project Name</th>
+    <th>Progress</th>
+    <th>Status</th>
+    <th>Risk Level</th>
+    <th>Updated At</th>
+    <th>Updated By</th>
+</tr>
                     </thead>
                     <tbody>
                         ${rowsHtml}
                     </tbody>
                 </table>
 
-                <h2>Recent Audit Events</h2>
-                <ul>
-                    ${auditHtml}
-                </ul>
+                <h2>Project Health &amp; Recommendations</h2>
+                <p class="section-subtitle">Automated insights based on current project data</p>
+                ${insightsHtml}
 
                 <div class="footer">
                     This report was generated locally from EngiSphere browser data.
@@ -390,33 +676,34 @@
             const wrapper = createReportContainer(html);
             const reportElement = wrapper.querySelector("#engisphere-pdf-report");
 
-            const canvas = await window.html2canvas(reportElement, {
-                scale: 2,
-                backgroundColor: "#ffffff",
-                useCORS: true,
-            });
+const canvas = await window.html2canvas(reportElement, {
+    scale: 1.7,
+    backgroundColor: "#ffffff",
+    useCORS: true,
+    logging: false,
+});
 
-            const imageData = canvas.toDataURL("image/png");
-            const pdf = new window.jspdf.jsPDF("p", "mm", "a4");
+          const imageData = canvas.toDataURL("image/jpeg", 0.86);
+const pdf = new window.jspdf.jsPDF("l", "mm", "a4");
 
-            const pageWidth = pdf.internal.pageSize.getWidth();
-            const pageHeight = pdf.internal.pageSize.getHeight();
-            const margin = 10;
-            const imageWidth = pageWidth - margin * 2;
-            const imageHeight = (canvas.height * imageWidth) / canvas.width;
+const pageWidth = pdf.internal.pageSize.getWidth();
+const pageHeight = pdf.internal.pageSize.getHeight();
+const margin = 12;
+const imageWidth = pageWidth - margin * 2;
+const imageHeight = (canvas.height * imageWidth) / canvas.width;
 
-            let heightLeft = imageHeight;
-            let position = margin;
+let heightLeft = imageHeight;
+let position = margin;
 
-            pdf.addImage(imageData, "PNG", margin, position, imageWidth, imageHeight);
-            heightLeft -= pageHeight - margin * 2;
+pdf.addImage(imageData, "JPEG", margin, position, imageWidth, imageHeight, undefined, "FAST");
+heightLeft -= pageHeight - margin * 2;
 
-            while (heightLeft > 0) {
-                position = heightLeft - imageHeight + margin;
-                pdf.addPage();
-                pdf.addImage(imageData, "PNG", margin, position, imageWidth, imageHeight);
-                heightLeft -= pageHeight - margin * 2;
-            }
+while (heightLeft > 0) {
+    position = heightLeft - imageHeight + margin;
+    pdf.addPage();
+    pdf.addImage(imageData, "JPEG", margin, position, imageWidth, imageHeight, undefined, "FAST");
+    heightLeft -= pageHeight - margin * 2;
+}
 
             const datePart = new Date().toISOString().slice(0, 10);
             pdf.save(`engisphere-project-report-${datePart}.pdf`);
