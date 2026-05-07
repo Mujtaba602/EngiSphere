@@ -314,11 +314,11 @@ function getProjectProgressRows(auditEvents = []) {
             })
             .map((row) => {
                 const priorityVal = getPriorityLabel(row);
-                const cls         = `priority-${getRiskPriority(row)}`;
+                const badgeCls    = priorityVal === "High" ? "badge badge-high" : priorityVal === "Medium" ? "badge badge-medium" : "badge badge-low";
                 return `
 <tr>
-    <td>${escapeHtml(row.project_name || row.project_id)}</td>
-    <td class="${cls}">${escapeHtml(priorityVal)}</td>
+    <td><strong>${escapeHtml(row.project_name || row.project_id)}</strong></td>
+    <td><span class="${badgeCls}">${escapeHtml(priorityVal)}</span></td>
     <td>${escapeHtml(getProjectIssue(row))}</td>
     <td>${escapeHtml(getRecommendedAction(row))}</td>
 </tr>`;
@@ -376,190 +376,263 @@ function buildReportHtml() {
         return `
             <div id="engisphere-pdf-report">
                 <style>
+/* ── Base ── */
 #engisphere-pdf-report {
-    width: 1120px;
-    min-height: 760px;
+    width: 1280px;
+    min-height: 820px;
     background: #ffffff;
     color: #111827;
-    padding: 44px;
+    padding: 36px 52px 40px;
     font-family: Arial, sans-serif;
+    font-size: 13px;
     box-sizing: border-box;
 }
 
+/* ── Header ── */
 #engisphere-pdf-report .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
     border-bottom: 3px solid #2563eb;
-    padding-bottom: 18px;
-    margin-bottom: 24px;
+    padding-bottom: 14px;
+    margin-bottom: 22px;
 }
 
-#engisphere-pdf-report .brand {
-    font-size: 28px;
+#engisphere-pdf-report .header-left .brand {
+    font-size: 26px;
     font-weight: 800;
     color: #1d4ed8;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
+    line-height: 1;
 }
 
-#engisphere-pdf-report .subtitle {
-    margin-top: 6px;
-    color: #4b5563;
-    font-size: 14px;
+#engisphere-pdf-report .header-left .subtitle {
+    margin-top: 5px;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
 }
 
+#engisphere-pdf-report .header-right {
+    text-align: right;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+/* ── Section titles ── */
 #engisphere-pdf-report h2 {
-    font-size: 18px;
-    margin: 26px 0 12px;
-    color: #111827;
+    font-size: 15px;
+    font-weight: 800;
+    margin: 22px 0 10px;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-left: 4px solid #2563eb;
+    padding-left: 10px;
 }
 
 #engisphere-pdf-report .section-subtitle {
     font-size: 12px;
     color: #6b7280;
-    margin: -8px 0 14px;
+    margin: -6px 0 12px;
 }
 
 /* ── Executive Summary Cards ── */
 #engisphere-pdf-report .summary-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin: 18px 0 28px;
+    gap: 16px;
+    margin: 12px 0 24px;
 }
 
 #engisphere-pdf-report .summary-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    padding: 14px;
-    background: #f9fafb;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    padding: 16px 18px;
+    background: #f8fafc;
 }
 
 #engisphere-pdf-report .summary-label {
-    color: #6b7280;
+    color: #64748b;
     font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     margin-bottom: 8px;
 }
 
 #engisphere-pdf-report .summary-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: #111827;
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.1;
 }
 
 /* ── Project Details Table ── */
 #engisphere-pdf-report table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 12px;
-    font-size: 12px;
+    margin-top: 10px;
+    font-size: 13px;
 }
 
 #engisphere-pdf-report th {
-    background: #111827;
+    background: #0f172a;
     color: #ffffff;
     text-align: left;
-    padding: 10px 9px;
+    padding: 11px 10px;
     font-size: 11px;
+    font-weight: 800;
     text-transform: uppercase;
+    letter-spacing: 0.4px;
 }
 
 #engisphere-pdf-report td {
-    border: 1px solid #e5e7eb;
-    padding: 10px 9px;
-    vertical-align: top;
-    line-height: 1.35;
+    border: 1px solid #e2e8f0;
+    padding: 11px 10px;
+    vertical-align: middle;
+    line-height: 1.4;
 }
 
 #engisphere-pdf-report tr:nth-child(even) td {
-    background: #f9fafb;
+    background: #f8fafc;
 }
 
 #engisphere-pdf-report .empty-row {
     text-align: center;
     color: #6b7280;
-    padding: 18px;
+    padding: 20px;
 }
 
-/* ── Insight Cards (Health & Recommendations) ── */
+/* ── Badges ── */
+#engisphere-pdf-report .badge {
+    display: inline-block;
+    padding: 4px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+#engisphere-pdf-report .badge-high {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+#engisphere-pdf-report .badge-medium,
+#engisphere-pdf-report .badge-pending {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+#engisphere-pdf-report .badge-low,
+#engisphere-pdf-report .badge-completed {
+    color: #166534;
+    background: #dcfce7;
+}
+
+#engisphere-pdf-report .badge-progress {
+    color: #1e40af;
+    background: #dbeafe;
+}
+
+#engisphere-pdf-report .badge-default {
+    color: #374151;
+    background: #f3f4f6;
+}
+
+/* ── Insight Cards ── */
 #engisphere-pdf-report .insight-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-    margin: 14px 0 22px;
+    gap: 16px;
+    margin: 12px 0 22px;
 }
 
 #engisphere-pdf-report .insight-card {
-    border: 1px solid #dbeafe;
-    border-radius: 10px;
-    padding: 14px 16px;
+    border: 1px solid #cfe1f7;
+    border-radius: 12px;
+    padding: 16px 18px;
     background: #eff6ff;
 }
 
 #engisphere-pdf-report .insight-label {
+    color: #1d4ed8;
     font-size: 10px;
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.6px;
-    color: #3b82f6;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
 }
 
 #engisphere-pdf-report .insight-value {
-    font-size: 18px;
+    color: #0f172a;
+    font-size: 22px;
     font-weight: 800;
-    color: #1e3a8a;
     line-height: 1.2;
 }
 
 #engisphere-pdf-report .insight-note {
-    font-size: 10px;
-    color: #64748b;
-    margin-top: 5px;
+    color: #475569;
+    font-size: 11px;
+    margin-top: 8px;
+}
+
+#engisphere-pdf-report .insight-empty {
+    text-align: center;
+    color: #6b7280;
+    font-size: 13px;
+    padding: 18px;
 }
 
 /* ── Action Table ── */
 #engisphere-pdf-report .action-table th {
     background: #1e3a8a;
     color: #ffffff;
-    padding: 9px 10px;
-    font-size: 10px;
+    padding: 10px 12px;
+    font-size: 11px;
+    font-weight: 800;
     text-transform: uppercase;
 }
 
 #engisphere-pdf-report .action-table td {
-    font-size: 11px;
-    padding: 9px 10px;
-    border: 1px solid #dbeafe;
+    font-size: 12px;
+    padding: 10px 12px;
+    border: 1px solid #cfe1f7;
     vertical-align: top;
+    line-height: 1.45;
 }
 
 #engisphere-pdf-report .action-table tr:nth-child(even) td {
     background: #f0f9ff;
 }
 
-#engisphere-pdf-report .priority-high   { color: #dc2626; font-weight: 700; }
-#engisphere-pdf-report .priority-medium { color: #d97706; font-weight: 700; }
-#engisphere-pdf-report .priority-normal { color: #16a34a; font-weight: 700; }
-
-#engisphere-pdf-report .insight-empty {
-    text-align: center;
-    color: #6b7280;
-    font-size: 12px;
-    padding: 16px;
+#engisphere-pdf-report .action-table td:last-child {
+    width: 42%;
 }
 
 /* ── Footer ── */
 #engisphere-pdf-report .footer {
-    margin-top: 32px;
-    padding-top: 14px;
-    border-top: 1px solid #e5e7eb;
-    color: #6b7280;
+    margin-top: 28px;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+    color: #94a3b8;
     font-size: 11px;
+    display: flex;
+    justify-content: space-between;
 }
                 </style>
 
                 <div class="header">
-                    <div class="brand">ENGISPHERE</div>
-                    <div class="subtitle">Project Progress PDF Report</div>
-                    <div class="subtitle">Generated at: ${escapeHtml(generatedAt)}</div>
+                    <div class="header-left">
+                        <div class="brand">ENGISPHERE</div>
+                        <div class="subtitle">Project Progress Executive Report</div>
+                    </div>
+                    <div class="header-right">
+                        <div>Generated: ${escapeHtml(generatedAt)}</div>
+                        <div>EngiSphere &mdash; Internal Use Only</div>
+                    </div>
                 </div>
 
                 <h2>Executive Summary</h2>
@@ -567,22 +640,19 @@ function buildReportHtml() {
                 <div class="summary-grid">
                     <div class="summary-card">
                         <div class="summary-label">Tracked Projects</div>
-                        <div class="value">${summary.total}</div>
+                        <div class="summary-value">${summary.total}</div>
                     </div>
-
                     <div class="summary-card">
-                        <div class="label">Average Progress</div>
-                        <div class="value">${summary.averageProgress}%</div>
+                        <div class="summary-label">Average Progress</div>
+                        <div class="summary-value">${summary.averageProgress}%</div>
                     </div>
-
                     <div class="summary-card">
-                        <div class="label">High Risk</div>
-                        <div class="value">${summary.highRisk}</div>
+                        <div class="summary-label">High Risk</div>
+                        <div class="summary-value">${summary.highRisk}</div>
                     </div>
-
                     <div class="summary-card">
-                        <div class="label">Pending</div>
-                        <div class="value">${summary.pending}</div>
+                        <div class="summary-label">Pending</div>
+                        <div class="summary-value">${summary.pending}</div>
                     </div>
                 </div>
 
@@ -590,15 +660,15 @@ function buildReportHtml() {
 
                 <table>
                     <thead>
-<tr>
-    <th>Project ID</th>
-    <th>Project Name</th>
-    <th>Progress</th>
-    <th>Status</th>
-    <th>Risk Level</th>
-    <th>Updated At</th>
-    <th>Updated By</th>
-</tr>
+                        <tr>
+                            <th>Project ID</th>
+                            <th>Project Name</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th>Risk Level</th>
+                            <th>Updated At</th>
+                            <th>Updated By</th>
+                        </tr>
                     </thead>
                     <tbody>
                         ${rowsHtml}
@@ -610,7 +680,8 @@ function buildReportHtml() {
                 ${insightsHtml}
 
                 <div class="footer">
-                    This report was generated locally from EngiSphere browser data.
+                    <span>Generated locally from EngiSphere browser data.</span>
+                    <span>CONFIDENTIAL &mdash; For Internal Use Only</span>
                 </div>
             </div>
         `;
@@ -676,34 +747,34 @@ function buildReportHtml() {
             const wrapper = createReportContainer(html);
             const reportElement = wrapper.querySelector("#engisphere-pdf-report");
 
-const canvas = await window.html2canvas(reportElement, {
-    scale: 1.7,
-    backgroundColor: "#ffffff",
-    useCORS: true,
-    logging: false,
-});
+            const canvas = await window.html2canvas(reportElement, {
+                scale: 1.8,
+                backgroundColor: "#ffffff",
+                useCORS: true,
+                logging: false,
+            });
 
-          const imageData = canvas.toDataURL("image/jpeg", 0.86);
-const pdf = new window.jspdf.jsPDF("l", "mm", "a4");
+            const imageData = canvas.toDataURL("image/jpeg", 0.88);
+            const pdf = new window.jspdf.jsPDF("l", "mm", "a4");
 
-const pageWidth = pdf.internal.pageSize.getWidth();
-const pageHeight = pdf.internal.pageSize.getHeight();
-const margin = 12;
-const imageWidth = pageWidth - margin * 2;
-const imageHeight = (canvas.height * imageWidth) / canvas.width;
+            const pageWidth  = pdf.internal.pageSize.getWidth();
+            const pageHeight = pdf.internal.pageSize.getHeight();
+            const margin     = 8;
+            const imageWidth  = pageWidth - margin * 2;
+            const imageHeight = (canvas.height * imageWidth) / canvas.width;
 
-let heightLeft = imageHeight;
-let position = margin;
+            let heightLeft = imageHeight;
+            let position   = margin;
 
-pdf.addImage(imageData, "JPEG", margin, position, imageWidth, imageHeight, undefined, "FAST");
-heightLeft -= pageHeight - margin * 2;
+            pdf.addImage(imageData, "JPEG", margin, position, imageWidth, imageHeight, undefined, "FAST");
+            heightLeft -= pageHeight - margin * 2;
 
-while (heightLeft > 0) {
-    position = heightLeft - imageHeight + margin;
-    pdf.addPage();
-    pdf.addImage(imageData, "JPEG", margin, position, imageWidth, imageHeight, undefined, "FAST");
-    heightLeft -= pageHeight - margin * 2;
-}
+            while (heightLeft > 0) {
+                position = heightLeft - imageHeight + margin;
+                pdf.addPage();
+                pdf.addImage(imageData, "JPEG", margin, position, imageWidth, imageHeight, undefined, "FAST");
+                heightLeft -= pageHeight - margin * 2;
+            }
 
             const datePart = new Date().toISOString().slice(0, 10);
             pdf.save(`engisphere-project-report-${datePart}.pdf`);
