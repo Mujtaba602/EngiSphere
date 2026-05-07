@@ -727,6 +727,11 @@ function buildReportHtml() {
     }
 
     async function downloadWorkspaceReport() {
+        // ── RBAC guard ────────────────────────────────────────────────────
+        if (window.EngiSphereRBAC && !window.EngiSphereRBAC.requirePermission("export_pdf")) {
+            return;
+        }
+
         const html = buildReportHtml();
 
         if (!window.html2canvas || !window.jspdf || !window.jspdf.jsPDF) {
@@ -734,6 +739,7 @@ function buildReportHtml() {
             fallbackPrint(html);
             return;
         }
+
 
         const button = document.querySelector("[data-engisphere-pdf-export]");
         const originalButtonText = button ? button.textContent : "";
@@ -784,6 +790,22 @@ function buildReportHtml() {
             if (window.showToast) {
                 window.showToast("PDF report generated successfully.", "success");
             }
+
+            // Fire typed notification
+            if (window.EngiSphereNotifications && window.EngiSphereNotifications.notifyPdfExport) {
+                window.EngiSphereNotifications.notifyPdfExport();
+            }
+
+            // Audit
+            if (window.EngiSphereAudit) {
+                window.EngiSphereAudit.logAuditEvent({
+                    action:   "pdf_export_clicked",
+                    entity_type: "report",
+                    message:  "Project progress PDF report exported.",
+                    severity: "success"
+                });
+            }
+
         } catch (error) {
             console.error("[PDF Reports] Failed to generate PDF:", error);
             alert("Failed to generate PDF report. Check Console for details.");

@@ -19,77 +19,96 @@ window.EngiSphereProgress = (function () {
 
     function setProjectProgress(projectId, data, projectTitle) {
         if (!projectId) return;
-        const all = getAllProjectProgress();
+
+        // ── RBAC guard ────────────────────────────────────────────────────
+        // NOTE: backend must also enforce this; this is a UI-layer safeguard.
+        if (window.EngiSphereRBAC && !window.EngiSphereRBAC.hasPermission("update_project_progress")) {
+            window.EngiSphereRBAC.requirePermission("update_project_progress");
+            return;
+        }
+
+        const all      = getAllProjectProgress();
         const existing = all[projectId] || {};
-        
+
         // Clamp progress
         let newProgress = data.progress !== undefined ? Number(data.progress) : existing.progress;
         if (!isNaN(newProgress)) {
             newProgress = Math.max(0, Math.min(100, newProgress));
         }
 
-        const newStatus = data.status || existing.status;
-        const newRisk = data.risk_level || existing.risk_level;
-        
-        const title = projectTitle || `Project ${projectId}`;
+        const newStatus = data.status     || existing.status;
+        const newRisk   = data.risk_level || existing.risk_level;
+        const title     = projectTitle    || `Project ${projectId}`;
 
-        // Audit Logging
+        // ── Audit Logging ─────────────────────────────────────────────────
         if (window.EngiSphereAudit) {
             if (newProgress !== existing.progress && newProgress !== undefined) {
                 window.EngiSphereAudit.logAuditEvent({
-                    action: "project_progress_updated",
+                    action:      "project_progress_updated",
                     entity_type: "project",
-                    entity_id: projectId,
-                    project_id: projectId,
-                    message: `${title} progress updated to ${newProgress}%`,
-                    severity: "success"
+                    entity_id:   projectId,
+                    project_id:  projectId,
+                    message:     `${title} progress updated to ${newProgress}%`,
+                    severity:    "success"
                 });
             }
             if (newStatus && newStatus !== existing.status) {
                 let severity = "info";
                 if (newStatus.toLowerCase() === "completed") severity = "success";
-                if (newStatus.toLowerCase() === "pending") severity = "warning";
-                
+                if (newStatus.toLowerCase() === "pending")   severity = "warning";
                 window.EngiSphereAudit.logAuditEvent({
-                    action: "project_status_changed",
+                    action:      "project_status_changed",
                     entity_type: "project",
-                    entity_id: projectId,
-                    project_id: projectId,
-                    message: `${title} status changed to ${newStatus}`,
-                    severity: severity
+                    entity_id:   projectId,
+                    project_id:  projectId,
+                    message:     `${title} status changed to ${newStatus}`,
+                    severity:    severity
                 });
             }
             if (newRisk && newRisk !== existing.risk_level) {
-                let severity = "success"; // low
+                let severity = "success";
                 if (newRisk.toLowerCase() === "medium") severity = "warning";
-                if (newRisk.toLowerCase() === "high") severity = "danger";
-
+                if (newRisk.toLowerCase() === "high")   severity = "danger";
                 window.EngiSphereAudit.logAuditEvent({
-                    action: "project_risk_changed",
+                    action:      "project_risk_changed",
                     entity_type: "project",
-                    entity_id: projectId,
-                    project_id: projectId,
-                    message: `${title} risk level changed to ${newRisk}`,
-                    severity: severity
+                    entity_id:   projectId,
+                    project_id:  projectId,
+                    message:     `${title} risk level changed to ${newRisk}`,
+                    severity:    severity
                 });
+            }
+        }
+
+        // ── Typed Notifications ───────────────────────────────────────────
+        if (window.EngiSphereNotifications) {
+            if (newProgress !== existing.progress && newProgress !== undefined) {
+                window.EngiSphereNotifications.notifyProgressUpdate(title, newProgress, projectId);
+            }
+            if (newStatus && newStatus !== existing.status) {
+                window.EngiSphereNotifications.notifyStatusUpdate(title, newStatus, projectId);
+            }
+            if (newRisk && newRisk !== existing.risk_level) {
+                window.EngiSphereNotifications.notifyRiskAlert(title, newRisk, projectId);
             }
         }
 
         all[projectId] = {
-            project_id: projectId,
-            progress: newProgress,
-            status: newStatus,
-            risk_level: newRisk,
-            updated_at: new Date().toISOString(),
-            updated_by: localStorage.getItem("user_email") || "User"
+            project_id:  projectId,
+            progress:    newProgress,
+            status:      newStatus,
+            risk_level:  newRisk,
+            updated_at:  new Date().toISOString(),
+            updated_by:  localStorage.getItem("user_email") || "User"
         };
 
         localStorage.setItem(STORAGE_KEY, JSON.stringify(all));
-        
+
         if (window.EngiSphereNotifications && window.EngiSphereNotifications.refreshNotifications) {
             window.EngiSphereNotifications.refreshNotifications();
         }
     }
+
 
     function mergeProjectProgress(project) {
         if (!project || !project.id) return project;
