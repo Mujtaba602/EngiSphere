@@ -3055,23 +3055,13 @@ loadRiskAssessmentForProject(currentProject.id);
 
     const panel = document.getElementById("riskAssessmentPanel");
 
-    if (!projectId) {
-        showRiskError("Project ID was not found.");
-        return;
-    }
-
-    if (!token) {
-        showRiskError("Authentication token was not found. Please login again.");
-        return;
-    }
+    if (!projectId) { showRiskError("Project ID was not found."); return; }
+    if (!token)     { showRiskError("Authentication token missing. Please login."); return; }
 
     try {
         const response = await fetch(`http://127.0.0.1:8000/projects/${projectId}/risk-assessment`, {
             method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Accept": "application/json"
-            }
+            headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" }
         });
 
         if (!response.ok) {
@@ -3080,12 +3070,41 @@ loadRiskAssessmentForProject(currentProject.id);
         }
 
         const data = await response.json();
-
         updateRiskAssessmentUI(data);
 
     } catch (error) {
-        console.error("Risk Assessment Error:", error);
-        showRiskError(error.message);
+        console.warn("Risk Assessment API error — using AI local fallback:", error.message);
+
+        // ── Local AI Analysis Fallback ──────────────────────────────────────
+        if (window.EngiSphereAIAnalysis && currentProjectData) {
+            const proj    = window.EngiSphereProgress
+                ? window.EngiSphereProgress.mergeProjectProgress(currentProjectData)
+                : currentProjectData;
+            const health  = window.EngiSphereAIAnalysis.getHealthStatus(proj);
+            const score   = window.EngiSphereAIAnalysis.calculateRiskScore(proj);
+            const delay   = window.EngiSphereAIAnalysis.calculateDelayProbability(proj);
+            const factors = window.EngiSphereAIAnalysis.getRiskFactors(proj);
+            const recs    = window.EngiSphereAIAnalysis.getRecommendations(proj);
+            const prog    = proj.progress !== undefined ? Number(proj.progress) : 0;
+
+            const localData = {
+                risk_score:   score,
+                risk_color:   health.color,
+                risk_level:   health.label,
+                summary:      `AI Local Analysis: ${health.label} — Delay probability ${delay.label} (${delay.pct}%).`,
+                metrics: {
+                    total_tasks:      0,
+                    completed_tasks:  prog,
+                    overdue_tasks:    score > 60 ? 1 : 0,
+                    unassigned_tasks: 0
+                },
+                factors:         factors,
+                recommendations: recs
+            };
+            updateRiskAssessmentUI(localData);
+        } else {
+            showRiskError(error.message);
+        }
     }
 }
 

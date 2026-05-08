@@ -1373,6 +1373,45 @@
             </div>
         </section>
 
+        </section>
+
+        <!-- Project Health Overview -->
+        <section style="margin-top:24px;">
+            <div class="card" id="projectHealthSection">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-brain" style="color:var(--primary);"></i>
+                        Project Health Overview
+                    </div>
+                    <div class="chip" id="healthChip">AI Powered</div>
+                </div>
+                <div id="projectHealthContent" style="padding:18px 0 6px;">
+                    <div style="color:var(--muted);font-size:13px;text-align:center;padding:16px;">
+                        <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Loading health overview...
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recent Notifications -->
+        <section style="margin-top:24px;">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <i class="fas fa-bell" style="color:var(--primary);"></i>
+                        Recent Notifications
+                    </div>
+                    <a href="#" onclick="if(window.EngiSphereNotifications){window.EngiSphereNotifications.markAllNotificationsAsRead();}renderDashboardNotifications();return false;"
+                       style="font-size:11px;font-weight:700;color:var(--primary);text-decoration:none;">Mark all read</a>
+                </div>
+                <div id="dashboardNotificationsContainer" style="padding:8px 0;">
+                    <div style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">
+                        <i class="fas fa-spinner fa-spin" style="margin-right:8px;"></i>Loading...
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section class="activity-section" style="margin-top: 24px;">
             <div class="card">
                 <div class="card-header">
@@ -1494,6 +1533,7 @@
 <script src="assets/js/rbac.js"></script>
 <script src="assets/js/notifications.js"></script>
 <script src="assets/js/project_progress.js"></script>
+<script src="assets/js/ai_analysis.js"></script>
     <script>
         const API_BASE_URL = "http://127.0.0.1:8000";
         const token = localStorage.getItem("access_token");
@@ -1988,6 +2028,135 @@
             });
         }
 
+        // ── Project Health Overview ─────────────────────────────────────────────
+        function renderProjectHealthOverview(projects) {
+            const container = document.getElementById("projectHealthContent");
+            if (!container) return;
+
+            const safeProjects = Array.isArray(projects) ? projects.map(p =>
+                window.EngiSphereProgress ? window.EngiSphereProgress.mergeProjectProgress(p) : p
+            ) : [];
+
+            if (!safeProjects.length) {
+                container.innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">No projects to analyze.</p>`;
+                return;
+            }
+
+            // AI Analysis if available
+            let results = [];
+            if (window.EngiSphereAIAnalysis) {
+                results = window.EngiSphereAIAnalysis.analyzeAllProjects(safeProjects)
+                    .sort((a, b) => b.riskScore - a.riskScore);
+            }
+
+            const avgProgress = Math.round(
+                safeProjects.reduce((s, p) => {
+                    const prog = p.progress !== undefined ? Number(p.progress) :
+                        (String(p.status || "").toLowerCase() === "completed" ? 100 :
+                         String(p.status || "").toLowerCase() === "active"    ? 65 : 25);
+                    return s + prog;
+                }, 0) / safeProjects.length
+            );
+
+            const bestProject  = results.length ? results[results.length - 1].project : safeProjects[0];
+            const worstProject = results.length ? results[0].project : safeProjects[0];
+            const criticalCnt  = results.filter(r => ["Critical","At Risk"].includes(r.health.label)).length;
+            const worstHealth  = results.length ? results[0].health : null;
+
+            // Executive sentence
+            let execMsg;
+            if (!results.length) {
+                execMsg = `Portfolio contains ${safeProjects.length} project${safeProjects.length > 1 ? "s" : ""}. Average progress: ${avgProgress}%.`;
+            } else if (criticalCnt === 0) {
+                execMsg = `Portfolio health is stable. Average progress: ${avgProgress}%. No critical projects detected.`;
+            } else {
+                execMsg = `Portfolio health requires attention — ${criticalCnt} project${criticalCnt > 1 ? "s" : ""} at risk. Average progress: ${avgProgress}%. Immediate review recommended for <strong>${escapeHTML(worstProject.title || "Unknown")}</strong>.`;
+            }
+
+            const makeCard = (label, value, color, sub) => `
+                <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);
+                            border-radius:14px;padding:14px 16px;">
+                    <div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;
+                                color:var(--muted);margin-bottom:8px;">${label}</div>
+                    <div style="font-size:22px;font-weight:900;color:${color};line-height:1;">${value}</div>
+                    ${sub ? `<div style="font-size:11px;color:var(--muted);margin-top:5px;">${sub}</div>` : ""}
+                </div>`;
+
+            container.innerHTML = `
+                <div style="padding:0 0 14px;font-size:13px;color:var(--muted);line-height:1.7;
+                            border-left:3px solid var(--primary);padding-left:14px;margin-bottom:18px;">
+                    ${execMsg}
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;">
+                    ${makeCard("Avg Progress", avgProgress + "%", "var(--primary)")}
+                    ${makeCard("Healthiest", escapeHTML(bestProject.title || "—"), "#10b981",
+                        results.length ? results[results.length-1].health.label : "N/A")}
+                    ${makeCard("Highest Risk", escapeHTML(worstProject.title || "—"),
+                        worstHealth ? worstHealth.color : "#f59e0b",
+                        worstHealth ? `Score: ${results[0].riskScore}/100` : "")}
+                    ${makeCard("Critical / At Risk", criticalCnt,
+                        criticalCnt > 0 ? "#ef4444" : "#10b981", "projects")}
+                </div>`;
+        }
+
+        // ── Recent Notifications panel ────────────────────────────────────────────
+        function renderDashboardNotifications() {
+            const container = document.getElementById("dashboardNotificationsContainer");
+            if (!container) return;
+
+            if (!window.EngiSphereNotifications) {
+                container.innerHTML = `<p style="color:var(--muted);font-size:13px;text-align:center;padding:20px;">Notifications unavailable.</p>`;
+                return;
+            }
+
+            const notifs = window.EngiSphereNotifications.getNotifications().slice(0, 5);
+
+            if (!notifs.length) {
+                container.innerHTML = `
+                    <div style="text-align:center;padding:24px;">
+                        <i class="fas fa-bell-slash" style="font-size:24px;color:var(--muted);margin-bottom:10px;display:block;"></i>
+                        <p style="color:var(--muted);font-size:13px;">No notifications yet.</p>
+                    </div>`;
+                return;
+            }
+
+            const iconMap = {
+                high_risk_alert:     {i: "fa-radiation",      c: "#ef4444"},
+                progress_update:     {i: "fa-chart-line",    c: "#3b82f6"},
+                status_update:       {i: "fa-circle-info",   c: "#f59e0b"},
+                pdf_export:          {i: "fa-file-pdf",      c: "#10b981"},
+                unauthorized_access: {i: "fa-lock",          c: "#ef4444"},
+                system:              {i: "fa-microchip",     c: "#94a3b8"},
+                risk_update:         {i: "fa-shield-virus",  c: "#f97316"},
+            };
+
+            const readAt = Number(localStorage.getItem("engisphere_notification_read_at") || 0);
+
+            container.innerHTML = notifs.map(n => {
+                const meta   = iconMap[n.type] || {i: "fa-bell", c: "#94a3b8"};
+                const isNew  = !n.read && new Date(n.timestamp).getTime() > readAt;
+                const time   = new Date(n.timestamp).toLocaleString([], {month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+                return `
+                <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;
+                            border-bottom:1px solid rgba(255,255,255,0.05);
+                            ${isNew ? 'background:rgba(59,130,246,0.04);' : ''}">
+                    <div style="width:34px;height:34px;border-radius:10px;background:${meta.c}22;
+                                display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i class="fas ${meta.i}" style="color:${meta.c};font-size:13px;"></i>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:13px;font-weight:700;color:var(--text);
+                                    display:flex;align-items:center;gap:7px;">
+                            ${escapeHTML(n.title || n.type)}
+                            ${isNew ? '<span style="width:7px;height:7px;border-radius:50%;background:#3b82f6;display:inline-block;"></span>' : ''}
+                        </div>
+                        <div style="font-size:12px;color:var(--muted);margin-top:2px;">${escapeHTML(n.message || "")}</div>
+                        <div style="font-size:10px;color:var(--muted);margin-top:4px;opacity:0.7;">${time}</div>
+                    </div>
+                </div>`;
+            }).join("");
+        }
+
 async function loadDashboardRiskSummary() {
     try {
         const response = await fetch(`${API_BASE_URL}/projects/risk-summary`, {
@@ -2173,6 +2342,7 @@ async function loadDashboardRiskSummary() {
                 renderProjects(projects);
                 updatePortfolioText(projects);
                 updateDistribution(stats);
+                renderProjectHealthOverview(projects);
                 await loadDashboardRiskSummary();
                 renderProjectTemplates();
 
@@ -2218,6 +2388,8 @@ async function loadDashboardRiskSummary() {
         if (window.EngiSphereNotifications) {
             window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
         }
+
+        renderDashboardNotifications();
 
         window.addEventListener('engisphereProjectUpdated', () => {
             loadProjects();
