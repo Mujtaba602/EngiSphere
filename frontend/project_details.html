@@ -3138,57 +3138,82 @@ loadRiskAssessmentForProject(currentProject.id);
     }
 }
 
+// ── Helper: is the project in a definitively healthy state? ────────────────
+function isProjectStateHealthy(project) {
+    if (!project) return false;
+    const stat  = String(project.status     || "").toLowerCase();
+    const risk  = String(project.risk_level || project.riskLevel || "").toLowerCase();
+    const prog  = Number(project.progress   || 0);
+    return stat.includes("complet") && risk.includes("low") && prog >= 80;
+}
+
 function updateRiskAssessmentUI(data) {
+    // ── Healthy project override ────────────────────────────────────────────
+    // If the actual project state is Completed + Low Risk + >=80 progress,
+    // we override whatever the backend returned (it can lag or be stale).
+    const proj = window.EngiSphereProgress && currentProjectData
+        ? window.EngiSphereProgress.mergeProjectProgress(currentProjectData)
+        : currentProjectData;
+
+    if (proj && isProjectStateHealthy(proj)) {
+        const overdueNote = (data.metrics && data.metrics.overdue_tasks > 0)
+            ? `Task follow-up: ${data.metrics.overdue_tasks} overdue task(s) detected.`
+            : "Project is completed with low risk and strong progress.";
+
+        data = {
+            ...data,
+            risk_score: Math.min(data.risk_score || 0, 10), // cap at 10 max
+            risk_color: "#10b981",
+            risk_level: "Low",
+            summary:    overdueNote,
+            factors:        ["Project marked Completed with Low risk and ≥80% progress."],
+            recommendations:["Archive the project and generate a closure report."]
+        };
+    }
+
     const score = data.risk_score || 0;
     const color = data.risk_color || "#f59e0b";
 
-    const riskLevelText = document.getElementById("riskLevelText");
+    const riskLevelText   = document.getElementById("riskLevelText");
     const riskSummaryText = document.getElementById("riskSummaryText");
-    const riskCircle = document.getElementById("riskCircle");
-    const riskScoreText = document.getElementById("riskScoreText");
+    const riskCircle      = document.getElementById("riskCircle");
+    const riskScoreText   = document.getElementById("riskScoreText");
 
     if (riskLevelText) {
-        riskLevelText.textContent = `${data.risk_level} Risk`;
+        riskLevelText.textContent  = `${data.risk_level} Risk`;
         riskLevelText.style.background = color;
     }
 
-    if (riskSummaryText) {
-        riskSummaryText.textContent = data.summary;
-    }
+    if (riskSummaryText) riskSummaryText.textContent = data.summary;
 
     if (riskCircle) {
-        riskCircle.style.background = `conic-gradient(${color} ${score}%, rgba(255,255,255,0.08) ${score}%)`;
+        riskCircle.style.background =
+            `conic-gradient(${color} ${score}%, rgba(255,255,255,0.08) ${score}%)`;
     }
 
-    if (riskScoreText) {
-        riskScoreText.textContent = `${score}%`;
+    if (riskScoreText) riskScoreText.textContent = `${score}%`;
+
+    const safe = (id, val) => { const e = document.getElementById(id); if (e) e.textContent = val; };
+    if (data.metrics) {
+        safe("riskTotalTasks",      data.metrics.total_tasks      ?? 0);
+        safe("riskCompletedTasks",  data.metrics.completed_tasks  ?? 0);
+        safe("riskOverdueTasks",    data.metrics.overdue_tasks    ?? 0);
+        safe("riskUnassignedTasks", data.metrics.unassigned_tasks ?? 0);
     }
 
-    document.getElementById("riskTotalTasks").textContent = data.metrics.total_tasks;
-    document.getElementById("riskCompletedTasks").textContent = data.metrics.completed_tasks;
-    document.getElementById("riskOverdueTasks").textContent = data.metrics.overdue_tasks;
-    document.getElementById("riskUnassignedTasks").textContent = data.metrics.unassigned_tasks;
-
-    renderRiskList("riskFactorsList", data.factors);
-    renderRiskList("riskRecommendationsList", data.recommendations);
+    renderRiskList("riskFactorsList",         data.factors);
+    renderRiskList("riskRecommendationsList",  data.recommendations);
 
     const kpiRisk = document.getElementById("kpiRisk");
     if (kpiRisk) {
-        kpiRisk.textContent = data.risk_level;
-        kpiRisk.style.color = color;
+        kpiRisk.textContent  = data.risk_level;
+        kpiRisk.style.color  = color;
     }
 
     const riskVal = document.getElementById("riskVal");
     const riskBar = document.getElementById("riskBar");
-
-    if (riskVal) {
-        riskVal.textContent = `${score}%`;
-    }
-
-    if (riskBar) {
-        riskBar.style.width = `${score}%`;
-        riskBar.style.background = color;
-    }
+    if (riskVal) riskVal.textContent       = `${score}%`;
+    if (riskBar) { riskBar.style.width     = `${score}%`; riskBar.style.background = color; }
 }
 
 function renderRiskList(elementId, items) {
