@@ -754,6 +754,39 @@
                 display: none;
             }
         }
+
+        /* ── Filter Chips ─────────────────────────────────────────── */
+        .filter-chip {
+            height: 30px;
+            padding: 0 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .filter-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        body.light-mode .filter-chip {
+            background: rgba(15,23,42,0.04);
+            border-color: rgba(15,23,42,0.12);
+            color: #64748b;
+        }
+        body.light-mode .filter-chip.active {
+            background: var(--primary);
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -802,6 +835,18 @@
                     <div class="label">Active Sites</div>
                     <div class="value" id="activeSites">0</div>
                 </div>
+                <div class="floating-card">
+                    <div class="label">High Risk</div>
+                    <div class="value" id="highRiskCount" style="color:#ef4444;">0</div>
+                </div>
+                <div class="floating-card">
+                    <div class="label">Avg Progress</div>
+                    <div class="value" id="avgProgress" style="color:#3b82f6;">0%</div>
+                </div>
+                <div class="floating-card">
+                    <div class="label">Critical AI</div>
+                    <div class="value" id="criticalAICount" style="color:#f97316;">0</div>
+                </div>
             </div>
         </div>
 
@@ -827,6 +872,20 @@
                         oninput="filterProjects()"
                     />
                 </div>
+            </div>
+
+            <!-- Filter Chips -->
+            <div id="filterChips" style="
+                display:flex; flex-wrap:wrap; gap:6px;
+                padding: 0 22px 14px; flex-shrink:0;">
+                <button class="filter-chip active" data-filter="all" onclick="applyFilter(this,'all')">All</button>
+                <button class="filter-chip" data-filter="high" onclick="applyFilter(this,'high')">High Risk</button>
+                <button class="filter-chip" data-filter="medium" onclick="applyFilter(this,'medium')">Medium Risk</button>
+                <button class="filter-chip" data-filter="low" onclick="applyFilter(this,'low')">Low Risk</button>
+                <button class="filter-chip" data-filter="pending" onclick="applyFilter(this,'pending')">Pending</button>
+                <button class="filter-chip" data-filter="active" onclick="applyFilter(this,'active')">In Progress</button>
+                <button class="filter-chip" data-filter="completed" onclick="applyFilter(this,'completed')">Completed</button>
+                <button class="filter-chip" data-filter="critical" onclick="applyFilter(this,'critical')" style="color:#ef4444;border-color:rgba(239,68,68,0.4);">Critical AI</button>
             </div>
 
             <div class="list-area" id="radarList">
@@ -881,8 +940,10 @@
     </section>
     </main>
 <script src="assets/js/audit.js"></script>
+<script src="assets/js/rbac.js"></script>
 <script src="assets/js/notifications.js"></script>
 <script src="assets/js/project_progress.js"></script>
+<script src="assets/js/ai_analysis.js"></script>
   <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -895,6 +956,33 @@
     let allProjects = [];
     let markers = [];
     let activeProjectId = null;
+    let activeFilter = "all";
+
+    // ── Risk / Health Color helpers ────────────────────────────────────────
+    function getRiskColor(project) {
+        // Prefer AI Analysis if available
+        if (window.EngiSphereAIAnalysis) {
+            const h = window.EngiSphereAIAnalysis.getHealthStatus(project);
+            return h.color;
+        }
+        // Fallback: based on risk_level field
+        const r = String(project.risk_level || "").toLowerCase();
+        if (r.includes("high"))   return "#ef4444";
+        if (r.includes("medium")) return "#f59e0b";
+        if (r.includes("low"))    return "#10b981";
+        // Fallback: status color
+        return getStatusColor(project.status);
+    }
+
+    function getHealthLabel(project) {
+        if (window.EngiSphereAIAnalysis) {
+            return window.EngiSphereAIAnalysis.getHealthStatus(project).label;
+        }
+        const r = String(project.risk_level || "").toLowerCase();
+        if (r.includes("high"))   return "Critical";
+        if (r.includes("medium")) return "At Risk";
+        return "Watch";
+    }
 
     function clearAuthData() {
         localStorage.removeItem("access_token");
@@ -1314,56 +1402,58 @@ async function getLocationCoords(location) {
 
         for (const project of projects) {
             const [lat, lng] = await getLocationCoords(project.location);
-            const status = normalizeStatus(project.status);
-            const color = getStatusColor(status);
+            const color = getRiskColor(project);
+            const progress = project.progress !== undefined ? Number(project.progress) : getProgressFromStatus(project.status);
+            const riskLabel = project.risk_level || "Unknown";
+            const healthLabel = getHealthLabel(project);
 
-            const safeTitle = escapeHTML(project.title || "Untitled Project");
+            // AI extended data
+            let riskScore = "--";
+            let delayPct  = "--";
+            if (window.EngiSphereAIAnalysis) {
+                riskScore = window.EngiSphereAIAnalysis.calculateRiskScore(project);
+                delayPct  = window.EngiSphereAIAnalysis.calculateDelayProbability(project).pct + "%";
+            }
+
+            const safeTitle    = escapeHTML(project.title || "Untitled Project");
             const safeLocation = escapeHTML(project.location || "Unknown");
-            const safeType = escapeHTML(project.project_type || "General");
-            const safeStatus = escapeHTML(status);
-            const safeId = encodeURIComponent(project.id);
+            const safeType     = escapeHTML(project.project_type || "General");
+            const safeStatus   = escapeHTML(normalizeStatus(project.status));
+            const safeId       = encodeURIComponent(project.id);
 
             const icon = L.divIcon({
                 className: "custom-div-icon",
                 html: `
                     <div style="
-                        width: 18px;
-                        height: 18px;
-                        border-radius: 50%;
-                        background: ${color};
-                        border: 3px solid white;
+                        width: 20px; height: 20px; border-radius: 50%;
+                        background: ${color}; border: 3px solid white;
                         box-shadow: 0 0 18px ${color};
+                        display:flex; align-items:center; justify-content:center;
                     "></div>
                 `,
-                iconSize: [18, 18],
-                iconAnchor: [9, 9]
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
             });
 
-            const marker = L.marker([lat, lng], {
-                icon
-            }).addTo(map);
+            const marker = L.marker([lat, lng], { icon }).addTo(map);
 
             marker.bindPopup(`
-                <div style="min-width:180px; font-family:Arial, sans-serif;">
-                    <div style="font-weight:800; font-size:14px; margin-bottom:6px;">
-                        ${safeTitle}
-                    </div>
-                    <div style="font-size:12px; color:#475569; margin-bottom:4px;">
-                        ${safeLocation} · ${safeType}
-                    </div>
-                    <div style="font-size:12px; margin-bottom:10px;">
-                        Status: <strong>${safeStatus}</strong>
-                    </div>
+                <div style="min-width:200px; font-family:inherit;">
+                    <div style="font-weight:800; font-size:14px; margin-bottom:5px;">${safeTitle}</div>
+                    <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${safeLocation} &middot; ${safeType}</div>
+                    <table style="font-size:12px; width:100%; border-collapse:collapse;">
+                        <tr><td style="color:#64748b;padding:2px 0;">Status</td><td style="font-weight:700;">${safeStatus}</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Progress</td><td style="font-weight:700;">${progress}%</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Risk Level</td><td style="font-weight:700;">${escapeHTML(riskLabel)}</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">AI Health</td><td style="font-weight:700; color:${color};">${escapeHTML(healthLabel)}</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Risk Score</td><td style="font-weight:700;">${riskScore}/100</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Delay Prob.</td><td style="font-weight:700;">${delayPct}</td></tr>
+                    </table>
                     <a href="project_details.html?id=${safeId}" style="
-                        display:inline-block;
-                        background:#3b82f6;
-                        color:white;
-                        padding:8px 10px;
-                        border-radius:8px;
-                        text-decoration:none;
-                        font-size:12px;
-                        font-weight:700;
-                    ">Open Details</a>
+                        display:block; margin-top:10px; background:#3b82f6; color:white;
+                        padding:8px 12px; border-radius:8px; text-decoration:none;
+                        font-size:12px; font-weight:700; text-align:center;
+                    ">View Details</a>
                 </div>
             `);
 
@@ -1373,19 +1463,12 @@ async function getLocationCoords(location) {
                 updateAISelectedProject(project);
             });
 
-            markers.push({
-                id: project.id,
-                marker
-            });
-
+            markers.push({ id: project.id, marker });
             bounds.push([lat, lng]);
         }
 
         if (bounds.length > 0) {
-            map.fitBounds(bounds, {
-                padding: [60, 60],
-                maxZoom: 8
-            });
+            map.fitBounds(bounds, { padding: [60, 60], maxZoom: 8 });
         }
     }
 
@@ -1509,42 +1592,81 @@ async function getLocationCoords(location) {
         }).join("");
     }
 
-    function filterProjects() {
+    // ── Filter Chips ───────────────────────────────────────────────────────
+    function applyFilter(btn, filter) {
+        activeFilter = filter;
+        // Update button styles
+        document.querySelectorAll(".filter-chip").forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        // Apply to current project list
+        renderFilteredProjects();
+    }
+
+    function renderFilteredProjects() {
         const searchInput = document.getElementById("projectSearch");
         const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
 
-        if (!q) {
-            renderProjectList(allProjects);
-            renderMarkers(allProjects);
-            return;
-        }
-
-        const filtered = allProjects.filter(project =>
-            String(project.title || "").toLowerCase().includes(q) ||
-            String(project.location || "").toLowerCase().includes(q) ||
-            String(project.status || "").toLowerCase().includes(q) ||
-            String(project.project_type || "").toLowerCase().includes(q)
-        );
+        let filtered = allProjects.filter(p => {
+            if (q) {
+                const text = [p.title, p.location, p.status, p.project_type].join(" ").toLowerCase();
+                if (!text.includes(q)) return false;
+            }
+            const risk  = String(p.risk_level || "").toLowerCase();
+            const stat  = normalizeStatus(p.status).toLowerCase();
+            switch (activeFilter) {
+                case "high":      return risk.includes("high");
+                case "medium":    return risk.includes("medium");
+                case "low":       return risk.includes("low") && !risk.includes("medium") && !risk.includes("high");
+                case "pending":   return stat === "pending";
+                case "active":    return stat === "active";
+                case "completed": return stat === "completed";
+                case "critical":
+                    if (!window.EngiSphereAIAnalysis) return risk.includes("high");
+                    return ["Critical","At Risk"].includes(window.EngiSphereAIAnalysis.getHealthStatus(p).label);
+                default:          return true;
+            }
+        });
 
         renderProjectList(filtered);
         renderMarkers(filtered);
     }
 
-    function updateStats(projects) {
-        const trackedProjects = document.getElementById("trackedProjects");
-        const activeSites = document.getElementById("activeSites");
+    function filterProjects() {
+        renderFilteredProjects();
+    }
 
+    function updateStats(projects) {
         const safeProjects = Array.isArray(projects) ? projects : [];
 
-        if (trackedProjects) {
-            trackedProjects.innerText = safeProjects.length;
+        const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.innerText = val; };
+
+        setEl("trackedProjects", safeProjects.length);
+        setEl("activeSites", safeProjects.filter(p => normalizeStatus(p.status) === "Active").length);
+
+        // High Risk count
+        const highRisk = safeProjects.filter(p => String(p.risk_level || "").toLowerCase().includes("high")).length;
+        setEl("highRiskCount", highRisk);
+
+        // Avg Progress
+        if (safeProjects.length) {
+            const avg = Math.round(safeProjects.reduce((s, p) => {
+                const prog = p.progress !== undefined ? Number(p.progress) : getProgressFromStatus(p.status);
+                return s + prog;
+            }, 0) / safeProjects.length);
+            setEl("avgProgress", avg + "%");
+        } else {
+            setEl("avgProgress", "0%");
         }
 
-        if (activeSites) {
-            activeSites.innerText = safeProjects.filter(project => {
-                return normalizeStatus(project.status) === "Active";
+        // Critical AI count (requires AI Analysis)
+        let criticalCount = 0;
+        if (window.EngiSphereAIAnalysis) {
+            criticalCount = safeProjects.filter(p => {
+                const h = window.EngiSphereAIAnalysis.getHealthStatus(p);
+                return h.label === "Critical" || h.label === "At Risk";
             }).length;
         }
+        setEl("criticalAICount", criticalCount);
     }
 
     async function loadRadarData() {
@@ -2206,7 +2328,50 @@ function formatAITextToHTML(text) {
 
     async function initPage() {
         applySavedTheme();
+
+        // ── RBAC Guard ─────────────────────────────────────────────────────
+        if (window.EngiSphereRBAC) {
+            if (!window.EngiSphereRBAC.hasPermission("view_map")) {
+                window.EngiSphereRBAC.requirePermission("view_map");
+                if (window.EngiSphereNotifications) {
+                    window.EngiSphereNotifications.addNotification({
+                        type: "unauthorized_access", title: "Access Denied",
+                        message: "You do not have permission to access Geospatial Radar.",
+                        severity: "high"
+                    });
+                }
+                document.querySelector(".main-radar").innerHTML =
+                    `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:14px;color:#f87171;">
+                        <i class="fas fa-lock" style="font-size:40px;"></i>
+                        <div style="font-size:18px;font-weight:800;">Access Denied</div>
+                        <div style="font-size:13px;color:#94a3b8;">You do not have permission to view Geospatial Radar.</div>
+                     </div>`;
+                return;
+            }
+        }
+
         initMap();
+
+        // ── Audit: page opened ─────────────────────────────────────────────
+        if (window.EngiSphereAudit) {
+            window.EngiSphereAudit.logAuditEvent({
+                action: "geospatial_radar_opened", entity_type: "page",
+                message: "Geospatial Radar page opened", severity: "info"
+            });
+        }
+
+        // ── Notification: page open (anti-spam: once per 30 min) ──────────
+        const _lastMapOpen = Number(localStorage.getItem("_geoRadarOpenedAt") || 0);
+        if (Date.now() - _lastMapOpen > 1800000) {
+            localStorage.setItem("_geoRadarOpenedAt", Date.now());
+            if (window.EngiSphereNotifications) {
+                window.EngiSphereNotifications.addNotification({
+                    type: "system", title: "Geospatial Radar",
+                    message: "Geospatial Radar opened — monitoring active project locations.",
+                    severity: "info"
+                });
+            }
+        }
 
         const projectId = getProjectIdFromUrl();
         if (projectId) {
@@ -2214,7 +2379,6 @@ function formatAITextToHTML(text) {
             try {
                 const project = await fetchProjectById(projectId);
                 if (project) {
-                    console.log("[Radar] Project loaded successfully:", project);
                     if (window.EngiSphereAudit) {
                         window.EngiSphereAudit.logAuditEvent({
                             action: "ai_radar_project_loaded",
@@ -2227,9 +2391,7 @@ function formatAITextToHTML(text) {
                     }
                     activeProjectId = project.id;
                     renderProjectContext(project);
-                    
                     await loadRadarData();
-                    
                     activeProjectId = project.id;
                     updateAISelectedProject(project);
                     await focusMapOnProject(project);
@@ -2238,12 +2400,10 @@ function formatAITextToHTML(text) {
                 }
             } catch (err) {
                 console.warn("[Radar] Project fetch failed:", err);
-                console.log("Project context could not be loaded, showing general geospatial radar.");
                 showToast("Project context could not be loaded, showing general geospatial radar.", "error");
                 await loadRadarData();
             }
         } else {
-            console.log("[Radar] No projectId in URL, loading general radar.");
             await loadRadarData();
         }
 
