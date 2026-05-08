@@ -1423,6 +1423,7 @@
    <script src="assets/js/rbac.js"></script>
    <script src="assets/js/notifications.js"></script>
    <script src="assets/js/project_progress.js"></script>
+   <script src="assets/js/ai_analysis.js"></script>
    <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -1828,17 +1829,27 @@
             return;
         }
 
-        const analyzeBtn = document.getElementById("analyzeBtn");
+        const analyzeBtn    = document.getElementById("analyzeBtn");
         const analysisPanel = document.getElementById("aiAnalysisPanel");
         const analysisContent = document.getElementById("aiAnalysisContent");
 
         if (!analyzeBtn || !analysisPanel || !analysisContent) return;
 
         analysisPanel.style.display = "block";
-        analysisContent.innerHTML = `<div class="ai-response"><p>Analyzing project with EngiBot...</p></div>`;
-
         analyzeBtn.disabled = true;
         analyzeBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Analyzing...`;
+
+        // ── Local AI Analysis (runs immediately, no API needed) ────────────
+        if (window.EngiSphereAIAnalysis) {
+            window.EngiSphereAIAnalysis.renderProjectAnalysis(analysisContent, currentProjectData);
+            showToast("AI Analysis complete.", "success");
+            analyzeBtn.disabled = false;
+            analyzeBtn.innerHTML = `<i class="fas fa-brain"></i> Analyze with EngiBot`;
+            return;
+        }
+
+        // ── Fallback: try backend EngiBot API ─────────────────────────────
+        analysisContent.innerHTML = `<div class="ai-response"><p>Analyzing project with EngiBot...</p></div>`;
 
         const prompt = `
 Analyze this engineering project and provide a professional structured assessment.
@@ -1865,15 +1876,10 @@ Keep the answer concise, practical, and professional.
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    message: prompt
-                })
+                body: JSON.stringify({ message: prompt })
             });
 
-            if (response.status === 401 || response.status === 403) {
-                handleUnauthorized();
-                return;
-            }
+            if (response.status === 401 || response.status === 403) { handleUnauthorized(); return; }
 
             const data = await response.json();
 
@@ -1888,7 +1894,7 @@ Keep the answer concise, practical, and professional.
 
         } catch (error) {
             console.error("AI analysis error:", error);
-            analysisContent.innerHTML = `<div class="ai-response"><p>Unable to connect to AI analysis service.</p></div>`;
+            analysisContent.innerHTML = `<div class="ai-response"><p>AI service unavailable.</p></div>`;
             showToast("Unable to connect to AI service.", "error");
         } finally {
             analyzeBtn.disabled = false;
@@ -2885,6 +2891,16 @@ await loadRiskAssessmentForProject(currentProjectData.id);
 
         if (window.EngiSphereProgress) {
             window.EngiSphereProgress.renderProgressControl("projectProgressControlContainer", currentProject);
+        }
+
+        // Auto-render local AI Analysis
+        if (window.EngiSphereAIAnalysis) {
+            const aiPanel   = document.getElementById("aiAnalysisPanel");
+            const aiContent = document.getElementById("aiAnalysisContent");
+            if (aiPanel && aiContent) {
+                aiPanel.style.display = "block";
+                window.EngiSphereAIAnalysis.renderProjectAnalysis(aiContent, currentProject);
+            }
         }
 
         if (projectStatusBadge) {

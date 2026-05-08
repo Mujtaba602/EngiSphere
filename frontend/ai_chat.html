@@ -545,6 +545,26 @@
             </div>
         </div>
 
+        <div id="portfolioAnalysisPanel" style="
+            padding: 16px 32px 0; z-index: 2; position: relative;
+            max-height: 420px; overflow-y: auto; display: none;">
+            <div style="
+                background: rgba(15,23,42,0.72); border: 1px solid rgba(59,130,246,0.2);
+                border-radius: 16px; padding: 18px 20px; backdrop-filter: blur(12px);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                    <div style="font-size:13px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-brain" style="color:var(--primary);"></i>
+                        AI Project Portfolio Analysis
+                    </div>
+                    <button onclick="document.getElementById('portfolioAnalysisPanel').style.display='none';"
+                        style="background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:16px;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="portfolioAnalysisContent"></div>
+            </div>
+        </div>
+
         <div class="chat-box" id="chatBox">
             <div class="msg-row bot">
                 <div class="msg-bubble">
@@ -566,6 +586,9 @@
             </div>
 
             <div class="quick-prompts">
+                <button class="prompt-chip" onclick="loadPortfolioAnalysis()">
+                    <i class="fas fa-brain" style="margin-right:5px;"></i>AI Portfolio Analysis
+                </button>
                 <button class="prompt-chip" onclick="usePrompt('Give me a short risk analysis for my current projects.')">Risk Analysis</button>
                 <button class="prompt-chip" onclick="usePrompt('Suggest a software architecture for an AI-driven engineering management platform.')">Architecture Suggestion</button>
                 <button class="prompt-chip" onclick="usePrompt('How can I improve my graduation project presentation?')">Presentation Help</button>
@@ -594,7 +617,10 @@
     </div>
 
    <script src="assets/js/audit.js"></script>
+   <script src="assets/js/rbac.js"></script>
    <script src="assets/js/notifications.js"></script>
+   <script src="assets/js/project_progress.js"></script>
+   <script src="assets/js/ai_analysis.js"></script>
    <script>
     const API_BASE_URL = "http://127.0.0.1:8000";
     const token = localStorage.getItem("access_token");
@@ -902,6 +928,47 @@
 
     if (window.EngiSphereNotifications) {
         window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
+    }
+
+    // ── AI Portfolio Analysis ──────────────────────────────────────────────
+
+    async function loadPortfolioAnalysis() {
+        const panel   = document.getElementById("portfolioAnalysisPanel");
+        const content = document.getElementById("portfolioAnalysisContent");
+        if (!panel || !content || !window.EngiSphereAIAnalysis) return;
+
+        panel.style.display = "block";
+        content.innerHTML   = `<p style="color:var(--muted);font-size:13px;">Loading projects...</p>`;
+
+        try {
+            const resp = await fetch(`${API_BASE_URL}/api/projects/`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!resp.ok) throw new Error("API error");
+            const projects = await resp.json();
+            window.EngiSphereAIAnalysis.renderPortfolioAnalysis(content, projects);
+        } catch (_) {
+            // Fallback: use localStorage progress data as minimal project list
+            try {
+                const raw = localStorage.getItem("engisphere_project_progress");
+                const progressMap = raw ? JSON.parse(raw) : {};
+                const localProjects = Object.values(progressMap).map(p => ({
+                    id:         p.project_id,
+                    title:      `Project ${p.project_id}`,
+                    status:     p.status,
+                    risk_level: p.risk_level,
+                    progress:   p.progress,
+                    updated_at: p.updated_at
+                }));
+                if (localProjects.length) {
+                    window.EngiSphereAIAnalysis.renderPortfolioAnalysis(content, localProjects);
+                } else {
+                    content.innerHTML = `<p style="color:var(--muted);font-size:13px;">No project data found. Open a project first to generate data.</p>`;
+                }
+            } catch (_) {
+                content.innerHTML = `<p style="color:var(--muted);font-size:13px;">Could not load projects.</p>`;
+            }
+        }
     }
 </script>
 </body>
