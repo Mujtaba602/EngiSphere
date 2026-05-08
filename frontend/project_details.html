@@ -2883,6 +2883,36 @@ await loadRiskAssessmentForProject(currentProjectData.id);
             meta.risk = currentProject.risk_level.charAt(0).toUpperCase() + currentProject.risk_level.slice(1);
         }
 
+        // ── Unify riskPct from AI engine or fallback calculation ─────────────
+        (function updateRiskKPI() {
+            const prog = Number(currentProject.progress ?? meta.progress ?? 0);
+            const risk = String(currentProject.risk_level || "").toLowerCase();
+            const stat = String(currentProject.status || "").toLowerCase();
+
+            // Priority 1: use AI Analysis engine if loaded
+            if (window.EngiSphereAIAnalysis) {
+                const h = window.EngiSphereAIAnalysis.getHealthStatus(currentProject);
+                meta.riskPct = h.score;
+                meta.risk    = h.label; // Healthy / Watch / At Risk / Critical
+                return;
+            }
+
+            // Priority 2: rule-based fallback (no AI engine)
+            // Completed project with low or no risk
+            if (stat.includes("complet") || (prog >= 80 && risk.includes("low"))) {
+                meta.risk    = meta.risk || "Low";
+                meta.riskPct = risk.includes("high") ? 55 : risk.includes("medium") ? 30 : 8;
+                return;
+            }
+            if (risk.includes("high")) {
+                meta.riskPct = 72;
+            } else if (risk.includes("medium")) {
+                meta.riskPct = prog >= 80 ? 25 : 42;
+            } else {
+                meta.riskPct = prog >= 80 ? 6 : 18;
+            }
+        })();
+
         const budget = extractBudget(currentProject.description);
 
         const projectStatusBadge = document.getElementById("projectStatusBadge");
