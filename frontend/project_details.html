@@ -515,22 +515,22 @@
                 <div class="stat-card">
                     <div class="stat-label">Overall Progress</div>
                     <div class="stat-value" id="kpiProgress">92%</div>
-                    <div class="stat-badge badge-green">On Track</div>
+                    <div class="stat-badge" id="kpiProgressBadge">On Track</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Budget Usage</div>
                     <div class="stat-value" id="kpiBudget">68%</div>
-                    <div class="stat-badge badge-green">Efficient</div>
+                    <div class="stat-badge" id="kpiBudgetBadge">Efficient</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Schedule Health</div>
                     <div class="stat-value" id="kpiSchedule">On Track</div>
-                    <div class="stat-badge badge-green">Healthy</div>
+                    <div class="stat-badge" id="kpiScheduleBadge">Healthy</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Open Issues</div>
                     <div class="stat-value" id="kpiIssues">3</div>
-                    <div class="stat-badge badge-green">Managed</div>
+                    <div class="stat-badge" id="kpiIssuesBadge">Managed</div>
                 </div>
             </div>
 
@@ -538,17 +538,17 @@
             <div class="card">
                 <div class="section-title"><i class="fas fa-info-circle"></i> Project Profile</div>
                 <div class="project-meta-grid">
-                    <div class="meta-item"><div class="meta-label">Project ID</div><div class="meta-value">PRJ-0001</div></div>
-                    <div class="meta-item"><div class="meta-label">Project Name</div><div class="meta-value">Dubai Smart Bridge</div></div>
-                    <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value"><span class="badge badge-active">Active</span></div></div>
-                    <div class="meta-item"><div class="meta-label">Location</div><div class="meta-value">Dubai, UAE</div></div>
-                    <div class="meta-item"><div class="meta-label">Project Type</div><div class="meta-value">Smart Bridge Infrastructure</div></div>
-                    <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value">18/100</div></div>
-                    <div class="meta-item"><div class="meta-label">Operational Progress</div><div class="meta-value">92%</div></div>
+                    <div class="meta-item"><div class="meta-label">Project ID</div><div class="meta-value" id="profileProjectId">PRJ-0001</div></div>
+                    <div class="meta-item"><div class="meta-label">Project Name</div><div class="meta-value" id="profileProjectName">Dubai Smart Bridge</div></div>
+                    <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value" id="profileStatus"><span class="badge badge-active">Active</span></div></div>
+                    <div class="meta-item"><div class="meta-label">Location</div><div class="meta-value" id="profileLocation">Dubai, UAE</div></div>
+                    <div class="meta-item"><div class="meta-label">Project Type</div><div class="meta-value" id="profileType">Smart Bridge Infrastructure</div></div>
+                    <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value" id="profileRiskScore">18/100</div></div>
+                    <div class="meta-item"><div class="meta-label">Operational Progress</div><div class="meta-value" id="profileProgress">92%</div></div>
                 </div>
                 <div class="executive-summary">
                     <h4>Executive Summary</h4>
-                    <p>Smart bridge infrastructure project focused on traffic optimization, IoT monitoring, and structural safety.</p>
+                    <p id="profileSummary">Smart bridge infrastructure project focused on traffic optimization, IoT monitoring, and structural safety.</p>
                 </div>
             </div>
 
@@ -566,23 +566,20 @@
                 <div class="card">
                     <div class="section-title"><i class="fas fa-shield-halved"></i> Risk Scoring Engine</div>
                     <div class="project-meta-grid" style="grid-template-columns: 1fr 1fr;">
-                        <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value" style="color: var(--success);">18/100</div></div>
-                        <div class="meta-item"><div class="meta-label">Risk Level</div><div class="meta-value">Low Risk</div></div>
-                        <div class="meta-item"><div class="meta-label">Confidence</div><div class="meta-value">94%</div></div>
-                        <div class="meta-item"><div class="meta-label">Open Risks</div><div class="meta-value">2</div></div>
+                        <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value" id="riskEngineScore" style="color: var(--success);">18/100</div></div>
+                        <div class="meta-item"><div class="meta-label">Risk Level</div><div class="meta-value" id="riskEngineLevel">Low Risk</div></div>
+                        <div class="meta-item"><div class="meta-label">Confidence</div><div class="meta-value" id="riskEngineConfidence">94%</div></div>
+                        <div class="meta-item"><div class="meta-label">Open Risks</div><div class="meta-value" id="riskEngineOpenRisks">2</div></div>
                     </div>
                     <div style="margin-top: 16px;">
                         <div class="meta-label">Main Risk Drivers</div>
-                        <ul style="list-style: none; padding: 0; margin-top: 8px;">
-                            <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Schedule exposure remains low</li>
-                            <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Procurement is stable</li>
-                            <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Critical path is controlled</li>
-                            <li style="font-size: 13px; font-weight: 600;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Sensor monitoring is active</li>
+                        <ul id="riskEngineDrivers" style="list-style: none; padding: 0; margin-top: 8px;">
+                            <!-- Dynamic Drivers -->
                         </ul>
                     </div>
                     <div style="margin-top: 20px; padding: 16px; background: var(--bg-soft); border-radius: 16px; border-left: 4px solid var(--primary);">
                         <div class="meta-label" style="color: var(--primary);">Recommended Mitigation</div>
-                        <p style="font-size: 13px; font-weight: 600; margin-top: 4px; line-height: 1.5;">Continue weekly monitoring, maintain structural sensor checks, and review supplier status every 7 days.</p>
+                        <p id="riskEngineMitigation" style="font-size: 13px; font-weight: 600; margin-top: 4px; line-height: 1.5;">Continue weekly monitoring, maintain structural sensor checks, and review supplier status every 7 days.</p>
                     </div>
                 </div>
 
@@ -590,22 +587,22 @@
                 <div class="card" style="border: 1px solid var(--primary-soft);">
                     <div class="section-title"><i class="fas fa-robot"></i> AI Project Analysis</div>
                     <div style="padding: 20px; background: var(--bg-soft); border-radius: 20px; margin-bottom: 20px;">
-                        <p style="font-size: 14px; font-weight: 600; font-style: italic; line-height: 1.6;">
-                            "EngiSphere AI indicates that Dubai Smart Bridge is currently stable with low delivery exposure. The project is progressing above the portfolio baseline, with controlled procurement, active IoT monitoring, and limited open risks. The recommended approach is to maintain routine monitoring and continue weekly risk review meetings."
+                        <p id="aiAnalysisText" style="font-size: 14px; font-weight: 600; font-style: italic; line-height: 1.6;">
+                            <!-- Dynamic Analysis -->
                         </p>
                     </div>
                     <div style="display: grid; gap: 12px;">
-                        <div style="padding: 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 12px;">
+                        <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 12px;">
                             <div class="meta-label" style="color: var(--danger);">Key Risks</div>
-                            <p style="font-size: 12px; font-weight: 700;">Potential minor delay in structural sensor component delivery.</p>
+                            <p id="aiAnalysisKeyRisks" style="font-size: 12px; font-weight: 700;"><!-- Dynamic --></p>
                         </div>
-                        <div style="padding: 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 12px;">
+                        <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 12px;">
                             <div class="meta-label" style="color: var(--success);">Recommended Actions</div>
-                            <p style="font-size: 12px; font-weight: 700;">Confirm supplier delivery schedules 14 days in advance and maintain weekly review meetings.</p>
+                            <p id="aiAnalysisActions" style="font-size: 12px; font-weight: 700;"><!-- Dynamic --></p>
                         </div>
-                        <div style="padding: 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 12px;">
+                        <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 12px;">
                             <div class="meta-label" style="color: var(--primary);">Executive Note</div>
-                            <p style="font-size: 12px; font-weight: 700;">Operational health is strong and the project can continue as planned.</p>
+                            <p id="aiAnalysisNote" style="font-size: 12px; font-weight: 700;"><!-- Dynamic --></p>
                         </div>
                     </div>
                 </div>
@@ -635,11 +632,8 @@
                             <thead>
                                 <tr><th>Member</th><th>Role</th><th>Access</th><th>Status</th></tr>
                             </thead>
-                            <tbody>
-                                <tr><td>Project Admin</td><td>System Owner</td><td>Full Access</td><td><span class="badge badge-active">Active</span></td></tr>
-                                <tr><td>Civil Engineer</td><td>Structural Review</td><td>Engineering</td><td><span class="badge badge-active">Active</span></td></tr>
-                                <tr><td>Project Manager</td><td>Delivery Control</td><td>Management</td><td><span class="badge badge-active">Active</span></td></tr>
-                                <tr><td>GIS Analyst</td><td>Geospatial</td><td>Radar Access</td><td><span class="badge badge-active">Active</span></td></tr>
+                            <tbody id="teamMemberList">
+                                <!-- Dynamic Team -->
                             </tbody>
                         </table>
                     </div>
@@ -648,28 +642,8 @@
                 <!-- 9. Related Reports -->
                 <div class="card">
                     <div class="section-title"><i class="fas fa-file-invoice"></i> Related Reports</div>
-                    <div class="report-grid">
-                        <div class="report-card">
-                            <h5>Executive Summary</h5>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="badge badge-completed">Ready</span>
-                                <button class="btn btn-outline btn-mini">Preview</button>
-                            </div>
-                        </div>
-                        <div class="report-card">
-                            <h5>Risk Scoring Report</h5>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="badge badge-completed">Ready</span>
-                                <button class="btn btn-outline btn-mini">Preview</button>
-                            </div>
-                        </div>
-                        <div class="report-card">
-                            <h5>Progress Tracking</h5>
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <span class="badge badge-completed">Ready</span>
-                                <button class="btn btn-outline btn-mini">Preview</button>
-                            </div>
-                        </div>
+                    <div class="report-grid" id="relatedReportsList">
+                        <!-- Dynamic Reports -->
                     </div>
                 </div>
             </div>
@@ -710,12 +684,12 @@
                 <div class="decision-grid">
                     <div class="decision-main">
                         <p style="opacity: 0.9; font-size: 14px;">Recommended Strategic Direction:</p>
-                        <h2>Continue as planned</h2>
-                        <p style="margin-top: 12px; font-size: 14px; line-height: 1.5; opacity: 0.9;"><strong>Reason:</strong> Low risk, stable procurement, and controlled critical path schedule.</p>
+                        <h2 id="decisionDirection">Continue as planned</h2>
+                        <p style="margin-top: 12px; font-size: 14px; line-height: 1.5; opacity: 0.9;"><strong style="margin-right: 4px;">Reason:</strong> <span id="decisionReason">Low risk, stable procurement, and controlled critical path schedule.</span></p>
                     </div>
                     <div class="decision-meta">
-                        <div class="meta-box"><label>Next Review</label><span>7 days</span></div>
-                        <div class="meta-box"><label>Escalation Required</label><span>No</span></div>
+                        <div class="meta-box"><label>Next Review</label><span id="decisionReview">7 days</span></div>
+                        <div class="meta-box"><label>Escalation Required</label><span id="decisionEscalation">No</span></div>
                     </div>
                 </div>
             </div>
@@ -778,6 +752,14 @@
             const PROJECT_DATASET = {
                 "PRJ-0001": { 
                     title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure", progress: 92, riskScore: 18, openRisks: 2, status: "Active", schedule: "On Track", budgetUsage: 68, riskLevel: "Low", openIssues: 3,
+                    executiveSummary: "Smart bridge infrastructure project focused on traffic optimization, IoT monitoring, and structural safety.",
+                    aiAnalysis: {
+                        text: "EngiSphere AI indicates that Dubai Smart Bridge is currently stable with low delivery exposure. The project is progressing above the portfolio baseline, with controlled procurement, active IoT monitoring, and limited open risks. The recommended approach is to maintain routine monitoring and continue weekly risk review meetings.",
+                        keyRisks: "Potential minor delay in structural sensor component delivery.",
+                        actions: "Confirm supplier delivery schedules 14 days in advance and maintain weekly review meetings.",
+                        note: "Operational health is strong and the project can continue as planned."
+                    },
+                    riskEngine: { confidence: "94%", drivers: ["Schedule exposure remains low", "Procurement is stable", "Critical path is controlled", "Sensor monitoring is active"] },
                     milestones: [
                         { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
                         { name: "Procurement", status: "Completed", priority: "Medium", progress: 100 },
@@ -785,11 +767,31 @@
                         { name: "Site Execution", status: "In Progress", priority: "High", progress: 85 },
                         { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
                     ],
+                    team: [
+                        { name: "Project Admin", role: "System Owner", access: "Full Access", status: "Active" },
+                        { name: "Civil Engineer", role: "Structural Review", access: "Engineering", status: "Active" },
+                        { name: "Project Manager", role: "Delivery Control", access: "Management", status: "Active" },
+                        { name: "GIS Analyst", role: "Geospatial", access: "Radar Access", status: "Active" }
+                    ],
+                    reports: [
+                        { title: "Executive Summary", status: "Ready" },
+                        { title: "Risk Scoring Report", status: "Ready" },
+                        { title: "Progress Tracking", status: "Ready" }
+                    ],
                     riskPlan: { risk: "Structural sensor delivery delay", impact: "Minor schedule impact", mitigation: "Parallel track testing and redundant supplier validation.", owner: "Ahmed M.", dueDate: "2026-06-15" },
-                    activities: ["Risk score updated by system", "Monthly progress report generated", "Team access permissions reviewed", "Site execution milestone updated"]
+                    activities: ["Risk score updated by system", "Monthly progress report generated", "Team access permissions reviewed", "Site execution milestone updated"],
+                    decision: { direction: "Continue as planned", reason: "Low risk, stable procurement, and controlled critical path schedule.", review: "7 days", escalation: "No" }
                 },
                 "PRJ-0002": { 
                     title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure", progress: 64, riskScore: 54, openRisks: 6, status: "Active", schedule: "Delayed", budgetUsage: 72, riskLevel: "Medium", openIssues: 12,
+                    executiveSummary: "Strategic expansion of the Riyadh Metro network to enhance urban mobility and connectivity through new lines and upgraded stations.",
+                    aiAnalysis: {
+                        text: "Riyadh Metro Expansion is facing moderate schedule pressure due to supply chain bottlenecks. While procurement is progressing, structural reviews are pending. Enhanced schedule control and alternative vendor sourcing are recommended to mitigate further delays.",
+                        keyRisks: "Supply chain bottleneck and specialized component delivery delays.",
+                        actions: "Intensify schedule control, source alternative vendors, and prioritize customs clearance.",
+                        note: "Increased management oversight required for the procurement phase."
+                    },
+                    riskEngine: { confidence: "88%", drivers: ["Supply chain bottlenecks identified", "Structural review pending", "Procurement at 45%", "Budget usage remains high"] },
                     milestones: [
                         { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
                         { name: "Procurement", status: "In Progress", priority: "High", progress: 45 },
@@ -797,11 +799,29 @@
                         { name: "Site Execution", status: "Pending", priority: "High", progress: 0 },
                         { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
                     ],
+                    team: [
+                        { name: "Khalid R.", role: "Project Lead", access: "Full Access", status: "Active" },
+                        { name: "Sarah L.", role: "Procurement", access: "Supply Chain", status: "Active" },
+                        { name: "Omar F.", role: "Lead Engineer", access: "Engineering", status: "Active" }
+                    ],
+                    reports: [
+                        { title: "Procurement Status", status: "Ready" },
+                        { title: "Schedule Gap Analysis", status: "Draft" }
+                    ],
                     riskPlan: { risk: "Supply chain bottleneck", impact: "High schedule pressure", mitigation: "Alternative vendor sourcing and priority customs clearance.", owner: "Khalid R.", dueDate: "2026-07-20" },
-                    activities: ["Supply chain risk flagged", "Procurement update logged", "Team access reviewed", "Budget forecast generated"]
+                    activities: ["Supply chain risk flagged", "Procurement update logged", "Team access reviewed", "Budget forecast generated"],
+                    decision: { direction: "Intensify schedule control", reason: "Moderate schedule pressure from procurement delays requires immediate corrective action.", review: "3 days", escalation: "Yes (Procurement)" }
                 },
                 "PRJ-0003": { 
-                    title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel", progress: 41, riskScore: 76, openRisks: 9, status: "At Risk", schedule: "Critical", budgetUsage: 85, riskLevel: "High", openIssues: 24,
+                    title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel", progress: 41, riskScore: 76, openRisks: 9, status: "At Risk", schedule: "Critical", budgetUsage: 85, riskLevel: "High", openIssues: 19,
+                    executiveSummary: "Large-scale sub-sea tunneling project designed to optimize coastal traffic flow and protect against rising sea levels.",
+                    aiAnalysis: {
+                        text: "Doha Coastal Tunnel is currently at high risk due to critical path delays and significant budget overruns. Tunnel boring machine downtime has severely impacted progress. Immediate executive escalation and a reinforced maintenance plan are essential for recovery.",
+                        keyRisks: "Critical path delay from TBM downtime and rising material costs.",
+                        actions: "Escalate risk response to executive committee and deploy 24/7 maintenance shifts.",
+                        note: "High risk of project overrun; structural recovery actions required."
+                    },
+                    riskEngine: { confidence: "82%", drivers: ["TBM downtime recorded", "Budget usage exceeds 80%", "Schedule at critical status", "Sub-sea soil instability"] },
                     milestones: [
                         { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
                         { name: "Procurement", status: "Delayed", priority: "High", progress: 30 },
@@ -809,11 +829,29 @@
                         { name: "Site Execution", status: "Pending", priority: "High", progress: 0 },
                         { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
                     ],
+                    team: [
+                        { name: "Sara J.", role: "Operations Lead", access: "Full Access", status: "Active" },
+                        { name: "Ahmed M.", role: "Maintenance", access: "Technical", status: "Active" },
+                        { name: "John D.", role: "Finance Control", access: "Budget Only", status: "Active" }
+                    ],
+                    reports: [
+                        { title: "Crisis Management", status: "Ready" },
+                        { title: "Geotechnical Exposure", status: "Ready" }
+                    ],
                     riskPlan: { risk: "Tunnel boring machine downtime", impact: "Critical path delay", mitigation: "Deploy 24/7 specialist maintenance shift and spare part pre-stocking.", owner: "Sara J.", dueDate: "2026-05-30" },
-                    activities: ["Critical risk alert triggered", "Maintenance report generated", "Executive review scheduled", "Milestone 'Procurement' marked as Delayed"]
+                    activities: ["Critical risk alert triggered", "Maintenance report generated", "Executive review scheduled", "Milestone 'Procurement' marked as Delayed"],
+                    decision: { direction: "Escalate risk response", reason: "Critical TBM failure and budget overruns require immediate executive intervention.", review: "24 hours", escalation: "Yes (Executive)" }
                 },
                 "PRJ-0004": { 
-                    title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District", progress: 78, riskScore: 31, openRisks: 3, status: "Active", schedule: "On Track", budgetUsage: 45, riskLevel: "Low", openIssues: 5,
+                    title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District", progress: 78, riskScore: 31, openRisks: 3, status: "Active", schedule: "On Track", budgetUsage: 61, riskLevel: "Low-Medium", openIssues: 6,
+                    executiveSummary: "Integrated smart city district featuring automated utility management, green energy grids, and AI-driven residential services.",
+                    aiAnalysis: {
+                        text: "Abu Dhabi Smart District is performing well with moderate operational exposure. While utility integration is complex, BIM coordination has mitigated major risks. The project remains on track with strong operational health and efficient budget management.",
+                        keyRisks: "Utility integration complexity and authority sign-off timeline.",
+                        actions: "Continue BIM-led coordination and finalize authority approvals by Q3.",
+                        note: "Project is healthy with manageable technical challenges."
+                    },
+                    riskEngine: { confidence: "91%", drivers: ["BIM coordination is effective", "Utility tunnels execution active", "Budget usage under 65%", "Schedule is stable"] },
                     milestones: [
                         { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
                         { name: "Procurement", status: "Completed", priority: "Medium", progress: 100 },
@@ -821,11 +859,28 @@
                         { name: "Site Execution", status: "Pending", priority: "High", progress: 0 },
                         { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
                     ],
+                    team: [
+                        { name: "Muna A.", role: "Project Director", access: "Full Access", status: "Active" },
+                        { name: "Laila H.", role: "Smart Grid Lead", access: "Engineering", status: "Active" }
+                    ],
+                    reports: [
+                        { title: "BIM Progress Report", status: "Ready" },
+                        { title: "Utility Integration Analysis", status: "Ready" }
+                    ],
                     riskPlan: { risk: "Utility integration complexity", impact: "Moderate schedule pressure", mitigation: "Unified BIM coordination and early authority sign-off.", owner: "Muna A.", dueDate: "2026-08-10" },
-                    activities: ["BIM model approved", "Utility tunnels execution started", "Team access reviewed", "AI risk scan performed"]
+                    activities: ["BIM model approved", "Utility tunnels execution started", "Team access reviewed", "AI risk scan performed"],
+                    decision: { direction: "Continue with monitoring", reason: "Stable progress and effective BIM coordination justify current strategic path.", review: "14 days", escalation: "No" }
                 },
                 "PRJ-0005": { 
-                    title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure", progress: 57, riskScore: 49, openRisks: 5, status: "Active", schedule: "Watch", budgetUsage: 88, riskLevel: "Medium", openIssues: 18,
+                    title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure", progress: 55, riskScore: 63, openRisks: 5, status: "Active", schedule: "Watchlist", budgetUsage: 79, riskLevel: "Medium-High", openIssues: 14,
+                    executiveSummary: "Massive civil works project to protect Jeddah from seasonal flooding through dams, canals, and automated drainage systems.",
+                    aiAnalysis: {
+                        text: "Jeddah Flood Defense is currently on the watchlist due to unforeseen ground conditions impacting cost and schedule. Excavation is active, but specialized piling equipment is required to manage soil instability. A strengthened mitigation plan and closer financial monitoring are necessary.",
+                        keyRisks: "Unforeseen ground conditions and specialized equipment availability.",
+                        actions: "Perform additional soil testing and secure specialized piling equipment immediately.",
+                        note: "Watchlist status; ground stability risk requires technical review."
+                    },
+                    riskEngine: { confidence: "86%", drivers: ["Ground instability detected", "Excavation phase 1 delayed", "Cost pressure increasing", "Piling equipment in transit"] },
                     milestones: [
                         { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
                         { name: "Procurement", status: "Completed", priority: "High", progress: 100 },
@@ -833,8 +888,17 @@
                         { name: "Site Execution", status: "Pending", priority: "High", progress: 0 },
                         { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
                     ],
+                    team: [
+                        { name: "Omar F.", role: "Geotech Lead", access: "Full Access", status: "Active" },
+                        { name: "Ali S.", role: "Site Supervisor", access: "Execution", status: "Active" }
+                    ],
+                    reports: [
+                        { title: "Geological Assessment", status: "Ready" },
+                        { title: "Equipment Logistics", status: "Ready" }
+                    ],
                     riskPlan: { risk: "Unforeseen ground conditions", impact: "High cost pressure", mitigation: "Additional soil testing and specialized piling equipment.", owner: "Omar F.", dueDate: "2026-09-05" },
-                    activities: ["Excavation phase 1 complete", "Ground sensors deployed", "Team access permissions reviewed", "Budget alert triggered"]
+                    activities: ["Excavation phase 1 complete", "Ground sensors deployed", "Team access permissions reviewed", "Budget alert triggered"],
+                    decision: { direction: "Strengthen mitigation plan", reason: "Ground instability requires revised technical approach and equipment prioritization.", review: "5 days", escalation: "Yes (Technical)" }
                 }
             };
 
@@ -972,7 +1036,7 @@
             document.querySelector('.header-left h1').innerText = project.title;
             document.querySelector('.header-left p').innerText = `Comprehensive management of ${project.title} operations`;
 
-            // KPIs
+            // 1. KPIs
             document.getElementById('kpiStatus').innerText = project.status;
             document.getElementById('kpiRisk').innerText = project.riskLevel;
             document.getElementById('kpiProgress').innerText = project.progress + '%';
@@ -980,15 +1044,56 @@
             document.getElementById('kpiSchedule').innerText = project.schedule;
             document.getElementById('kpiIssues').innerText = project.openIssues;
 
-            // Badges colors
+            // 2. KPI Badges
+            const statusBadge = document.getElementById('kpiStatusBadge');
+            statusBadge.innerText = project.status === 'Completed' ? 'Finalized' : 'Current';
+            statusBadge.className = 'stat-badge ' + (project.status === 'Completed' ? 'badge-green' : 'badge-blue');
+
             const riskBadge = document.getElementById('kpiRiskBadge');
-            riskBadge.innerText = project.riskLevel === 'High' ? 'Critical' : project.riskLevel === 'Medium' ? 'Warning' : 'Stable';
-            riskBadge.className = 'stat-badge ' + (project.riskLevel === 'High' ? 'badge-danger' : project.riskLevel === 'Medium' ? 'badge-warning' : 'badge-green');
-            if (project.riskLevel === 'High') riskBadge.style.cssText = 'background:#fee2e2;color:#991b1b;';
-            else if (project.riskLevel === 'Medium') riskBadge.style.cssText = 'background:#fef3c7;color:#92400e;';
+            riskBadge.innerText = (project.riskScore > 70) ? 'Critical' : (project.riskScore > 40) ? 'Warning' : 'Stable';
+            riskBadge.className = 'stat-badge ' + (project.riskScore > 70 ? 'badge-danger' : project.riskScore > 40 ? 'badge-warning' : 'badge-green');
+            
+            // Direct style overrides for clarity
+            if (project.riskScore > 70) riskBadge.style.cssText = 'background:#fee2e2;color:#991b1b;';
+            else if (project.riskScore > 40) riskBadge.style.cssText = 'background:#fef3c7;color:#92400e;';
             else riskBadge.style.cssText = 'background:#d1fae5;color:#065f46;';
 
-            // Milestones
+            document.getElementById('kpiProgressBadge').innerText = (project.progress > 80) ? 'On Track' : (project.progress > 50) ? 'Steady' : 'Early Phase';
+            document.getElementById('kpiBudgetBadge').innerText = (project.budgetUsage > 80) ? 'High Burn' : 'Efficient';
+            document.getElementById('kpiScheduleBadge').innerText = (project.schedule === 'On Track') ? 'Healthy' : (project.schedule === 'Delayed') ? 'Late' : 'Watchlist';
+            document.getElementById('kpiIssuesBadge').innerText = (project.openIssues > 10) ? 'Critical' : 'Managed';
+
+            // 3. Project Profile
+            document.getElementById('profileProjectId').innerText = id;
+            document.getElementById('profileProjectName').innerText = project.title;
+            document.getElementById('profileStatus').innerHTML = `<span class="badge ${project.status === 'At Risk' ? 'badge-danger' : 'badge-active'}">${project.status}</span>`;
+            document.getElementById('profileLocation').innerText = project.location;
+            document.getElementById('profileType').innerText = project.type;
+            document.getElementById('profileRiskScore').innerText = project.riskScore + '/100';
+            document.getElementById('profileProgress').innerText = project.progress + '%';
+            document.getElementById('profileSummary').innerText = project.executiveSummary;
+
+            // 4. Risk Scoring Engine
+            const engineScore = document.getElementById('riskEngineScore');
+            engineScore.innerText = project.riskScore + '/100';
+            engineScore.style.color = (project.riskScore > 70) ? 'var(--danger)' : (project.riskScore > 40) ? 'var(--warning)' : 'var(--success)';
+            document.getElementById('riskEngineLevel').innerText = project.riskLevel + ' Risk';
+            document.getElementById('riskEngineConfidence').innerText = project.riskEngine.confidence;
+            document.getElementById('riskEngineOpenRisks').innerText = project.openRisks;
+            document.getElementById('riskEngineDrivers').innerHTML = project.riskEngine.drivers.map(d => `
+                <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">
+                    <i class="fas fa-check-circle" style="color: ${project.riskScore > 70 ? 'var(--danger)' : 'var(--success)'}; margin-right: 8px;"></i> ${d}
+                </li>
+            `).join('');
+            document.getElementById('riskEngineMitigation').innerText = project.riskPlan.mitigation;
+
+            // 5. AI Project Analysis
+            document.getElementById('aiAnalysisText').innerText = project.aiAnalysis.text;
+            document.getElementById('aiAnalysisKeyRisks').innerText = project.aiAnalysis.keyRisks;
+            document.getElementById('aiAnalysisActions').innerText = project.aiAnalysis.actions;
+            document.getElementById('aiAnalysisNote').innerText = project.aiAnalysis.note;
+
+            // 6. Milestones
             const milestoneList = document.getElementById('milestoneList');
             milestoneList.innerHTML = project.milestones.map(m => `
                 <tr>
@@ -1003,25 +1108,44 @@
                 </tr>
             `).join('');
 
-            // Risk Plan
+            // 7. Team Members
+            document.getElementById('teamMemberList').innerHTML = project.team.map(t => `
+                <tr>
+                    <td>${t.name}</td>
+                    <td>${t.role}</td>
+                    <td>${t.access}</td>
+                    <td><span class="badge badge-active">${t.status}</span></td>
+                </tr>
+            `).join('');
+
+            // 8. Related Reports
+            document.getElementById('relatedReportsList').innerHTML = project.reports.map(r => `
+                <div class="report-card">
+                    <h5>${r.title}</h5>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="badge ${r.status === 'Ready' ? 'badge-completed' : 'badge-warning'}">${r.status}</span>
+                        <button class="btn btn-outline btn-mini">Preview</button>
+                    </div>
+                </div>
+            `).join('');
+
+            // 9. Risk Plan
             document.getElementById('riskPlanTitle').innerText = project.riskPlan.risk;
             document.getElementById('riskPlanImpact').innerText = project.riskPlan.impact;
             document.getElementById('riskPlanOwner').innerText = project.riskPlan.owner;
             document.getElementById('riskPlanMitigation').innerText = project.riskPlan.mitigation;
             document.getElementById('riskPlanDue').innerText = project.riskPlan.dueDate;
 
-            // Timeline
+            // 10. Timeline
             document.getElementById('activityTimeline').innerHTML = project.activities.map(a => `
                 <div class="timeline-item">${a}</div>
             `).join('');
 
-            // Walk text nodes for PRJ IDs and minor replacements
-            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-            let node;
-            while (node = walk.nextNode()) {
-                if (node.nodeValue.includes("PRJ-0001")) node.nodeValue = node.nodeValue.replace(/PRJ-0001/g, id);
-                if (node.nodeValue.includes("Dubai Smart Bridge")) node.nodeValue = node.nodeValue.replace(/Dubai Smart Bridge/g, project.title);
-            }
+            // 11. Decision Panel
+            document.getElementById('decisionDirection').innerText = project.decision.direction;
+            document.getElementById('decisionReason').innerText = project.decision.reason;
+            document.getElementById('decisionReview').innerText = project.decision.review;
+            document.getElementById('decisionEscalation').innerText = project.decision.escalation;
         }
     </script>
 </body>
