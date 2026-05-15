@@ -347,6 +347,34 @@
         .not-found-view p { color: var(--text-muted); margin-bottom: 32px; }
 
         .hidden { display: none !important; }
+
+        /* Project Switcher & Actions */
+        .header-actions { display: flex; gap: 16px; align-items: center; }
+        .project-switcher-wrapper { display: flex; align-items: center; gap: 10px; background: var(--bg-soft); padding: 6px 12px; border-radius: 12px; border: 1px solid var(--border-soft); }
+        .switcher-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
+        .project-switcher { background: transparent; border: none; color: var(--text-main); font-size: 13px; font-weight: 700; outline: none; cursor: pointer; padding-right: 10px; }
+        .project-switcher option { background: var(--card-bg); color: var(--text-main); }
+        
+        .back-to-selector-btn { 
+            padding: 10px 18px; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 13px; 
+            cursor: pointer; 
+            transition: var(--transition); 
+            border: 1px solid var(--border-soft); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 8px; 
+            text-decoration: none;
+            background: var(--card-bg);
+            color: var(--text-main);
+        }
+        .back-to-selector-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateX(-4px);
+        }
     </style>
 </head>
 <body>
@@ -415,10 +443,23 @@
                 <p>Comprehensive operational overview and risk analysis</p>
             </div>
             <div class="header-actions">
+                <!-- Theme Toggle -->
                 <button class="theme-toggle" id="themeToggleBtn" title="Toggle Dark/Light Mode">
                     <i class="fas fa-moon"></i>
                 </button>
-                <a href="project_details.html" id="changeProjectBtn" class="btn btn-outline hidden"><i class="fas fa-shuffle"></i> Change Project</a>
+
+                <!-- Project Switcher (Detail Mode Only) -->
+                <div id="switcherWrapper" class="project-switcher-wrapper hidden">
+                    <span class="switcher-label">Switch Project</span>
+                    <select id="projectSwitcher" class="project-switcher" aria-label="Switch project">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <!-- Back to Selector -->
+                <a href="project_details.html" id="backToSelectorBtn" class="back-to-selector-btn hidden">
+                    <i class="fas fa-arrow-left"></i> Back to Project Selection
+                </a>
             </div>
         </div>
 
@@ -813,9 +854,21 @@
 
             showProjectDetails(projectId, project);
 
+            // Populate Switcher
+            const switcher = document.getElementById('projectSwitcher');
+            if (switcher) {
+                switcher.innerHTML = Object.entries(PROJECT_DATASET).map(([id, p]) => 
+                    `<option value="${id}" ${id === projectId ? 'selected' : ''}>${id} - ${p.title}</option>`
+                ).join('');
+                
+                switcher.addEventListener('change', (e) => {
+                    window.location.href = `project_details.html?project=${encodeURIComponent(e.target.value)}`;
+                });
+            }
+
             // Update project-aware links
             document.querySelectorAll('a').forEach(a => {
-                if (a.id === 'changeProjectBtn') return;
+                if (a.id === 'backToSelectorBtn') return;
                 const href = a.getAttribute('href');
                 if (!href) return;
                 
@@ -835,7 +888,10 @@
             document.getElementById('projectSelectionView').classList.remove('hidden');
             document.getElementById('projectDetailView').classList.add('hidden');
             document.getElementById('projectNotFoundView').classList.add('hidden');
-            document.getElementById('changeProjectBtn').classList.add('hidden');
+            
+            // Hide Detail-only controls
+            document.getElementById('switcherWrapper').classList.add('hidden');
+            document.getElementById('backToSelectorBtn').classList.add('hidden');
             
             document.querySelector('.header-left h1').innerText = "Project Management";
             document.querySelector('.header-left p').innerText = "Select a project to review intelligence and performance data";
@@ -907,7 +963,10 @@
             document.getElementById('projectDetailView').classList.remove('hidden');
             document.getElementById('projectSelectionView').classList.add('hidden');
             document.getElementById('projectNotFoundView').classList.add('hidden');
-            document.getElementById('changeProjectBtn').classList.remove('hidden');
+            
+            // Show Detail-only controls
+            document.getElementById('switcherWrapper').classList.remove('hidden');
+            document.getElementById('backToSelectorBtn').classList.remove('hidden');
 
             document.title = project.title + " Intelligence | EngiSphere";
             document.querySelector('.header-left h1').innerText = project.title;
