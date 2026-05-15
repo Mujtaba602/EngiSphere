@@ -263,38 +263,44 @@
         .exit-link { margin-top: auto; color: var(--danger) !important; }
         .exit-link:hover { background: rgba(239, 68, 68, 0.08); box-shadow: inset 4px 0 0 var(--danger); color: var(--danger) !important; }
         
-        .header-actions { display: flex; align-items: center; gap: 12px; }
-        .theme-toggle { background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--text-main); padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
+        /* Header Polish */
+        .page-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; margin-bottom: 32px; flex-wrap: wrap; }
+        .page-header-info { flex: 1; min-width: 300px; }
+        .page-header-info h1 { font-size: 30px; font-weight: 800; letter-spacing: -1px; margin-bottom: 6px; color: var(--text-main); }
+        .page-header-info p { color: var(--text-muted); font-size: 15px; font-weight: 500; }
         
-        .project-switcher {
-            background: var(--card-bg);
-            border: 1px solid var(--border-soft);
-            color: var(--text-main);
-            padding: 10px 16px;
+        .page-header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        
+        .theme-toggle, .project-switcher, .btn-secondary {
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 16px;
             border-radius: 12px;
-            font-weight: 700;
             font-size: 13px;
-            cursor: pointer;
-            outline: none;
+            font-weight: 700;
             transition: var(--transition);
+            border: 1px solid var(--border-soft);
+            background: var(--card-bg);
+            color: var(--text-main);
+            white-space: nowrap;
         }
+
+        .theme-toggle { width: 42px; padding: 0; cursor: pointer; }
+        .theme-toggle:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-1px); }
+
+        .project-switcher { cursor: pointer; outline: none; }
         .project-switcher:hover { border-color: var(--primary); }
 
         .btn-secondary {
             background: var(--bg-soft);
             color: var(--primary);
             border: 1px solid var(--primary-soft);
-            padding: 10px 16px;
-            border-radius: 12px;
-            font-weight: 700;
-            font-size: 13px;
             text-decoration: none;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
             gap: 8px;
         }
-        .btn-secondary:hover { background: var(--primary-soft); transform: translateY(-1px); }
+        .btn-secondary:hover { background: var(--primary-soft); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
     </style>
 </head>
 <body>
@@ -357,15 +363,15 @@
     <button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-chevron-left"></i></button>
 
     <main class="main">
-        <div class="header">
-            <div>
+        <div class="page-header">
+            <div class="page-header-info">
                 <h1 id="headerTitle">Team Access</h1>
                 <p id="headerSub">Role-based access overview for engineering project collaboration.</p>
             </div>
-            <div class="header-actions">
-                <a href="#" id="backToProject" class="btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Project Details
-                </a>
+            <div class="page-header-actions">
+                <button class="theme-toggle" id="themeToggleBtn" title="Toggle Theme">
+                    <i class="fas fa-moon"></i>
+                </button>
                 <select id="projectSwitcher" class="project-switcher">
                     <option value="PRJ-0001">PRJ-0001 - Dubai Smart Bridge</option>
                     <option value="PRJ-0002">PRJ-0002 - Riyadh Metro Expansion</option>
@@ -373,10 +379,9 @@
                     <option value="PRJ-0004">PRJ-0004 - Abu Dhabi Smart District</option>
                     <option value="PRJ-0005">PRJ-0005 - Jeddah Flood Defense</option>
                 </select>
-                <button class="theme-toggle" id="themeToggleBtn">
-                    <i class="fas fa-moon"></i>
-                    <span>Theme</span>
-                </button>
+                <a href="#" id="backToProject" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Project Details
+                </a>
             </div>
         </div>
 
