@@ -271,7 +271,7 @@
         
         .page-header-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         
-        .theme-toggle, .project-switcher, .btn-secondary {
+        .theme-toggle, .project-switcher {
             height: 42px;
             display: flex;
             align-items: center;
@@ -293,14 +293,50 @@
         .project-switcher { cursor: pointer; outline: none; }
         .project-switcher:hover { border-color: var(--primary); }
 
-        .btn-secondary {
-            background: var(--bg-soft);
-            color: var(--primary);
-            border: 1px solid var(--primary-soft);
-            text-decoration: none;
-            gap: 8px;
+        /* Access Overview Card */
+        .overview-card { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px; 
+            background: var(--bg-soft); 
+            border: 1px solid var(--border-soft); 
+            border-radius: 20px; 
+            padding: 20px; 
+            margin-bottom: 30px; 
         }
-        .btn-secondary:hover { background: var(--primary-soft); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .overview-item { display: flex; flex-direction: column; gap: 4px; }
+        .overview-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+        .overview-value { font-size: 14px; font-weight: 700; color: var(--text-main); }
+
+        /* Matrix Table */
+        .matrix-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .matrix-table th { background: var(--bg-soft); }
+        .matrix-table td { text-align: center; font-weight: 600; font-size: 13px; }
+        .matrix-table td:first-child { text-align: left; }
+        
+        .perm-badge { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+        .perm-full { background: #d1fae5; color: #065f46; }
+        .perm-view { background: #dbeafe; color: #1e40af; }
+        .perm-limited { background: #fef3c7; color: #92400e; }
+        .perm-none { background: var(--bg-soft); color: var(--text-muted); }
+        .perm-admin { background: #ede9fe; color: #5b21b6; }
+
+        .gov-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 20px; }
+        .gov-card { padding: 16px; border-radius: 16px; background: var(--bg-soft); border: 1px solid var(--border-soft); border-left: 4px solid var(--primary); }
+        .gov-card p { font-size: 13px; color: var(--text-main); font-weight: 600; line-height: 1.5; }
+
+        .invite-note { 
+            font-size: 12px; 
+            font-weight: 700; 
+            color: var(--primary); 
+            margin-top: 12px; 
+            padding: 8px 12px; 
+            background: var(--primary-soft); 
+            border-radius: 8px; 
+            display: none; 
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -366,7 +402,7 @@
         <div class="page-header">
             <div class="page-header-info">
                 <h1 id="headerTitle">Team Access</h1>
-                <p id="headerSub">Role-based access overview for engineering project collaboration.</p>
+                <p id="headerSub">Manage access, roles, and permission coverage for projects.</p>
             </div>
             <div class="page-header-actions">
                 <button class="theme-toggle" id="themeToggleBtn" title="Toggle Theme">
@@ -379,9 +415,6 @@
                     <option value="PRJ-0004">PRJ-0004 - Abu Dhabi Smart District</option>
                     <option value="PRJ-0005">PRJ-0005 - Jeddah Flood Defense</option>
                 </select>
-                <a href="#" id="backToProject" class="btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Back to Project Details
-                </a>
             </div>
         </div>
 
@@ -389,15 +422,25 @@
             <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-value" id="kpiTotal">0</div></div>
             <div class="stat-card"><div class="stat-label">Active Users</div><div class="stat-value" id="kpiActive">0</div></div>
             <div class="stat-card"><div class="stat-label">Pending Invites</div><div class="stat-value" id="kpiPending">0</div></div>
-            <div class="stat-card"><div class="stat-label">Access Model</div><div class="stat-value" id="kpiModel">Role-Based</div></div>
+            <div class="stat-card"><div class="stat-label">Access Health</div><div class="stat-value" id="kpiHealth">Stable</div></div>
+        </div>
+
+        <div class="overview-card">
+            <div class="overview-item"><div class="overview-label">Access Model</div><div class="overview-value" id="overviewModel">---</div></div>
+            <div class="overview-item"><div class="overview-label">External Users</div><div class="overview-value" id="overviewExternal">0</div></div>
+            <div class="overview-item"><div class="overview-label">Limited Access</div><div class="overview-value" id="overviewLimited">0</div></div>
+            <div class="overview-item"><div class="overview-label">Last Review</div><div class="overview-value" id="overviewReview">---</div></div>
         </div>
 
         <div class="content-section">
             <div class="section-title">
                 <div class="title-left"><i class="fas fa-users"></i> Team Members</div>
-                <button class="btn-primary" onclick="alert('Demo mode: invite workflow is not connected to a backend.')">
-                    <i class="fas fa-plus"></i> Invite Member
-                </button>
+                <div style="text-align: right;">
+                    <button class="btn-primary" id="inviteBtn">
+                        <i class="fas fa-plus"></i> Invite Member
+                    </button>
+                    <div id="inviteNote" class="invite-note">Invite workflow is available in demo mode only.</div>
+                </div>
             </div>
             <div class="table-wrap">
                 <table>
@@ -417,24 +460,35 @@
             </div>
         </div>
 
+        <!-- Permission Matrix Section -->
         <div class="content-section">
-            <div class="section-title"><div class="title-left"><i class="fas fa-shield-halved"></i> Access Policy</div></div>
+            <div class="section-title"><div class="title-left"><i class="fas fa-table-cells"></i> Permission Matrix</div></div>
+            <div class="table-wrap">
+                <table class="matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="text-align: left;">Role</th>
+                            <th>Project Data</th>
+                            <th>Reports</th>
+                            <th>EngiBot</th>
+                            <th>Risk Actions</th>
+                            <th>Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="permissionMatrixList">
+                        <!-- Dynamic Content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div class="section-title"><div class="title-left"><i class="fas fa-shield-halved"></i> Access Governance</div></div>
             <p class="policy-text">
-                Team access is managed using role-based permissions to ensure that project information, engineering reports, and AI-generated recommendations are shared only with authorized users.
+                Access governance ensures that critical infrastructure data is protected through role-based permissions and regular identity audits.
             </p>
-            <div class="perm-grid">
-                <div class="perm-card">
-                    <h3><i class="fas fa-crown"></i> Full Access</h3>
-                    <p>Can manage project data, review reports, and use EngiBot. Typically assigned to system owners and lead administrators.</p>
-                </div>
-                <div class="perm-card">
-                    <h3><i class="fas fa-user-gear"></i> Engineering Review</h3>
-                    <p>Can review technical risks and project reports. Focused on engineering validation and decision support tasks.</p>
-                </div>
-                <div class="perm-card">
-                    <h3><i class="fas fa-file-lines"></i> Reports Only</h3>
-                    <p>Can view generated summaries and executive reports. Designed for stakeholders requiring high-level project awareness.</p>
-                </div>
+            <div class="gov-grid" id="governanceNotesList">
+                <!-- Dynamic Content -->
             </div>
         </div>
     </main>
@@ -488,74 +542,122 @@
             "PRJ-0001": {
                 id: "PRJ-0001",
                 name: "Dubai Smart Bridge",
-                totalMembers: 4,
-                activeUsers: 3,
-                pendingInvites: 1,
-                accessModel: "Role-Based",
+                totalMembers: 4, activeUsers: 3, pendingInvites: 1, externalUsers: 1, limitedUsers: 1,
+                accessModel: "Role-Based", accessHealth: "Controlled", lastReview: "Today",
                 members: [
                     { initials: "SA", name: "System Admin", email: "admin@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
                     { initials: "SE", name: "Structural Engineer", email: "structural@engisphere.com", role: "Structural Review", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
                     { initials: "IS", name: "IoT Specialist", email: "iot@engisphere.com", role: "Sensor Monitoring", access: "Dashboard + EngiBot", status: "Active", type: "active", last: "Yesterday" },
-                    { initials: "EC", name: "External Consultant", email: "consultant@partner.com", role: "Technical Consultant", access: "Reports Only", status: "Limited", type: "pending", last: "This Week" }
+                    { initials: "EC", name: "External Consultant", email: "consultant@partner.com", role: "Technical Consultant", access: "Reports Only", status: "Limited", type: "limited", last: "This Week" }
+                ],
+                matrix: [
+                    ["System Owner", "Full", "Full", "Full", "Full", "Admin"],
+                    ["Structural Review", "Full", "Full", "Limited", "View", "None"],
+                    ["Sensor Monitoring", "View", "View", "Full", "None", "None"],
+                    ["Technical Consultant", "None", "View", "None", "None", "None"]
+                ],
+                gov: [
+                    "External consultants are restricted to reports-only access.",
+                    "Admin privileges are limited to system owners.",
+                    "Sensor monitoring roles have dedicated EngiBot capabilities."
                 ]
             },
             "PRJ-0002": {
                 id: "PRJ-0002",
                 name: "Riyadh Metro Expansion",
-                totalMembers: 5,
-                activeUsers: 4,
-                pendingInvites: 1,
-                accessModel: "Unified Hub",
+                totalMembers: 5, activeUsers: 4, pendingInvites: 1, externalUsers: 2, limitedUsers: 1,
+                accessModel: "Unified Hub", accessHealth: "Review Needed", lastReview: "Yesterday",
                 members: [
                     { initials: "PD", name: "Program Director", email: "director@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
-                    { initials: "RE", name: "Rail Systems Engineer", email: "rail@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
+                    { initials: "RS", name: "Rail Systems Engineer", email: "rail@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
                     { initials: "PL", name: "Procurement Lead", email: "procurement@engisphere.com", role: "Delivery Control", access: "Dashboard + Reports", status: "Active", type: "active", last: "Yesterday" },
-                    { initials: "SA", name: "Safety Auditor", email: "safety@partner.com", role: "Compliance Auditor", access: "Reports Only", status: "Limited", type: "active", last: "This Week" },
+                    { initials: "SA", name: "Safety Auditor", email: "safety@partner.com", role: "Compliance Auditor", access: "Reports Only", status: "Limited", type: "limited", last: "This Week" },
                     { initials: "CL", name: "Contractor Lead", email: "contractor@partner.com", role: "Site Coordination", access: "Project View", status: "Pending", type: "pending", last: "Pending Invite" }
+                ],
+                matrix: [
+                    ["System Owner", "Full", "Full", "Full", "Full", "Admin"],
+                    ["Engineering Reviewer", "Full", "Full", "View", "Full", "None"],
+                    ["Delivery Control", "View", "Full", "View", "View", "None"],
+                    ["Compliance Auditor", "None", "View", "None", "None", "None"],
+                    ["Site Coordination", "Limited", "None", "None", "None", "None"]
+                ],
+                gov: [
+                    "Site coordination access is currently in pending state for contractors.",
+                    "Delivery control roles require weekly access verification.",
+                    "Safety auditors have read-only access to compliance reports."
                 ]
             },
             "PRJ-0003": {
                 id: "PRJ-0003",
                 name: "Doha Coastal Tunnel",
-                totalMembers: 5,
-                activeUsers: 4,
-                pendingInvites: 1,
-                accessModel: "Multi-Org",
+                totalMembers: 5, activeUsers: 4, pendingInvites: 1, externalUsers: 2, limitedUsers: 1,
+                accessModel: "Multi-Org", accessHealth: "Elevated Risk", lastReview: "3 days ago",
                 members: [
                     { initials: "TL", name: "Tunnel Project Lead", email: "tunnel.lead@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
                     { initials: "GE", name: "Geotechnical Engineer", email: "geo@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
-                    { initials: "MA", name: "Marine Risk Analyst", email: "marine@engisphere.com", role: "Risk Analyst", access: "Dashboard + EngiBot", status: "Active", type: "active", last: "Yesterday" },
-                    { initials: "QI", name: "QA Inspector", email: "qa@partner.com", role: "Quality Review", access: "Reports Only", status: "Limited", type: "active", last: "This Week" },
+                    { initials: "MR", name: "Marine Risk Analyst", email: "marine@engisphere.com", role: "Risk Analyst", access: "Dashboard + EngiBot", status: "Active", type: "active", last: "Yesterday" },
+                    { initials: "QA", name: "QA Inspector", email: "qa@partner.com", role: "Quality Review", access: "Reports Only", status: "Limited", type: "limited", last: "This Week" },
                     { initials: "EP", name: "Emergency Planning Consultant", email: "emergency@partner.com", role: "Risk Consultant", access: "Project View", status: "Pending", type: "pending", last: "Pending Invite" }
+                ],
+                matrix: [
+                    ["System Owner", "Full", "Full", "Full", "Full", "Admin"],
+                    ["Engineering Reviewer", "Full", "Full", "View", "Full", "None"],
+                    ["Risk Analyst", "Full", "View", "Full", "Full", "None"],
+                    ["Quality Review", "None", "View", "None", "None", "None"],
+                    ["Risk Consultant", "Limited", "None", "None", "None", "None"]
+                ],
+                gov: [
+                    "Elevated risk detected due to external consultant pending approval.",
+                    "Marine risk analyst role has elevated EngiBot permissions.",
+                    "Full project data access is restricted to the internal tunnel lead."
                 ]
             },
             "PRJ-0004": {
                 id: "PRJ-0004",
                 name: "Abu Dhabi Smart District",
-                totalMembers: 4,
-                activeUsers: 3,
-                pendingInvites: 1,
-                accessModel: "Role-Based",
+                totalMembers: 4, activeUsers: 3, pendingInvites: 1, externalUsers: 1, limitedUsers: 1,
+                accessModel: "Role-Based", accessHealth: "Controlled", lastReview: "Today",
                 members: [
                     { initials: "SA", name: "System Admin", email: "admin@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
                     { initials: "CE", name: "Civil Engineer", email: "civil@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
                     { initials: "PM", name: "Project Manager", email: "pm@engisphere.com", role: "Delivery Control", access: "Dashboard + EngiBot", status: "Active", type: "active", last: "Yesterday" },
-                    { initials: "EC", name: "External Consultant", email: "consultant@partner.com", role: "Technical Consultant", access: "Reports Only", status: "Limited", type: "pending", last: "This Week" }
+                    { initials: "EC", name: "External Consultant", email: "consultant@partner.com", role: "Technical Consultant", access: "Reports Only", status: "Limited", type: "limited", last: "This Week" }
+                ],
+                matrix: [
+                    ["System Owner", "Full", "Full", "Full", "Full", "Admin"],
+                    ["Engineering Reviewer", "Full", "Full", "View", "View", "None"],
+                    ["Delivery Control", "View", "View", "Full", "View", "None"],
+                    ["Technical Consultant", "None", "View", "None", "None", "None"]
+                ],
+                gov: [
+                    "Admin access is synchronized with the main project headquarters.",
+                    "Project manager has control over EngiBot delivery workflows.",
+                    "Civil engineering roles can review but not modify risk actions."
                 ]
             },
             "PRJ-0005": {
                 id: "PRJ-0005",
                 name: "Jeddah Flood Defense",
-                totalMembers: 5,
-                activeUsers: 4,
-                pendingInvites: 1,
-                accessModel: "Hybrid Access",
+                totalMembers: 5, activeUsers: 4, pendingInvites: 1, externalUsers: 2, limitedUsers: 1,
+                accessModel: "Hybrid Access", accessHealth: "Review Needed", lastReview: "Yesterday",
                 members: [
-                    { initials: "FM", name: "Flood Program Manager", email: "flood.pm@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
+                    { initials: "FP", name: "Flood Program Manager", email: "flood.pm@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
                     { initials: "HE", name: "Hydrology Engineer", email: "hydro@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
                     { initials: "GA", name: "GIS Analyst", email: "gis@engisphere.com", role: "Geospatial Review", access: "Dashboard + Radar", status: "Active", type: "active", last: "Yesterday" },
-                    { initials: "ML", name: "Municipal Liaison", email: "municipal@partner.com", role: "Government Liaison", access: "Reports Only", status: "Limited", type: "active", last: "This Week" },
+                    { initials: "ML", name: "Municipal Liaison", email: "municipal@partner.com", role: "Government Liaison", access: "Reports Only", status: "Limited", type: "limited", last: "This Week" },
                     { initials: "SS", name: "Site Supervisor", email: "site@partner.com", role: "Field Operations", access: "Project View", status: "Pending", type: "pending", last: "Pending Invite" }
+                ],
+                matrix: [
+                    ["System Owner", "Full", "Full", "Full", "Full", "Admin"],
+                    ["Engineering Reviewer", "Full", "Full", "View", "Full", "None"],
+                    ["Geospatial Review", "View", "View", "Full", "None", "None"],
+                    ["Government Liaison", "None", "View", "None", "None", "None"],
+                    ["Field Operations", "Limited", "None", "None", "None", "None"]
+                ],
+                gov: [
+                    "Municipal liaison access is strictly limited to reports and communication.",
+                    "GIS analysis role is synced with Geospatial Radar data feeds.",
+                    "Site supervisor pending invite requires government security clearance."
                 ]
             }
         };
@@ -563,48 +665,64 @@
         function updateTeamPage(projectId) {
             const data = projectTeamData[projectId] || projectTeamData["PRJ-0001"];
             
-            // Update Title & Header
+            // 1. Header
             document.title = `Team Access | ${data.name} | EngiSphere`;
             document.getElementById('headerTitle').innerText = `Team Access – ${data.name}`;
-            document.getElementById('headerSub').innerText = `Manage team permissions and access for ${data.id}.`;
+            document.getElementById('headerSub').innerText = `Manage access, roles, and permission coverage for ${data.id}.`;
 
-            // Update KPIs
+            // 2. KPIs
             document.getElementById('kpiTotal').innerText = data.totalMembers;
             document.getElementById('kpiActive').innerText = data.activeUsers;
             document.getElementById('kpiPending').innerText = data.pendingInvites;
-            document.getElementById('kpiModel').innerText = data.accessModel;
+            const healthVal = document.getElementById('kpiHealth');
+            healthVal.innerText = data.accessHealth;
+            healthVal.style.color = data.accessHealth === 'Controlled' ? 'var(--success)' : data.accessHealth === 'Review Needed' ? 'var(--warning)' : 'var(--danger)';
 
-            // Update Back Button
-            document.getElementById('backToProject').href = `project_details.html?project=${data.id}`;
+            // 3. Access Overview
+            document.getElementById('overviewModel').innerText = data.accessModel;
+            document.getElementById('overviewExternal').innerText = data.externalUsers;
+            document.getElementById('overviewLimited').innerText = data.limitedUsers;
+            document.getElementById('overviewReview').innerText = data.lastReview;
 
-            // Update Table
+            // 4. Team Table
             const tbody = document.getElementById('teamMemberList');
             tbody.innerHTML = data.members.map(m => `
                 <tr>
                     <td>
                         <div class="member-info">
-                            <div class="avatar" style="${m.type === 'pending' ? 'background:var(--warning-soft); color:var(--warning)' : ''}">${m.initials}</div>
-                            <div>
-                                <strong>${m.name}</strong><br>
-                                <small style="color:var(--text-muted)">${m.email}</small>
-                            </div>
+                            <div class="avatar" style="${m.type === 'pending' ? 'background:var(--bg-soft); color:var(--text-muted)' : m.type === 'limited' ? 'background:#fef3c7; color:#92400e' : ''}">${m.initials}</div>
+                            <div><strong>${m.name}</strong><br><small style="color:var(--text-muted)">${m.email}</small></div>
                         </div>
                     </td>
                     <td><span class="role-badge">${m.role}</span></td>
                     <td>${m.access}</td>
                     <td>
                         <div class="status-badge">
-                            <div class="dot ${m.type === 'active' ? 'dot-active' : 'dot-pending'}"></div> ${m.status}
+                            <div class="dot ${m.type === 'active' ? 'dot-active' : m.type === 'limited' ? 'dot-pending' : ''}" style="${m.type === 'pending' ? 'background:var(--border-soft)' : ''}"></div> ${m.status}
                         </div>
                     </td>
                     <td>${m.last}</td>
                 </tr>
             `).join('');
 
-            // Update Switcher Value
-            document.getElementById('projectSwitcher').value = data.id;
+            // 5. Permission Matrix
+            const matrixBody = document.getElementById('permissionMatrixList');
+            matrixBody.innerHTML = data.matrix.map(row => `
+                <tr>
+                    <td style="font-weight: 800;">${row[0]}</td>
+                    ${row.slice(1).map(cell => `
+                        <td><span class="perm-badge ${cell === 'Full' ? 'perm-full' : cell === 'View' ? 'perm-view' : cell === 'Limited' ? 'perm-limited' : cell === 'Admin' ? 'perm-admin' : 'perm-none'}">${cell}</span></td>
+                    `).join('')}
+                </tr>
+            `).join('');
 
-            // Update Sidebar Links
+            // 6. Access Governance
+            const govList = document.getElementById('governanceNotesList');
+            govList.innerHTML = data.gov.map(note => `
+                <div class="gov-card"><p>${note}</p></div>
+            `).join('');
+
+            // 7. Sidebar Links
             document.querySelectorAll('.sidebar .nav-link').forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && (href.includes('project_details.html') || href.includes('reports.html') || href.includes('team_access.html'))) {
@@ -613,22 +731,28 @@
                 }
             });
 
-            // Save to localStorage
+            document.getElementById('projectSwitcher').value = data.id;
             localStorage.setItem("engisphere-selected-project-id", data.id);
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             initThemeToggle();
-
             const urlParams = new URLSearchParams(window.location.search);
             const projectId = urlParams.get("project") || localStorage.getItem("engisphere-selected-project-id") || "PRJ-0001";
-
             updateTeamPage(projectId);
 
             document.getElementById('projectSwitcher').addEventListener('change', (e) => {
-                const newId = e.target.value;
-                window.location.href = `team_access.html?project=${newId}`;
+                window.location.href = `team_access.html?project=${e.target.value}`;
             });
+
+            const inviteBtn = document.getElementById('inviteBtn');
+            const inviteNote = document.getElementById('inviteNote');
+            if(inviteBtn && inviteNote) {
+                inviteBtn.addEventListener('click', () => {
+                    inviteNote.style.display = 'block';
+                    setTimeout(() => { inviteNote.style.display = 'none'; }, 3000);
+                });
+            }
         });
     </script>
 </body>
