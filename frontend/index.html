@@ -2098,7 +2098,7 @@
                     Open EngiBot
                 </a>
 
-                <button class="new-project-btn" onclick="openModal()" type="button">
+                <button class="new-project-btn" onclick="alert('Project creation workflow is available in demo mode.')" type="button">
                     <i class="fas fa-plus"></i>
                     New Project
                 </button>
@@ -2114,7 +2114,7 @@
                 </p>
 
                 <div class="hero-actions">
-                    <button class="hero-action primary" onclick="openModal()" type="button">
+                    <button class="hero-action primary" onclick="alert('Project creation workflow is available in demo mode.')" type="button">
                         Create Project
                     </button>
 
@@ -2122,7 +2122,7 @@
                         Open EngiBot
                     </a>
 
-                    <a class="hero-action" href="solutions.html">
+                    <a class="hero-action" href="ai-radar.html">
                         View Project Map
                     </a>
                 </div>
@@ -4757,68 +4757,136 @@
             }
         ];
 
+        function goToProject(id) {
+            localStorage.setItem("engisphere-selected-project-id", id);
+            window.location.href = "project_details.html?project=" + id;
+        }
+
         async function init() {
-            let projects = [];
-            let stats = { total: 0, active: 0, pending: 0, completed: 0 };
-            
-            try {
-                showSkeletons();
-                updateLastSync();
+            const DEMO_PROJECTS = [
+                { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", status: "Active", type: "Smart Bridge Infrastructure", progress: 92, risk_score: 18, openRisks: 2, budgetUsage: 68, scheduleHealth: "On Track" },
+                { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", status: "Active", type: "Metro Infrastructure", progress: 64, risk_score: 54, openRisks: 6, budgetUsage: 82, scheduleHealth: "Delayed" },
+                { id: "PRJ-0003", title: "Doha Coastal Tunnel", location: "Doha, Qatar", status: "At Risk", type: "Coastal Tunnel", progress: 41, risk_score: 76, openRisks: 9, budgetUsage: 91, scheduleHealth: "Critical" },
+                { id: "PRJ-0004", title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", status: "Active", type: "Smart City District", progress: 78, risk_score: 31, openRisks: 3, budgetUsage: 73, scheduleHealth: "On Track" },
+                { id: "PRJ-0005", title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", status: "Active", type: "Flood Defense Infrastructure", progress: 57, risk_score: 49, openRisks: 5, budgetUsage: 79, scheduleHealth: "Watch" }
+            ];
 
-                const [userRes, projectsRes, statsRes] = await Promise.all([
-                    fetch(`${API_BASE_URL}/users/me`, { headers: { "Authorization": `Bearer ${token}` } }),
-                    fetch(`${API_BASE_URL}/projects/`, { headers: { "Authorization": `Bearer ${token}` } }),
-                    fetch(`${API_BASE_URL}/projects/stats`, { headers: { "Authorization": `Bearer ${token}` } })
-                ]);
+            const userWelcome = document.getElementById("userWelcome");
+            if (userWelcome) userWelcome.innerText = "Engineer";
 
-                if (userRes.status === 401 || projectsRes.status === 401 || statsRes.status === 401) {
-                    handleUnauthorized();
-                    return;
-                }
+            document.getElementById("totalProjects").innerText = "5";
+            document.getElementById("activeProjects").innerText = "4";
+            document.getElementById("atRiskProjects").innerText = "1";
+            document.getElementById("avgProgress").innerText = "66%";
+            document.getElementById("totalOpenRisks").innerText = "25";
+            document.getElementById("reportsGenerated").innerText = "15";
 
-                if (userRes.ok) {
-                    const user = await userRes.json();
-                    const userWelcome = document.getElementById("userWelcome");
-                    if (userWelcome) userWelcome.innerText = user.full_name || user.email || "Engineer";
-                }
-
-                if (!projectsRes.ok || !statsRes.ok) {
-                    throw new Error("Failed to load dashboard data");
-                }
-
-                const fetchedProjects = await projectsRes.json();
-                if (Array.isArray(fetchedProjects) && fetchedProjects.length > 0) {
-                    projects = fetchedProjects;
-                    stats = await statsRes.json();
-                } else if (fetchedProjects && Array.isArray(fetchedProjects.projects) && fetchedProjects.projects.length > 0) {
-                    projects = fetchedProjects.projects;
-                    stats = await statsRes.json();
-                } else {
-                    throw new Error("Empty project data");
-                }
-            } catch (error) {
-                console.warn("Using fallback demo data:", error);
-                projects = fallbackProjects;
-                stats = {
-                    total: fallbackProjects.length,
-                    active: fallbackProjects.filter(p => p.status === "Active" || p.status === "In Progress").length,
-                    pending: fallbackProjects.filter(p => p.status === "Pending").length,
-                    completed: fallbackProjects.filter(p => p.status === "Completed").length
-                };
+            const intellContainer = document.getElementById("portfolioIntelligenceContent");
+            if (intellContainer) {
+                intellContainer.innerHTML = `
+                <div class="portfolio-intelligence-grid">
+                    <div class="intelligence-card warning">
+                        <span>Average Risk Score</span>
+                        <strong style="color:#f59e0b">46</strong>
+                        <small>Moderate portfolio risk</small>
+                    </div>
+                    <div class="intelligence-card success">
+                        <span>Portfolio Health</span>
+                        <strong style="color:var(--success)">Moderate</strong>
+                        <small>Stable overall status</small>
+                    </div>
+                    <div class="intelligence-card critical">
+                        <span>Highest Risk</span>
+                        <strong title="Doha Coastal Tunnel">Doha Coastal Tunnel</strong>
+                        <small>Score: 76/100</small>
+                    </div>
+                    <div class="intelligence-card blue">
+                        <span>Best Progress</span>
+                        <strong title="Dubai Smart Bridge" style="color:var(--primary)">Dubai Smart Bridge</strong>
+                        <small>92% Completion</small>
+                    </div>
+                    <div class="intelligence-card critical">
+                        <span>Delayed / Critical</span>
+                        <strong style="color:#ef4444">2</strong>
+                        <small>Projects require attention</small>
+                    </div>
+                </div>`;
             }
 
-            // Set global state for notifications
-            window.EngiSphereProjects = projects;
+            const riskContainer = document.getElementById("topRiskProjectsList");
+            if (riskContainer) {
+                riskContainer.innerHTML = `
+                <div class="top-risk-item at-risk" onclick="goToProject('PRJ-0003')" style="cursor:pointer;">
+                    <div class="top-risk-rank">01</div>
+                    <div class="top-risk-project-name">
+                        Doha Coastal Tunnel
+                        <small>Doha, Qatar</small>
+                    </div>
+                    <div>
+                        <div class="risk-score-pill" style="background:#ef4444;">76</div>
+                    </div>
+                    <div class="risk-main-factor">
+                        <span class="risk-level-label" style="color:#ef4444;">Critical</span>
+                    </div>
+                </div>
+                <div class="top-risk-item warning" onclick="goToProject('PRJ-0002')" style="cursor:pointer;">
+                    <div class="top-risk-rank">02</div>
+                    <div class="top-risk-project-name">
+                        Riyadh Metro Expansion
+                        <small>Riyadh, Saudi Arabia</small>
+                    </div>
+                    <div>
+                        <div class="risk-score-pill" style="background:#f59e0b;">54</div>
+                    </div>
+                    <div class="risk-main-factor">
+                        <span class="risk-level-label" style="color:#f59e0b;">Delayed</span>
+                    </div>
+                </div>
+                <div class="top-risk-item watch" onclick="goToProject('PRJ-0005')" style="cursor:pointer;">
+                    <div class="top-risk-rank">03</div>
+                    <div class="top-risk-project-name">
+                        Jeddah Flood Defense
+                        <small>Jeddah, Saudi Arabia</small>
+                    </div>
+                    <div>
+                        <div class="risk-score-pill" style="background:#3b82f6;">49</div>
+                    </div>
+                    <div class="risk-main-factor">
+                        <span class="risk-level-label" style="color:#3b82f6;">Watch</span>
+                    </div>
+                </div>`;
+            }
 
-            updateStats(stats, projects);
-            renderProjects(projects);
-            updatePortfolioText(projects);
-            updateDistribution(projects);
-            renderPortfolioIntelligence(projects);
-            renderProjectTemplates();
-            renderTopRiskProjects(projects);
+            const tableBody = document.getElementById("projectsTableBody");
+            if (tableBody) {
+                tableBody.innerHTML = DEMO_PROJECTS.map(p => `
+                    <tr>
+                        <td>
+                            <div class="project-name">${p.title}</div>
+                            <div class="project-id">${p.id}</div>
+                        </td>
+                        <td>${p.location}</td>
+                        <td><span class="status-badge status-${p.status.toLowerCase().replace(' ','-')}">${p.status}</span></td>
+                        <td>${p.type}</td>
+                        <td>
+                            <div class="table-btns">
+                                <button onclick="goToProject('${p.id}')" class="table-btn primary">
+                                    View
+                                </button>
+                                <button class="table-btn" type="button" onclick="alert('Demo mode: editing project data is available as a frontend preview.')">
+                                    Edit
+                                </button>
+                                <a href="ai-radar.html?project=${p.id}" class="table-btn radar">
+                                    <i class="fas fa-satellite" style="margin-right:6px;"></i> AI Radar
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `).join("");
+            }
             
-            // Initialize notifications with projects
+            updateDistribution(DEMO_PROJECTS);
+            renderProjectTemplates();
             if (window.EngiSphereNotifications) {
                 window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
                 renderDashboardNotifications();
