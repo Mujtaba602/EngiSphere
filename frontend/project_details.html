@@ -170,7 +170,7 @@
             <div class="nav-section">Core Systems</div>
             <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span>Home</span></a>
             <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
-            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i><span>Geospatial Radar</span></a>
+            <a href="#" class="nav-link" onclick="document.getElementById('ai-insights-section').scrollIntoView({behavior: 'smooth'}); return false;"><i class="fas fa-satellite"></i><span>AI Insights</span></a>
             <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i><span>AI EngiBot</span></a>
             <div class="nav-section">Management</div>
             <a href="project_details.html" class="nav-link active"><i class="fas fa-folder-open"></i><span>Project Details</span></a>
@@ -193,7 +193,7 @@
                     <i class="fas fa-moon"></i>
                 </button>
                 <a href="index.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-                <a href="solutions.html" class="btn btn-primary"><i class="fas fa-satellite"></i> Run AI Radar</a>
+                <button class="btn btn-primary" onclick="document.getElementById('ai-insights-section').scrollIntoView({behavior: 'smooth'})"><i class="fas fa-satellite"></i> AI Insights</button>
             </div>
         </div>
 
@@ -256,10 +256,10 @@
                     <h3>AI Risk Radar Ready</h3>
                     <p>Generate a deep-dive analysis of project health, cost realism, schedule stability, geospatial exposure, and structural monitoring performance.</p>
                 </div>
-                <a href="solutions.html" class="btn btn-primary">Analyze Now</a>
+                <button class="btn btn-primary" onclick="document.getElementById('ai-insights-section').scrollIntoView({behavior: 'smooth'})">AI Insights</button>
             </div>
 
-            <div class="grid-2">
+            <div class="grid-2" id="ai-insights-section">
                 <!-- 5. Risk Scoring Engine -->
                 <div class="card">
                     <div class="section-title"><i class="fas fa-shield-halved"></i> Risk Scoring Engine</div>
@@ -518,6 +518,16 @@
                     if (node.nodeValue.includes("Smart Bridge Infrastructure")) node.nodeValue = node.nodeValue.replace(/Smart Bridge Infrastructure/g, project.type);
                 }
             }
+
+            // Update project-aware links
+            document.querySelectorAll('a').forEach(a => {
+                if (a.href.includes('reports.html')) {
+                    a.href = `reports.html?project=${selectedProjectId}`;
+                }
+                if (a.href.includes('team_access.html')) {
+                    a.href = `team_access.html?project=${selectedProjectId}`;
+                }
+            });
         });
     </script>
 </body>
