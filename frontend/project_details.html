@@ -485,6 +485,39 @@
         document.addEventListener('DOMContentLoaded', () => {
             setupThemeToggle();
             setupSidebarToggle();
+
+            // Minimal routing fix
+            const PROJECT_DATASET = {
+                "PRJ-0001": { title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure" },
+                "PRJ-0002": { title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure" },
+                "PRJ-0003": { title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel" },
+                "PRJ-0004": { title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District" },
+                "PRJ-0005": { title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure" }
+            };
+
+            let selectedProjectId = new URLSearchParams(window.location.search).get("project") 
+                || localStorage.getItem("engisphere-selected-project-id") 
+                || "PRJ-0001";
+
+            if (!PROJECT_DATASET[selectedProjectId]) {
+                selectedProjectId = "PRJ-0001";
+            }
+
+            localStorage.setItem("engisphere-selected-project-id", selectedProjectId);
+
+            if (selectedProjectId !== "PRJ-0001") {
+                const project = PROJECT_DATASET[selectedProjectId];
+                document.title = project.title + " Intelligence | EngiSphere";
+                
+                const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+                let node;
+                while (node = walk.nextNode()) {
+                    if (node.nodeValue.includes("PRJ-0001")) node.nodeValue = node.nodeValue.replace(/PRJ-0001/g, selectedProjectId);
+                    if (node.nodeValue.includes("Dubai Smart Bridge")) node.nodeValue = node.nodeValue.replace(/Dubai Smart Bridge/g, project.title);
+                    if (node.nodeValue.includes("Dubai, UAE")) node.nodeValue = node.nodeValue.replace(/Dubai, UAE/g, project.location);
+                    if (node.nodeValue.includes("Smart Bridge Infrastructure")) node.nodeValue = node.nodeValue.replace(/Smart Bridge Infrastructure/g, project.type);
+                }
+            }
         });
     </script>
 </body>
