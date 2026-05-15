@@ -341,10 +341,25 @@
         .p-stat span { font-size: 14px; font-weight: 800; color: var(--text-main); }
         .p-card-btn { margin-top: 20px; width: 100%; }
         
-        .not-found-view { text-align: center; padding: 100px 20px; }
-        .not-found-view i { font-size: 64px; color: var(--text-muted); margin-bottom: 24px; }
-        .not-found-view h2 { font-size: 32px; font-weight: 800; margin-bottom: 12px; }
         .not-found-view p { color: var(--text-muted); margin-bottom: 32px; }
+
+        /* Action Links */
+        .action-links { display: flex; gap: 12px; margin-top: 16px; }
+        .action-link-btn { 
+            padding: 8px 14px; 
+            border-radius: 10px; 
+            font-size: 12px; 
+            font-weight: 700; 
+            text-decoration: none; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 6px; 
+            background: var(--bg-soft); 
+            color: var(--text-main); 
+            border: 1px solid var(--border-soft); 
+            transition: var(--transition);
+        }
+        .action-link-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--card-bg); }
 
         .hidden { display: none !important; }
 
@@ -550,59 +565,46 @@
                     <h4>Executive Summary</h4>
                     <p id="profileSummary">Smart bridge infrastructure project focused on traffic optimization, IoT monitoring, and structural safety.</p>
                 </div>
+                
+                <div class="action-links">
+                    <a href="team_access.html" id="linkTeamAccess" class="action-link-btn"><i class="fas fa-users-gear"></i> Open Team Access</a>
+                    <a href="reports.html" id="linkReports" class="action-link-btn"><i class="fas fa-file-invoice"></i> View Reports</a>
+                </div>
             </div>
 
-            <!-- 4. AI Risk Radar Ready Card -->
-            <div class="card radar-card">
-                <div class="radar-text">
-                    <h3>AI Risk Radar Ready</h3>
-                    <p>Generate a deep-dive analysis of project health, cost realism, schedule stability, geospatial exposure, and structural monitoring performance.</p>
-                </div>
-                <button class="btn btn-primary" onclick="document.getElementById('ai-insights-section').scrollIntoView({behavior: 'smooth'})">AI Insights</button>
-            </div>
-
-            <div class="grid-2" id="ai-insights-section">
-                <!-- 5. Risk Scoring Engine -->
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-shield-halved"></i> Risk Scoring Engine</div>
-                    <div class="project-meta-grid" style="grid-template-columns: 1fr 1fr;">
-                        <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value" id="riskEngineScore" style="color: var(--success);">18/100</div></div>
-                        <div class="meta-item"><div class="meta-label">Risk Level</div><div class="meta-value" id="riskEngineLevel">Low Risk</div></div>
-                        <div class="meta-item"><div class="meta-label">Confidence</div><div class="meta-value" id="riskEngineConfidence">94%</div></div>
-                        <div class="meta-item"><div class="meta-label">Open Risks</div><div class="meta-value" id="riskEngineOpenRisks">2</div></div>
-                    </div>
-                    <div style="margin-top: 16px;">
-                        <div class="meta-label">Main Risk Drivers</div>
-                        <ul id="riskEngineDrivers" style="list-style: none; padding: 0; margin-top: 8px;">
-                            <!-- Dynamic Drivers -->
-                        </ul>
-                    </div>
-                    <div style="margin-top: 20px; padding: 16px; background: var(--bg-soft); border-radius: 16px; border-left: 4px solid var(--primary);">
-                        <div class="meta-label" style="color: var(--primary);">Recommended Mitigation</div>
-                        <p id="riskEngineMitigation" style="font-size: 13px; font-weight: 600; margin-top: 4px; line-height: 1.5;">Continue weekly monitoring, maintain structural sensor checks, and review supplier status every 7 days.</p>
-                    </div>
-                </div>
-
-                <!-- 6. AI Project Analysis -->
-                <div class="card" style="border: 1px solid var(--primary-soft);">
-                    <div class="section-title"><i class="fas fa-robot"></i> AI Project Analysis</div>
-                    <div style="padding: 20px; background: var(--bg-soft); border-radius: 20px; margin-bottom: 20px;">
-                        <p id="aiAnalysisText" style="font-size: 14px; font-weight: 600; font-style: italic; line-height: 1.6;">
-                            <!-- Dynamic Analysis -->
-                        </p>
-                    </div>
-                    <div style="display: grid; gap: 12px;">
-                        <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 12px;">
-                            <div class="meta-label" style="color: var(--danger);">Key Risks</div>
-                            <p id="aiAnalysisKeyRisks" style="font-size: 12px; font-weight: 700;"><!-- Dynamic --></p>
+            <!-- 4. Combined AI Risk & Recommendation -->
+            <div class="card" id="ai-insights-section">
+                <div class="section-title"><i class="fas fa-robot"></i> AI Risk & Recommendation</div>
+                <div class="grid-2">
+                    <!-- Left: Metrics -->
+                    <div>
+                        <div class="project-meta-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 20px;">
+                            <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value" id="riskEngineScore" style="color: var(--success);">18/100</div></div>
+                            <div class="meta-item"><div class="meta-label">Risk Level</div><div class="meta-value" id="riskEngineLevel">Low Risk</div></div>
+                            <div class="meta-item"><div class="meta-label">Confidence</div><div class="meta-value" id="riskEngineConfidence">94%</div></div>
+                            <div class="meta-item"><div class="meta-label">Open Risks</div><div class="meta-value" id="riskEngineOpenRisks">2</div></div>
                         </div>
-                        <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 12px;">
-                            <div class="meta-label" style="color: var(--success);">Recommended Actions</div>
-                            <p id="aiAnalysisActions" style="font-size: 12px; font-weight: 700;"><!-- Dynamic --></p>
+                        <div style="padding: 16px; background: var(--bg-soft); border-radius: 16px; border-left: 4px solid var(--danger);">
+                            <div class="meta-label" style="color: var(--danger);">Key Risk</div>
+                            <p id="aiAnalysisKeyRisks" style="font-size: 13px; font-weight: 700; margin-top: 4px;">Potential minor delay in structural sensor component delivery.</p>
                         </div>
-                        <div style="padding: 12px; background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 12px;">
-                            <div class="meta-label" style="color: var(--primary);">Executive Note</div>
-                            <p id="aiAnalysisNote" style="font-size: 12px; font-weight: 700;"><!-- Dynamic --></p>
+                    </div>
+                    <!-- Right: Analysis -->
+                    <div>
+                        <div style="padding: 16px; background: var(--primary-soft); border-radius: 16px; margin-bottom: 12px;">
+                            <p id="aiAnalysisText" style="font-size: 13px; font-weight: 600; font-style: italic; line-height: 1.6; color: var(--text-main);">
+                                <!-- AI Summary -->
+                            </p>
+                        </div>
+                        <div style="display: grid; gap: 8px;">
+                            <div style="padding: 10px; background: var(--bg-soft); border-radius: 10px; border: 1px solid var(--border-soft);">
+                                <div class="meta-label" style="color: var(--success);">Recommended Action</div>
+                                <p id="aiAnalysisActions" style="font-size: 12px; font-weight: 700;"></p>
+                            </div>
+                            <div style="padding: 10px; background: var(--bg-soft); border-radius: 10px; border: 1px solid var(--border-soft);">
+                                <div class="meta-label" style="color: var(--primary);">Executive Note</div>
+                                <p id="aiAnalysisNote" style="font-size: 12px; font-weight: 700;"></p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -623,59 +625,6 @@
                 </div>
             </div>
 
-            <div class="grid-2">
-                <!-- 8. Assigned Team Members -->
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-users"></i> Assigned Team Members</div>
-                    <div class="table-responsive">
-                        <table class="clean-table">
-                            <thead>
-                                <tr><th>Member</th><th>Role</th><th>Access</th><th>Status</th></tr>
-                            </thead>
-                            <tbody id="teamMemberList">
-                                <!-- Dynamic Team -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 9. Related Reports -->
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-file-invoice"></i> Related Reports</div>
-                    <div class="report-grid" id="relatedReportsList">
-                        <!-- Dynamic Reports -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid-2">
-                <!-- 10. Risk & Action Plan -->
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-shield-halved"></i> Risk & Action Plan</div>
-                    <div class="project-meta-grid" style="grid-template-columns: 1fr; gap: 12px;">
-                        <div class="meta-item">
-                            <div class="meta-label">Main Risk</div>
-                            <div class="meta-value" id="riskPlanTitle">Structural sensor delivery delay</div>
-                        </div>
-                        <div class="grid-2">
-                            <div class="meta-item"><div class="meta-label">Impact</div><div class="meta-value" id="riskPlanImpact">Minor schedule impact</div></div>
-                            <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value" id="riskPlanOwner">Ahmed M.</div></div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 16px; padding: 16px; background: var(--bg-soft); border-radius: 16px; border-left: 4px solid var(--primary);">
-                        <div class="meta-label" style="color: var(--primary);">Recommended Mitigation</div>
-                        <p style="font-size: 13px; font-weight: 600; margin-top: 4px; line-height: 1.5;" id="riskPlanMitigation">Continue weekly monitoring, maintain structural sensor checks, and review supplier status every 7 days.</p>
-                        <div style="margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--text-muted);">DUE DATE: <span id="riskPlanDue">2026-06-15</span></div>
-                    </div>
-                </div>
-
-                <!-- 11. Recent Activity -->
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-clock-rotate-left"></i> Recent Activity</div>
-                    <div class="timeline" id="activityTimeline">
-                        <!-- Dynamic Activity -->
-                    </div>
-                </div>
             </div>
 
             <!-- 12. Executive Decision Panel -->
@@ -1073,27 +1022,24 @@
             document.getElementById('profileProgress').innerText = project.progress + '%';
             document.getElementById('profileSummary').innerText = project.executiveSummary;
 
-            // 4. Risk Scoring Engine
+            // Action Links
+            document.getElementById('linkTeamAccess').href = `team_access.html?project=${id}`;
+            document.getElementById('linkReports').href = `reports.html?project=${id}`;
+
+            // 4. Combined AI Risk & Recommendation
             const engineScore = document.getElementById('riskEngineScore');
             engineScore.innerText = project.riskScore + '/100';
             engineScore.style.color = (project.riskScore > 70) ? 'var(--danger)' : (project.riskScore > 40) ? 'var(--warning)' : 'var(--success)';
             document.getElementById('riskEngineLevel').innerText = project.riskLevel + ' Risk';
             document.getElementById('riskEngineConfidence').innerText = project.riskEngine.confidence;
             document.getElementById('riskEngineOpenRisks').innerText = project.openRisks;
-            document.getElementById('riskEngineDrivers').innerHTML = project.riskEngine.drivers.map(d => `
-                <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">
-                    <i class="fas fa-check-circle" style="color: ${project.riskScore > 70 ? 'var(--danger)' : 'var(--success)'}; margin-right: 8px;"></i> ${d}
-                </li>
-            `).join('');
-            document.getElementById('riskEngineMitigation').innerText = project.riskPlan.mitigation;
-
-            // 5. AI Project Analysis
-            document.getElementById('aiAnalysisText').innerText = project.aiAnalysis.text;
+            
             document.getElementById('aiAnalysisKeyRisks').innerText = project.aiAnalysis.keyRisks;
+            document.getElementById('aiAnalysisText').innerText = project.aiAnalysis.text;
             document.getElementById('aiAnalysisActions').innerText = project.aiAnalysis.actions;
             document.getElementById('aiAnalysisNote').innerText = project.aiAnalysis.note;
 
-            // 6. Milestones
+            // 5. Milestones
             const milestoneList = document.getElementById('milestoneList');
             milestoneList.innerHTML = project.milestones.map(m => `
                 <tr>
@@ -1108,40 +1054,7 @@
                 </tr>
             `).join('');
 
-            // 7. Team Members
-            document.getElementById('teamMemberList').innerHTML = project.team.map(t => `
-                <tr>
-                    <td>${t.name}</td>
-                    <td>${t.role}</td>
-                    <td>${t.access}</td>
-                    <td><span class="badge badge-active">${t.status}</span></td>
-                </tr>
-            `).join('');
-
-            // 8. Related Reports
-            document.getElementById('relatedReportsList').innerHTML = project.reports.map(r => `
-                <div class="report-card">
-                    <h5>${r.title}</h5>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span class="badge ${r.status === 'Ready' ? 'badge-completed' : 'badge-warning'}">${r.status}</span>
-                        <button class="btn btn-outline btn-mini">Preview</button>
-                    </div>
-                </div>
-            `).join('');
-
-            // 9. Risk Plan
-            document.getElementById('riskPlanTitle').innerText = project.riskPlan.risk;
-            document.getElementById('riskPlanImpact').innerText = project.riskPlan.impact;
-            document.getElementById('riskPlanOwner').innerText = project.riskPlan.owner;
-            document.getElementById('riskPlanMitigation').innerText = project.riskPlan.mitigation;
-            document.getElementById('riskPlanDue').innerText = project.riskPlan.dueDate;
-
-            // 10. Timeline
-            document.getElementById('activityTimeline').innerHTML = project.activities.map(a => `
-                <div class="timeline-item">${a}</div>
-            `).join('');
-
-            // 11. Decision Panel
+            // 6. Decision Panel
             document.getElementById('decisionDirection').innerText = project.decision.direction;
             document.getElementById('decisionReason').innerText = project.decision.reason;
             document.getElementById('decisionReview').innerText = project.decision.review;
