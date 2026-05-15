@@ -488,11 +488,11 @@
 
             // Minimal routing fix
             const PROJECT_DATASET = {
-                "PRJ-0001": { title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure" },
-                "PRJ-0002": { title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure" },
-                "PRJ-0003": { title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel" },
-                "PRJ-0004": { title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District" },
-                "PRJ-0005": { title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure" }
+                "PRJ-0001": { title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure", progress: 92, riskScore: 18, openRisks: 2, status: "Active", schedule: "On Track" },
+                "PRJ-0002": { title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure", progress: 64, riskScore: 54, openRisks: 6, status: "Active", schedule: "Delayed" },
+                "PRJ-0003": { title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel", progress: 41, riskScore: 76, openRisks: 9, status: "At Risk", schedule: "Critical" },
+                "PRJ-0004": { title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District", progress: 78, riskScore: 31, openRisks: 3, status: "Active", schedule: "On Track" },
+                "PRJ-0005": { title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure", progress: 57, riskScore: 49, openRisks: 5, status: "Active", schedule: "Watch" }
             };
 
             let selectedProjectId = new URLSearchParams(window.location.search).get("project") 
@@ -517,6 +517,55 @@
                     if (node.nodeValue.includes("Dubai, UAE")) node.nodeValue = node.nodeValue.replace(/Dubai, UAE/g, project.location);
                     if (node.nodeValue.includes("Smart Bridge Infrastructure")) node.nodeValue = node.nodeValue.replace(/Smart Bridge Infrastructure/g, project.type);
                 }
+
+                // Update specific KPI DOM elements
+                document.querySelectorAll('.stat-card').forEach(card => {
+                    const label = card.querySelector('.stat-label')?.innerText.trim();
+                    const val = card.querySelector('.stat-value');
+                    const badge = card.querySelector('.stat-badge');
+                    
+                    if (label === 'Progress' && val) val.innerText = project.progress + '%';
+                    if (label === 'Risk Score' && val) {
+                        val.innerText = project.riskScore + '/100';
+                        if (badge) {
+                            badge.innerText = project.riskScore >= 70 ? 'High Risk' : project.riskScore >= 50 ? 'Medium Risk' : 'Low Risk';
+                            if (project.riskScore >= 70) badge.style.cssText = 'background: #fee2e2; color: #991b1b;';
+                            else if (project.riskScore >= 50) badge.style.cssText = 'background: #fef3c7; color: #92400e;';
+                        }
+                    }
+                    if (label === 'Open Risks' && val) val.innerText = project.openRisks;
+                    if (label === 'Schedule Health' && val) {
+                        val.innerText = project.schedule;
+                        if (badge) {
+                            badge.innerText = project.schedule === 'Critical' ? 'Danger' : project.schedule === 'Delayed' ? 'Warning' : 'Healthy';
+                            if (project.schedule === 'Critical') badge.style.cssText = 'background: #fee2e2; color: #991b1b;';
+                            else if (project.schedule !== 'On Track') badge.style.cssText = 'background: #fef3c7; color: #92400e;';
+                        }
+                    }
+                });
+
+                document.querySelectorAll('.meta-item').forEach(item => {
+                    const label = item.querySelector('.meta-label')?.innerText.trim();
+                    const val = item.querySelector('.meta-value');
+                    if (!val) return;
+                    
+                    if (label === 'Status') {
+                        val.innerHTML = `<span class="badge" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; ${project.status === 'At Risk' ? 'background: #fee2e2; color: #991b1b;' : 'background: #dbeafe; color: #1e40af;'}">${project.status}</span>`;
+                    }
+                    if (label === 'Risk Score') val.innerText = project.riskScore + '/100';
+                    if (label === 'Operational Progress') val.innerText = project.progress + '%';
+                    if (label === 'Open Risks') val.innerText = project.openRisks;
+                });
+
+                document.querySelectorAll('.progress-container').forEach(container => {
+                    const header = container.querySelector('.progress-header')?.innerText || '';
+                    if (header.includes('Overall Progress')) {
+                        const spans = container.querySelectorAll('span');
+                        if (spans.length > 1) spans[1].innerText = project.progress + '%';
+                        const fill = container.querySelector('.progress-fill');
+                        if (fill) fill.style.width = project.progress + '%';
+                    }
+                });
             }
 
             // Update project-aware links
