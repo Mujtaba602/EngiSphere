@@ -562,34 +562,6 @@
         @media (max-width: 1024px) {
             .sidebar { display: none; }
         }
-
-        /* Floating Theme Toggle */
-        .page-theme-toggle {
-            position: absolute;
-            top: 22px;
-            right: 420px; /* Positioned left of the AI panel */
-            width: 46px;
-            height: 46px;
-            border-radius: 16px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-soft);
-            color: var(--text-main);
-            font-size: 18px;
-            cursor: pointer;
-            z-index: 1500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-premium);
-            backdrop-filter: blur(10px);
-            transition: var(--transition);
-        }
-
-        .page-theme-toggle:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-2px);
-        }
     </style>
 </head>
 <body>
@@ -618,6 +590,12 @@
             <a href="project_details.html" class="nav-link"><i class="fas fa-folder-open"></i><span>Project Details</span></a>
             <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span>Team Access</span></a>
             <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i><span>Reports</span></a>
+            
+            <div class="nav-section" style="margin-top:20px;">System</div>
+            <button class="nav-link" id="themeToggleBtn" onclick="toggleAppTheme()" style="width:100%; border:none; background:none; cursor:pointer;">
+                <i class="fas fa-moon" id="themeIcon"></i>
+                <span id="themeLabel">Dark Mode</span>
+            </button>
         </nav>
 
         <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
@@ -628,10 +606,6 @@
 
     <main class="main-radar">
         <div id="map"></div>
-
-        <button id="themeToggleBtn" class="page-theme-toggle" onclick="toggleAppTheme()" title="Toggle theme">
-            <i class="fas fa-moon" id="themeIcon"></i>
-        </button>
 
         <section class="left-panel" id="leftPanel">
             <button class="collapse-btn" onclick="togglePanel()" id="collapseBtn">
@@ -711,38 +685,16 @@
         }
 
         async function fetchProjects() {
-            const fallbackProjects = [
-                { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", status: "Active", type: "Infrastructure", progress: 92, latitude: 25.2048, longitude: 55.2708 },
-                { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", status: "In Progress", type: "Transportation", progress: 67, latitude: 24.7136, longitude: 46.6753 },
-                { id: "PRJ-0003", title: "Doha Energy Control Center", location: "Doha, Qatar", status: "Pending", type: "Energy", progress: 35, latitude: 25.2854, longitude: 51.5310 },
-                { id: "PRJ-0004", title: "Cairo Residential District", location: "Cairo, Egypt", status: "Completed", type: "Residential", progress: 100, latitude: 30.0444, longitude: 31.2357 },
-                { id: "PRJ-0005", title: "Riyadh Business Innovation Tower", location: "Riyadh, Saudi Arabia", status: "Pending", type: "Commercial", progress: 45, latitude: 24.7743, longitude: 46.7386 }
-            ];
-
             try {
                 const token = localStorage.getItem("token");
                 const res = await fetch(`${API_BASE_URL}/projects`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
-                if (res.ok) {
-                    projects = await res.json();
-                } else {
-                    projects = fallbackProjects;
-                }
+                projects = await res.json();
+                renderProjects(projects);
+                addMarkers(projects);
             } catch (err) {
-                console.warn("Using fallback projects", err);
-                projects = fallbackProjects;
-            }
-
-            renderProjects(projects);
-            addMarkers(projects);
-
-            // Handle URL Parameter
-            const params = new URLSearchParams(window.location.search);
-            const targetId = params.get('id') || params.get('projectId');
-            if (targetId) {
-                const target = projects.find(p => String(p.id) === String(targetId));
-                if (target) selectProject(target.id);
+                console.error("Fetch failed", err);
             }
         }
 
@@ -912,7 +864,9 @@
 
         function updateThemeUI(isDark) {
             const icon = document.getElementById("themeIcon");
+            const label = document.getElementById("themeLabel");
             if (icon) icon.className = isDark ? "fas fa-sun" : "fas fa-moon";
+            if (label) label.textContent = isDark ? "Light Mode" : "Dark Mode";
         }
 
         function applyAppTheme() {

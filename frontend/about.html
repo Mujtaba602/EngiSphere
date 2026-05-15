@@ -8,6 +8,7 @@
 
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <script src="assets/js/theme.js"></script>
 
   <style>
     :root {
@@ -31,6 +32,16 @@
       --line: rgba(255, 255, 255, 0.10);
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
       --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
+    }
+
+    body.light-theme {
+      --ink: #0f172a;
+      --muted: #64748b;
+      --soft: #f8fafc;
+      --panel: #ffffff;
+      --line: #e2e8f0;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 16px 42px rgba(15, 23, 42, 0.06);
     }
 
     * {
@@ -63,103 +74,14 @@
       font-family: inherit;
     }
 
-    /* ===== UNIFIED NAVBAR ===== */
-    .nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      min-height: 78px;
-      padding: 0 7%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-      background: rgba(255, 255, 255, 0.88);
-      border-bottom: 1px solid var(--line);
-      backdrop-filter: blur(18px);
-    }
-
-    body.dark-theme .nav {
-      background: rgba(2, 6, 23, 0.86);
-    }
-
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-weight: 800;
-      letter-spacing: -0.8px;
-      white-space: nowrap;
-    }
-
-    .brand-icon {
-      width: 40px;
-      height: 40px;
-      display: grid;
-      place-items: center;
-      border-radius: 13px;
-      background: var(--primary);
-      color: #ffffff;
-      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.25);
-      flex: 0 0 auto;
-    }
-
-    .brand-text {
-      font-size: 22px;
-      color: var(--ink);
-      line-height: 1;
-    }
-
-    .brand-text span {
-      color: var(--primary);
-    }
-
-    .nav-center,
-    .nav-right,
-    .auth-actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
+    .nav a,
+    .nav button,
+    .nav .btn,
     .nav-link {
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 800;
-      transition: 0.2s ease;
-      white-space: nowrap;
-      text-transform: none;
+      text-transform: none !important;
     }
 
-    .nav-link:hover,
-    .nav-link.active {
-      color: var(--primary);
-    }
-
-    .theme-toggle {
-      width: 42px;
-      height: 42px;
-      display: grid;
-      place-items: center;
-      border: 1px solid var(--line);
-      background: var(--panel);
-      color: var(--ink);
-      border-radius: 14px;
-      cursor: pointer;
-      box-shadow: var(--shadow-soft);
-      transition: 0.2s ease;
-      font-family: inherit;
-      flex: 0 0 auto;
-    }
-
-    .theme-toggle:hover {
-      transform: translateY(-1px);
-      color: var(--primary);
-    }
-
+    /* ===== BUTTONS ===== */
     .btn {
       min-height: 42px;
       padding: 0 18px;
@@ -175,7 +97,6 @@
       transition: 0.2s ease;
       white-space: nowrap;
       font-family: inherit;
-      text-transform: none;
     }
 
     .btn-primary {
@@ -193,7 +114,6 @@
       background: var(--panel);
       border-color: rgba(37, 99, 235, 0.35);
       color: var(--primary);
-      box-shadow: none;
     }
 
     .btn-outline:hover {
@@ -201,27 +121,9 @@
       transform: translateY(-1px);
     }
 
-    .btn-danger {
-      background: transparent;
-      border-color: rgba(239, 68, 68, 0.35);
-      color: var(--danger);
-    }
-
-    .btn-danger:hover {
-      background: rgba(239, 68, 68, 0.08);
-      transform: translateY(-1px);
-    }
-
-    .nav a,
-    .nav button,
-    .nav .btn,
-    .nav-link {
-      text-transform: none !important;
-    }
-
     /* ===== ABOUT PAGE ===== */
     .about-page {
-      padding: 136px 7% 54px;
+      padding: 50px 7% 54px;
     }
 
     .about-container {
@@ -234,21 +136,6 @@
       margin-bottom: 38px;
     }
 
-    .eyebrow {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      min-height: 32px;
-      padding: 0 13px;
-      border-radius: 999px;
-      background: rgba(37, 99, 235, 0.10);
-      color: var(--primary);
-      font-size: 12px;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.7px;
-      margin-bottom: 18px;
-    }
 
     .about-header h1 {
       font-size: clamp(40px, 5vw, 64px);
@@ -373,6 +260,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 22px;
+      margin-bottom: 54px;
     }
 
     .cta h2 {
@@ -451,32 +339,8 @@
     }
 
     @media (max-width: 900px) {
-      .nav {
-        position: relative;
-        min-height: auto;
-        padding: 16px 22px;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 14px;
-      }
-
-      .nav-center,
-      .nav-right,
-      .auth-actions {
-        width: 100%;
-        gap: 12px;
-      }
-
-      .nav-link {
-        font-size: 13px;
-      }
-
-      .auth-actions .btn {
-        flex: 1;
-      }
-
       .about-page {
-        padding: 48px 22px 44px;
+        padding: 40px 22px 44px;
       }
 
       .footer {
@@ -505,13 +369,11 @@
       }
 
       .cta-actions,
-      .cta-actions .btn,
-      .auth-actions .btn {
+      .cta-actions .btn {
         width: 100%;
       }
 
-      .cta-actions,
-      .auth-actions {
+      .cta-actions {
         flex-direction: column;
         align-items: stretch;
       }
@@ -520,43 +382,16 @@
 </head>
 
 <body>
-  <nav class="nav">
-    <a href="home.html" class="brand" aria-label="EngiSphere Home">
-      <span class="brand-icon">
-        <i class="fas fa-compass-drafting"></i>
-      </span>
-      <span class="brand-text">ENGI<span>SPHERE</span></span>
+  <header style="padding: 32px 7% 0; display: flex; align-items: center; justify-content: space-between;">
+    <a href="home.html" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i>
+      Back to Home
     </a>
-
-    <div class="nav-center">
-      <a href="home.html" class="nav-link">Home</a>
-      <a href="#" onclick="requireAuth('index.html'); return false;" class="nav-link">Workspace</a>
-      <a href="about.html" class="nav-link active">About</a>
-      <a href="contact.html" class="nav-link">Contact</a>
-    </div>
-
-    <div class="nav-right">
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <i class="fas fa-moon"></i>
-      </button>
-
-      <div id="authActions" class="auth-actions">
-        <a href="login.html" class="btn btn-primary">
-          <i class="fas fa-right-to-bracket"></i>
-          System Access
-        </a>
-      </div>
-    </div>
-  </nav>
+  </header>
 
   <main class="about-page">
     <div class="about-container">
       <header class="about-header">
-        <div class="eyebrow">
-          <i class="fas fa-circle-info"></i>
-          About EngiSphere
-        </div>
-
         <h1>
           A compact platform for <span>engineering project management.</span>
         </h1>
@@ -688,73 +523,6 @@
     };
 
     document.addEventListener("DOMContentLoaded", function () {
-      const themeBtn = document.getElementById("themeToggle");
-      const authActions = document.getElementById("authActions");
-      const body = document.body;
-
-      function updateThemeIcon(isDark) {
-        if (!themeBtn) return;
-
-        themeBtn.innerHTML = isDark
-          ? '<i class="fas fa-sun"></i>'
-          : '<i class="fas fa-moon"></i>';
-      }
-
-      function applySavedTheme() {
-        const savedTheme = localStorage.getItem("theme") || "light";
-        const isDark = savedTheme === "dark";
-
-        body.classList.toggle("dark-theme", isDark);
-        updateThemeIcon(isDark);
-      }
-
-      function toggleTheme() {
-        body.classList.toggle("dark-theme");
-
-        const isDark = body.classList.contains("dark-theme");
-        localStorage.setItem("theme", isDark ? "dark" : "light");
-
-        updateThemeIcon(isDark);
-      }
-
-      function renderAuthActions() {
-        if (!authActions) return;
-
-        const token = localStorage.getItem("access_token");
-
-        if (token) {
-          authActions.innerHTML = `
-            <a href="profile.html" class="btn btn-outline">
-              <i class="fas fa-user"></i>
-              Profile
-            </a>
-
-            <a href="settings.html" class="btn btn-outline">
-              <i class="fas fa-gear"></i>
-              Settings
-            </a>
-
-            <button type="button" class="btn btn-danger" onclick="logout()">
-              <i class="fas fa-power-off"></i>
-              Logout
-            </button>
-          `;
-        } else {
-          authActions.innerHTML = `
-            <a href="login.html" class="btn btn-primary">
-              <i class="fas fa-right-to-bracket"></i>
-              System Access
-            </a>
-          `;
-        }
-      }
-
-      applySavedTheme();
-      renderAuthActions();
-
-      if (themeBtn) {
-        themeBtn.addEventListener("click", toggleTheme);
-      }
     });
   </script>
 </body>

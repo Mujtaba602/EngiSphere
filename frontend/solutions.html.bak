@@ -1,0 +1,4079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EngiSphere | AI Geospatial Solutions Radar</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-soft: rgba(59, 130, 246, 0.14);
+            --bg: #020617;
+            --sidebar: #0f172a;
+            --panel: rgba(15, 23, 42, 0.76);
+            --panel-2: rgba(30, 41, 59, 0.45);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 78px;
+        }
+
+        body.dark-theme {
+            --bg: #020617;
+            --sidebar: #0f172a;
+            --panel: rgba(15, 23, 42, 0.76);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+        }
+
+        body.light-theme {
+            --bg: #eef2f7;
+            --sidebar: #ffffff;
+            --panel: #ffffff;
+            --panel-2: #ffffff;
+            --border: #cbd5e1;
+            --text: #0f172a;
+            --muted: #64748b;
+            --primary: #2563eb;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --success: #059669;
+        }
+
+        body.light-theme .main {
+            background: #f1f5f9;
+        }
+
+        body.light-theme .card,
+        body.light-theme .mini-card,
+        body.light-theme .theme-toggle {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            color: #0f172a;
+        }
+        
+        body.light-theme .nav-link,
+        body.light-mode .nav-link {
+            color: #475569;
+        }
+        
+        body.light-theme .nav-link:hover,
+        body.light-mode .nav-link:hover {
+            background: #f1f5f9;
+            color: #1d4ed8;
+        }
+
+        body.light-theme .nav-link.active,
+        body.light-mode .nav-link.active {
+            background: #dbeafe;
+            color: #1d4ed8 !important;
+            font-weight: 800;
+            border-left: 3px solid #2563eb;
+            border-radius: 0 14px 14px 0;
+            box-shadow: none;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+        .theme-toggle:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Plus Jakarta Sans", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 28px 18px;
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 34px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 16px;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            color: var(--text);
+        }
+
+        .logo-text span { color: var(--primary); }
+
+        .sidebar-section-title {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin: 20px 0 8px 14px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: 0.2s;
+            margin-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: var(--primary);
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .exit-link {
+            margin-top: auto;
+            color: var(--danger) !important;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            left: calc(var(--sidebar-width) - 18px);
+            top: 24px;
+            z-index: 1100;
+            width: 36px;
+            height: 36px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        body.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
+        body.sidebar-collapsed .logo-text,
+        body.sidebar-collapsed .sidebar-section-title,
+        body.sidebar-collapsed .nav-link span { display: none; }
+        body.sidebar-collapsed .nav-link { justify-content: center; padding: 12px 0; width: 48px; margin-left: auto; margin-right: auto; }
+        body.sidebar-collapsed .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
+        body.sidebar-collapsed .sidebar-toggle i { transform: rotate(180deg); }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            min-height: 100vh;
+            padding: 24px 34px;
+            background: var(--bg);
+            box-sizing: border-box;
+            overflow-x: hidden;
+            position: relative;
+            z-index: 1;
+            transition: 0.3s;
+        }
+
+        body.sidebar-collapsed .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+            width: calc(100% - var(--sidebar-collapsed-width));
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .topbar-left h1 {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: var(--text);
+            letter-spacing: -0.5px;
+            padding-left: 48px; /* Fix for sidebar toggle overlay */
+        }
+
+        .topbar-left p {
+            color: var(--muted);
+            font-size: 14px;
+            padding-left: 48px; /* Align with title */
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .top-btn {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            color: var(--text);
+            height: 42px;
+            padding: 0 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            font-weight: 700;
+            font-size: 12px;
+            transition: 0.25s;
+            text-decoration: none;
+        }
+
+        .top-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .top-btn.primary {
+            background: linear-gradient(135deg, var(--primary), #1d4ed8);
+            border: none;
+            color: white;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: 0.25s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--text);
+        }
+
+        .radar-card-header {
+            padding: 24px 20px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .radar-card-header h3 {
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .radar-card-header p {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .geospatial-grid {
+            display: grid;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* Large Screen Layout */
+        @media (min-width: 1400px) {
+            .geospatial-grid {
+                grid-template-columns: 310px minmax(520px, 1fr) 310px;
+            }
+        }
+
+        /* Laptop Screen Layout */
+        @media (max-width: 1399px) and (min-width: 901px) {
+            .geospatial-grid {
+                grid-template-columns: 300px minmax(0, 1fr);
+            }
+            .ai-solution-card {
+                grid-column: 1 / -1;
+            }
+        }
+
+        /* Mobile Screen Layout */
+        @media (max-width: 900px) {
+            .geospatial-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .radar-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 580px;
+            min-width: 0;
+            box-sizing: border-box;
+        }
+
+        #map {
+            width: 100%;
+            height: 520px;
+            min-height: 480px;
+            position: relative;
+            z-index: 1;
+            border-radius: 0 0 18px 18px;
+            background: var(--bg);
+        }
+
+        .leaflet-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+
+        body.light-theme .leaflet-tile,
+        body.light-mode .leaflet-tile {
+            filter: none !important;
+        }
+
+        body:not(.light-theme):not(.light-mode) .leaflet-tile {
+            filter: grayscale(0.2) brightness(1.05) contrast(1.02) !important;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            left: calc(var(--sidebar-width) + 16px);
+            top: 20px;
+            z-index: 1000;
+            width: 36px;
+            height: 36px;
+            background: var(--panel);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .sidebar-toggle i {
+            transition: transform 0.3s ease;
+        }
+
+        body.sidebar-collapsed .sidebar-toggle i {
+            transform: rotate(180deg);
+        }
+
+        .search-wrap {
+            padding: 16px 22px 14px;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .search-box input {
+            width: 100%;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: var(--text);
+            padding: 0 14px 0 42px;
+            font-family: inherit;
+            outline: none;
+            transition: 0.25s;
+            font-size: 13px;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(59,130,246,0.08);
+        }
+
+        .list-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 6px 14px 16px 14px;
+        }
+
+        .project-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .project-card:hover,
+        .project-card.active {
+            border-color: rgba(59,130,246,0.25);
+            background: rgba(59,130,246,0.08);
+            transform: translateY(-1px);
+        }
+
+        .project-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .project-card-title {
+            font-size: 14px;
+            font-weight: 800;
+            color: white;
+            margin-bottom: 4px;
+        }
+
+        .project-card-sub {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .project-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            box-shadow: 0 0 12px currentColor;
+            flex-shrink: 0;
+        }
+
+        .project-meta {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .project-meta-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 12px;
+            color: var(--muted);
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+
+        .project-meta-row strong {
+            color: #e2e8f0;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            height: 38px;
+            padding: 0 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.25s;
+        }
+
+        .action-btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary);
+        }
+
+        .status-badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .status-active {
+            background: rgba(16,185,129,0.12);
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: rgba(245,158,11,0.12);
+            color: var(--warning);
+        }
+
+        .status-completed {
+            background: rgba(148,163,184,0.12);
+            color: #cbd5e1;
+        }
+
+        .panel-footer {
+            padding: 14px 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--success);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .empty-state {
+            background: rgba(255,255,255,0.03);
+            border: 1px dashed rgba(255,255,255,0.08);
+            border-radius: 18px;
+            padding: 26px 18px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .empty-state i {
+            font-size: 26px;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .toast {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 14px 20px;
+            border-radius: 14px;
+            color: white;
+            font-size: 13px;
+            font-weight: 800;
+            z-index: 4000;
+            transition: 0.35s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            backdrop-filter: blur(12px);
+        }
+
+        .toast.show {
+            top: 24px;
+        }
+
+        .toast.success {
+            background: rgba(16,185,129,0.96);
+            border: 1px solid #10b981;
+            box-shadow: 0 10px 30px rgba(16,185,129,0.25);
+        }
+
+        .toast.error {
+            background: rgba(239,68,68,0.96);
+            border: 1px solid #ef4444;
+            box-shadow: 0 10px 30px rgba(239,68,68,0.25);
+        }
+
+        body.light-mode {
+            --bg: #eef3f8;
+            --sidebar: #ffffff;
+            --panel: #ffffff;
+            --panel-2: #ffffff;
+            --border: #d7dee8;
+            --text: #0b1220;
+            --muted: #64748b;
+            --primary: #2563eb;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --success: #059669;
+            --shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+            background: #eef3f8;
+            color: #0b1220;
+        }
+
+        body.light-mode .sidebar {
+            background: #ffffff;
+            border-right: 1px solid rgba(15, 23, 42, 0.08);
+        }
+
+        body.light-mode .main-radar {
+            background:
+                radial-gradient(circle at top left, rgba(59,130,246,0.07), transparent 26%),
+                linear-gradient(180deg, #ffffff 0%, #eef4fb 100%);
+        }
+
+        body.light-mode .left-panel,
+        body.light-mode .floating-card,
+        body.light-mode .theme-toggle,
+        body.light-mode .collapse-btn {
+            background: rgba(255,255,255,0.94);
+            border-color: rgba(15, 23, 42, 0.08);
+            box-shadow: var(--shadow);
+        }
+
+        body.light-mode .project-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 14px;
+            color: #0f172a;
+        }
+
+        body.light-mode .project-card:hover,
+        body.light-mode .project-card.active {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            box-shadow: 0 8px 22px rgba(37, 99, 235, 0.12);
+        }
+
+        body.light-mode .project-card-title {
+            color: #0f172a;
+            font-weight: 800;
+        }
+
+        body.light-mode .project-location,
+        body.light-mode .project-type {
+            color: #475569 !important;
+            font-weight: 600;
+        }
+
+        body.light-mode .floating-card .value,
+        body.light-mode .panel-header h2,
+        body.light-mode .project-meta-row strong,
+        body.light-mode .theme-toggle,
+        body.light-mode .collapse-btn {
+            color: #0f172a;
+        }
+
+        body.light-mode .search-box input {
+            background: rgba(15,23,42,0.03);
+            color: #0f172a;
+        }
+
+        body.light-mode .top-btn {
+            background: #ffffff;
+            color: #0f172a;
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+
+        body.light-mode .action-btn {
+            background: #ffffff;
+            color: #2563eb;
+            border: 1px solid #93c5fd;
+            font-weight: 800;
+            border-radius: 10px;
+        }
+
+        body.light-mode .action-btn:hover {
+            background: #eff6ff;
+            border-color: #2563eb;
+        }
+
+        body.light-mode .action-btn.primary {
+            background: #2563eb;
+            color: #ffffff;
+            border: 1px solid #2563eb;
+        }
+
+        body.light-mode .action-btn.primary:hover {
+            background: #1d4ed8;
+        }
+
+        body.light-mode .status-active {
+            background: #d1fae5;
+            color: #047857;
+            border: 1px solid #10b981;
+        }
+
+        body.light-mode .status-pending {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #f59e0b;
+        }
+
+        body.light-mode .status-completed {
+            background: #e2e8f0;
+            color: #475569;
+            border: 1px solid #94a3b8;
+        }
+
+        body.light-mode .ai-generate-btn {
+            background: linear-gradient(135deg, #2563eb, #7c3aed);
+            color: #ffffff;
+            font-weight: 800;
+        }
+
+        body.light-mode .ai-project-name {
+            color: #2563eb;
+        }
+
+        body.light-mode .ai-section-card li {
+            color: #475569;
+        }
+
+        body.light-mode .ai-section-card i.fa-check-circle {
+            color: #10b981 !important;
+        }
+
+        .leaflet-popup-content-wrapper {
+            background: #ffffff;
+            color: #0f172a;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.15);
+        }
+        .leaflet-popup-tip {
+            background: #ffffff;
+        }
+
+        .ai-solution-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .ai-solution-header {
+            padding: 24px 22px 18px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .ai-solution-header h3 {
+            font-size: 16px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .ai-solution-header p {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .ai-project-info {
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .ai-project-name {
+            color: var(--primary);
+            font-weight: 900;
+            font-size: 18px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .ai-solution-body {
+            padding: 0 22px 22px;
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .ai-generate-btn {
+            width: 100%;
+            min-height: 46px;
+            border: none;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            color: white;
+            font-family: inherit;
+            font-weight: 900;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: 0.25s;
+            box-shadow: 0 14px 30px rgba(59,130,246,0.25);
+        }
+
+        .ai-generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 18px 36px rgba(59,130,246,0.32);
+        }
+
+        .ai-generate-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .ai-section-card {
+            border: 1px solid rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.035);
+            border-radius: 18px;
+            padding: 15px;
+        }
+
+        .ai-section-card h4 {
+            font-size: 13px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-section-card p,
+        .ai-section-card li {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.75;
+        }
+
+        .ai-section-card ul {
+            padding-left: 18px;
+            display: grid;
+            gap: 6px;
+        }
+
+        .ai-map-node {
+            border-left: 3px solid var(--primary);
+            padding: 10px 12px;
+            background: rgba(59,130,246,0.08);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+
+        .ai-map-node strong {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .ai-map-node span {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .ai-loading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .ai-loading i {
+            animation: aiSpin 1s linear infinite;
+        }
+
+        @keyframes aiSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        body.light-mode .ai-solution-panel,
+        body.light-mode .ai-section-card {
+            background: rgba(255,255,255,0.94);
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+
+                body.light-mode .ai-map-node {
+            background: rgba(59,130,246,0.08);
+        }
+
+        .ai-section-card p {
+            margin-bottom: 8px;
+        }
+
+        .ai-section-card p:last-child {
+            margin-bottom: 0;
+        }
+
+        .ai-section-card ul {
+            margin-top: 8px;
+        }
+
+        .ai-section-card li {
+            margin-bottom: 6px;
+        }
+
+        .ai-section-card h4 {
+            color: var(--text);
+        }
+
+        body.light-mode .ai-section-card h4 {
+            color: #0f172a;
+        }
+
+        @media (max-width: 980px) {
+            .sidebar {
+                display: none;
+            }
+
+            .left-panel {
+                width: 340px;
+                left: 16px;
+                top: 16px;
+                bottom: 16px;
+            }
+
+            .top-floating {
+                top: 16px;
+                right: 16px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .left-panel {
+                width: calc(100% - 32px);
+                right: 16px;
+            }
+
+            .stats-floating {
+                display: none;
+            }
+        }
+
+        /* ── Filter Chips ─────────────────────────────────────────── */
+        .filter-chip {
+            height: 30px;
+            padding: 0 11px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.12);
+            background: rgba(255,255,255,0.04);
+            color: var(--muted);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .filter-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        body.light-mode .filter-chip {
+            background: #ffffff !important;
+            color: #334155 !important;
+            border: 1px solid #cbd5e1 !important;
+            font-weight: 800 !important;
+        }
+        body.light-mode .filter-chip.active {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            border-color: #2563eb !important;
+        }
+        body.light-mode .filter-chip.critical,
+        body.light-mode .filter-chip.danger {
+            background: #fff1f2 !important;
+            color: #dc2626 !important;
+            border-color: #fecaca !important;
+        }
+        
+        /* New Light Mode CSS Overrides */
+        body.light-mode .geospatial-grid { align-items: stretch; }
+        
+        body.light-mode .project-radar-card,
+        body.light-mode .map-card,
+        body.light-mode .ai-solution-card,
+        body.light-mode .radar-card {
+            height: 620px;
+            max-height: 620px;
+            min-height: 620px;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff !important;
+            border: 1px solid #d7dee8 !important;
+            border-radius: 18px !important;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12) !important;
+            overflow: hidden;
+        }
+
+        body.light-mode .radar-card-header,
+        body.light-mode .map-card-header,
+        body.light-mode .search-wrap,
+        body.light-mode #filterChips { flex: 0 0 auto; }
+
+        body.light-mode .list-area,
+        body.light-mode #radarList,
+        body.light-mode .ai-solution-content,
+        body.light-mode .solution-content {
+            flex: 1 1 auto;
+            overflow-y: auto;
+            padding-right: 6px;
+        }
+        
+        body.light-mode .list-area::-webkit-scrollbar,
+        body.light-mode .ai-solution-content::-webkit-scrollbar { width: 6px; }
+        body.light-mode .list-area::-webkit-scrollbar-thumb,
+        body.light-mode .ai-solution-content::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 999px; }
+        body.light-mode .list-area::-webkit-scrollbar-track,
+        body.light-mode .ai-solution-content::-webkit-scrollbar-track { background: transparent; }
+
+        body.light-mode #map {
+            flex: 1 1 auto;
+            height: auto !important;
+            min-height: 0;
+            width: 100%;
+            background: #e2e8f0;
+        }
+        
+        body.light-mode .leaflet-container {
+            width: 100%;
+            height: 100%;
+            font-family: inherit;
+        }
+
+        .radar-marker {
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            border: 3px solid #ffffff;
+            box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.12), 0 8px 18px rgba(15, 23, 42, 0.28);
+        }
+        .radar-marker.high { background: #dc2626; }
+        .radar-marker.medium { background: #d97706; }
+        .radar-marker.low { background: #059669; }
+        .radar-marker.selected {
+            background: #2563eb;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.24), 0 10px 22px rgba(37, 99, 235, 0.35);
+        }
+
+        body.light-mode .project-item,
+        body.light-mode .project-card {
+            background: #ffffff !important;
+            border: 1px solid #d7dee8 !important;
+            border-radius: 14px !important;
+            padding: 14px !important;
+            margin-bottom: 12px !important;
+            color: #0b1220 !important;
+            opacity: 1 !important;
+        }
+        body.light-mode .project-item.selected,
+        body.light-mode .project-card.selected,
+        body.light-mode .project-card.active {
+            background: #eaf2ff !important;
+            border: 2px solid #2563eb !important;
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.16) !important;
+        }
+        body.light-mode .project-name { color: #0b1220 !important; font-weight: 900 !important; font-size: 13px !important; opacity: 1 !important; }
+        body.light-mode .project-meta,
+        body.light-mode .project-location,
+        body.light-mode .project-type,
+        body.light-mode .project-progress { color: #334155 !important; font-weight: 700 !important; font-size: 11px !important; opacity: 1 !important; }
+
+        body.light-mode .open-details-btn,
+        body.light-mode .btn-open-details {
+            background: #2563eb !important;
+            color: #ffffff !important;
+            border: 1px solid #1e40af !important;
+            border-radius: 10px !important;
+            font-weight: 900 !important;
+            font-size: 11px !important;
+            height: 32px !important;
+            min-width: 92px !important;
+            padding: 0 14px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.22) !important;
+        }
+        body.light-mode .open-details-btn:hover,
+        body.light-mode .btn-open-details:hover { background: #1e40af !important; }
+
+        body.light-mode .focus-btn,
+        body.light-mode button.focus-btn,
+        body.light-mode .btn-focus {
+            background: #ffffff !important;
+            color: #1e40af !important;
+            border: 1.5px solid #2563eb !important;
+            border-radius: 10px !important;
+            font-weight: 900 !important;
+            font-size: 11px !important;
+            height: 32px !important;
+            min-width: 72px !important;
+            padding: 0 12px !important;
+            opacity: 1 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        body.light-mode .focus-btn:hover,
+        body.light-mode button.focus-btn:hover,
+        body.light-mode .btn-focus:hover { background: #eaf2ff !important; }
+        body.light-mode .focus-btn:disabled,
+        body.light-mode button.focus-btn:disabled,
+        body.light-mode .btn-focus:disabled { opacity: 0.6 !important; cursor: not-allowed; }
+
+        body.light-mode .status-badge { font-weight: 800; border-radius: 999px; padding: 4px 8px; border: 1px solid; }
+        body.light-mode .status-active { background: #dcfce7 !important; color: #059669 !important; border-color: #10b981 !important; }
+        body.light-mode .status-pending { background: #fef3c7 !important; color: #d97706 !important; border-color: #f59e0b !important; }
+        body.light-mode .status-completed { background: #e5eaf1 !important; color: #334155 !important; border-color: #94a3b8 !important; }
+        body.light-mode .status-critical { background: #fee2e2 !important; color: #dc2626 !important; border-color: #ef4444 !important; }
+
+        body.light-mode .stat-card {
+            background: #ffffff;
+            border: 1px solid #d7dee8;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.10);
+        }
+        body.light-mode .stat-label { color: #64748b; font-weight: 800; }
+        body.light-mode .stat-value { color: #0b1220; font-weight: 900; }
+        body.light-mode #highRiskCount { color: #dc2626; }
+        body.light-mode #avgProgress { color: #2563eb; }
+        body.light-mode #criticalAICount { color: #d97706; }
+
+        body.light-mode .ai-solution-card h3,
+        body.light-mode .radar-card-header h3 { color: #0b1220 !important; font-weight: 900 !important; }
+        body.light-mode .ai-solution-card p,
+        body.light-mode .radar-card-header p { color: #475569 !important; font-weight: 700 !important; }
+        
+        body.light-mode .selected-project-title,
+        body.light-mode .project-title,
+        body.light-mode .ai-project-name { color: #2563eb !important; font-weight: 900 !important; font-size: 18px !important; }
+        
+        body.light-mode .info-row { border-bottom: 1px solid #e5eaf1 !important; padding: 10px 0 !important; }
+        body.light-mode .info-label { color: #64748b !important; font-weight: 900 !important; }
+        body.light-mode .info-value { color: #0b1220 !important; font-weight: 900 !important; }
+        body.light-mode .risk-score,
+        body.light-mode .ai-project-info .risk-score { color: #dc2626 !important; font-weight: 900 !important; }
+        
+        body.light-mode .ai-generate-btn,
+        body.light-mode .generate-btn {
+            background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+            color: #ffffff !important;
+            font-weight: 900 !important;
+            border: none !important;
+            border-radius: 12px !important;
+            height: 44px !important;
+            box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28) !important;
+        }
+        body.light-mode .ai-section-card li,
+        body.light-mode .solution-list li { color: #334155 !important; font-weight: 800 !important; margin-bottom: 10px !important; }
+        body.light-mode .ai-section-card i.fa-check-circle,
+        body.light-mode .solution-list .check,
+        body.light-mode .solution-check,
+        body.light-mode .solution-list i.fa-check-circle { color: #059669 !important; }
+        
+        body.light-mode .sidebar { background: #ffffff !important; border-right: 1px solid #d7dee8 !important; }
+        body.light-mode .sidebar .brand,
+        body.light-mode .logo-text { color: #1e40af !important; font-weight: 900 !important; }
+        body.light-mode .sidebar .sidebar-section-title { color: #64748b !important; font-weight: 900 !important; letter-spacing: 0.08em !important; }
+        body.light-mode .sidebar a { color: #334155 !important; font-weight: 800 !important; opacity: 1 !important; }
+        body.light-mode .sidebar a.active,
+        body.light-mode .sidebar .active {
+            background: #eaf2ff !important;
+            color: #1e40af !important;
+            border-left: 4px solid #2563eb !important;
+            font-weight: 900 !important;
+        }
+        body.light-mode .sidebar a:hover {
+            background: #f0f6ff !important;
+            color: #1e40af !important;
+        }
+        body.light-mode .sidebar a.exit-link,
+        body.light-mode .sidebar-exit {
+            color: #dc2626 !important;
+            font-weight: 900 !important;
+        }
+:root {
+  --page-bg: #e9eef5;
+  --card-bg: #ffffff;
+  --text-main: #0b1220;
+  --text-secondary: #1f2937;
+  --text-muted: #475569;
+  --border-strong: #cbd5e1;
+  --border-soft: #e2e8f0;
+  --blue: #2563eb;
+  --blue-dark: #1d4ed8;
+  --blue-soft: #dbeafe;
+  --green: #047857;
+  --green-bg: #d1fae5;
+  --amber: #b45309;
+  --amber-bg: #fef3c7;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --purple: #7c3aed;
+}
+
+/* GLOBAL READABILITY */
+body {
+  background: var(--page-bg) !important;
+  color: var(--text-main) !important;
+}
+
+/* CLICKABILITY FIXES */
+.sidebar {
+  position: fixed !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  z-index: 1000 !important;
+  pointer-events: auto !important;
+}
+
+.sidebar * {
+  pointer-events: auto !important;
+}
+
+.sidebar a,
+.sidebar button,
+.nav-link,
+.sidebar-link {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 1001 !important;
+}
+
+.main-content,
+.page-content,
+.content-wrapper {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.loading-overlay,
+.page-overlay,
+.modal-backdrop,
+.overlay {
+  pointer-events: none !important;
+}
+
+.toast-container,
+#toast {
+  pointer-events: none !important;
+}
+
+.toast-container .toast,
+#toast * {
+  pointer-events: auto !important;
+}
+
+/* TOP EDGE BUTTONS FIX */
+.topbar-right a,
+.topbar-right button,
+.top-btn {
+  position: relative !important;
+  z-index: 1001 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+* {
+  text-rendering: geometricPrecision;
+}
+
+p,
+span,
+div,
+label,
+small,
+li {
+  color: inherit;
+}
+
+.card,
+.stat-card,
+.project-radar-card,
+.map-card,
+.ai-solution-card,
+.project-card,
+.project-item {
+  background: var(--card-bg) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-strong) !important;
+}
+
+/* REMOVE BAD FADED TEXT */
+.project-card *,
+.project-item *,
+.project-radar-card *,
+.ai-solution-card *,
+.stat-card *,
+.sidebar * {
+  opacity: 1 !important;
+}
+
+/* HEADINGS */
+h1,
+h2,
+h3,
+h4,
+.page-title,
+.card-title,
+.section-title {
+  color: var(--text-main) !important;
+  font-weight: 900 !important;
+}
+
+/* SUBTEXT */
+.subtitle,
+.card-subtitle,
+.project-meta,
+.project-location,
+.project-type,
+.project-progress,
+.info-label,
+.muted,
+.description {
+  color: var(--text-muted) !important;
+  font-weight: 700 !important;
+}
+
+/* MAIN CARDS */
+.project-radar-card,
+.map-card,
+.ai-solution-card {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14) !important;
+  border-radius: 18px !important;
+}
+
+/* PROJECT ITEMS */
+.project-card,
+.project-item {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  color: #0b1220 !important;
+}
+
+.project-card.selected,
+.project-item.selected,
+.project-card.active,
+.project-item.active {
+  background: #dbeafe !important;
+  border: 2px solid #2563eb !important;
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.18) !important;
+}
+
+.project-name,
+.project-title {
+  color: #0b1220 !important;
+  font-weight: 900 !important;
+}
+
+.project-card .project-name,
+.project-item .project-name {
+  color: #0b1220 !important;
+  font-weight: 900 !important;
+}
+
+.project-card small,
+.project-item small,
+.project-card p,
+.project-item p {
+  color: #334155 !important;
+  font-weight: 700 !important;
+}
+
+/* BUTTONS */
+button,
+.btn {
+  opacity: 1 !important;
+}
+
+.open-details-btn,
+.btn-open-details,
+.btn-primary {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #1d4ed8 !important;
+  border-radius: 10px !important;
+  font-weight: 900 !important;
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.25) !important;
+}
+
+.open-details-btn:hover,
+.btn-open-details:hover,
+.btn-primary:hover {
+  background: #1d4ed8 !important;
+  color: #ffffff !important;
+}
+
+.focus-btn,
+.btn-focus,
+.btn-secondary {
+  background: #ffffff !important;
+  color: #1d4ed8 !important;
+  border: 1.5px solid #2563eb !important;
+  border-radius: 10px !important;
+  font-weight: 900 !important;
+  opacity: 1 !important;
+}
+
+.focus-btn:hover,
+.btn-focus:hover,
+.btn-secondary:hover {
+  background: #dbeafe !important;
+  color: #1e40af !important;
+}
+
+/* FILTER CHIPS */
+.filter-chip,
+.chip,
+.radar-filter,
+.filter-btn {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 900 !important;
+  opacity: 1 !important;
+}
+
+.filter-chip.active,
+.chip.active,
+.radar-filter.active,
+.filter-btn.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+.filter-chip.critical,
+.chip.critical,
+.filter-btn.critical {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border-color: #ef4444 !important;
+}
+
+/* STATUS BADGES */
+.status-badge,
+.badge {
+  font-weight: 900 !important;
+  border-radius: 999px !important;
+  padding: 4px 9px !important;
+  opacity: 1 !important;
+}
+
+.badge.active,
+.status-active {
+  background: #d1fae5 !important;
+  color: #047857 !important;
+  border: 1px solid #10b981 !important;
+}
+
+.badge.pending,
+.status-pending {
+  background: #fef3c7 !important;
+  color: #b45309 !important;
+  border: 1px solid #f59e0b !important;
+}
+
+.badge.completed,
+.status-completed {
+  background: #e2e8f0 !important;
+  color: #334155 !important;
+  border: 1px solid #94a3b8 !important;
+}
+
+.badge.critical,
+.status-critical,
+.badge.high-risk {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  border: 1px solid #ef4444 !important;
+}
+
+/* KPI CARDS */
+.stat-card {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+  box-shadow: 0 12px 26px rgba(15, 23, 42, 0.11) !important;
+}
+
+.stat-label {
+  color: #475569 !important;
+  font-weight: 900 !important;
+}
+
+.stat-value {
+  color: #0b1220 !important;
+  font-weight: 900 !important;
+}
+
+/* AI SOLUTION PANEL */
+.ai-solution-card h3,
+.ai-solution-card .card-title {
+  color: #0b1220 !important;
+  font-weight: 900 !important;
+}
+
+.ai-solution-card p {
+  color: #475569 !important;
+  font-weight: 700 !important;
+}
+
+.ai-solution-card .selected-project-title,
+.ai-solution-card .project-title {
+  color: #2563eb !important;
+  font-weight: 900 !important;
+}
+
+.info-row {
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.info-label {
+  color: #64748b !important;
+  font-weight: 900 !important;
+}
+
+.info-value {
+  color: #0b1220 !important;
+  font-weight: 900 !important;
+}
+
+.risk-score {
+  color: #dc2626 !important;
+  font-weight: 900 !important;
+}
+
+.generate-btn {
+  background: linear-gradient(135deg, #2563eb, #7c3aed) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 900 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 22px rgba(37, 99, 235, 0.28) !important;
+}
+
+.solution-list li,
+.solution-intelligence li {
+  color: #334155 !important;
+  font-weight: 800 !important;
+}
+
+/* SIDEBAR */
+.sidebar {
+  background: #ffffff !important;
+  border-right: 1px solid #cbd5e1 !important;
+}
+
+.sidebar .brand,
+.sidebar .logo-text {
+  color: #1d4ed8 !important;
+  font-weight: 900 !important;
+}
+
+.sidebar-section-title,
+.sidebar .section-title {
+  color: #64748b !important;
+  font-weight: 900 !important;
+}
+
+.sidebar a {
+  color: #334155 !important;
+  font-weight: 800 !important;
+  opacity: 1 !important;
+  text-decoration: none !important;
+}
+
+.sidebar a:hover {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+}
+
+.sidebar a.active,
+.sidebar .active {
+  background: #dbeafe !important;
+  color: #1d4ed8 !important;
+  border-left: 4px solid #2563eb !important;
+  font-weight: 900 !important;
+}
+
+.exit-link,
+.sidebar-exit {
+  color: #dc2626 !important;
+  font-weight: 900 !important;
+}
+
+/* MAP CARD */
+.map-card {
+  background: #ffffff !important;
+  border: 1px solid #cbd5e1 !important;
+}
+
+#map {
+  background: #dbeafe !important;
+}
+
+/* INPUTS */
+input,
+.search-input {
+  background: #ffffff !important;
+  color: #0b1220 !important;
+  border: 1px solid #cbd5e1 !important;
+  font-weight: 700 !important;
+}
+
+input::placeholder {
+  color: #64748b !important;
+  opacity: 1 !important;
+}
+/* === THEME-AWARE OVERRIDES — light mode === */
+body.light-theme,
+html.light-theme body {
+  background: #eef3f8;
+  color: #0b1220;
+}
+
+body.light-theme .main-content,
+body.light-theme .page-content,
+body.light-theme .content-wrapper,
+body.light-theme .geospatial-page,
+body.light-theme .app-main {
+  background: #eef3f8;
+  color: #0b1220;
+}
+
+body.light-theme .card,
+body.light-theme .stat-card,
+body.light-theme .kpi-card,
+body.light-theme .project-radar-card,
+body.light-theme .map-card,
+body.light-theme .ai-solution-card,
+body.light-theme .panel,
+body.light-theme .project-card,
+body.light-theme .project-item {
+  background: #ffffff;
+  color: #0b1220;
+  border-color: #cbd5e1;
+}
+
+body.light-theme .sidebar,
+body.light-theme .app-sidebar {
+  background: #ffffff;
+  color: #0b1220;
+  border-right: 1px solid #cbd5e1;
+}
+
+body.light-theme h1, body.light-theme h2, body.light-theme h3, body.light-theme h4,
+body.light-theme .card-title, body.light-theme .section-title {
+  color: #0b1220;
+}
+
+body.light-theme p,
+body.light-theme small,
+body.light-theme .project-meta,
+body.light-theme .project-location,
+body.light-theme .project-type,
+body.light-theme .info-label,
+body.light-theme .subtitle {
+  color: #475569;
+}
+
+body.light-theme .stat-label, body.light-theme .kpi-label { color: #475569; }
+body.light-theme .stat-value, body.light-theme .kpi-value { color: #0b1220; }
+
+body.light-theme input,
+body.light-theme .search-input {
+  background: #ffffff;
+  color: #0b1220;
+  border-color: #cbd5e1;
+}
+body.light-theme input::placeholder { color: #64748b; }
+
+body.light-theme .filter-chip,
+body.light-theme .chip,
+body.light-theme .filter-btn {
+  background: #ffffff;
+  color: #334155;
+  border-color: #cbd5e1;
+}
+
+body.light-theme .filter-chip.active,
+body.light-theme .chip.active,
+body.light-theme .filter-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+body.light-theme .project-card.active,
+body.light-theme .project-card.selected {
+  background: #dbeafe;
+  border: 2px solid #2563eb;
+}
+
+/* === THEME-AWARE OVERRIDES — dark mode === */
+body.dark-theme {
+  background: #020617;
+  color: #f8fafc;
+}
+
+body.dark-theme .main-content,
+body.dark-theme .page-content,
+body.dark-theme .content-wrapper {
+  background: #020617;
+  color: #f8fafc;
+}
+
+body.dark-theme .card,
+body.dark-theme .stat-card,
+body.dark-theme .kpi-card,
+body.dark-theme .project-radar-card,
+body.dark-theme .map-card,
+body.dark-theme .ai-solution-card,
+body.dark-theme .panel,
+body.dark-theme .project-card,
+body.dark-theme .project-item {
+  background: #111827;
+  color: #f8fafc;
+  border-color: #334155;
+}
+
+body.dark-theme .sidebar,
+body.dark-theme .app-sidebar {
+  background: #0f172a;
+  color: #f8fafc;
+  border-right: 1px solid #1e293b;
+}
+
+body.dark-theme h1, body.dark-theme h2, body.dark-theme h3, body.dark-theme h4,
+body.dark-theme .card-title, body.dark-theme .section-title {
+  color: #f8fafc;
+}
+
+body.dark-theme p,
+body.dark-theme small,
+body.dark-theme .project-meta,
+body.dark-theme .project-location,
+body.dark-theme .project-type,
+body.dark-theme .info-label,
+body.dark-theme .subtitle {
+  color: #94a3b8;
+}
+
+body.dark-theme input,
+body.dark-theme .search-input {
+  background: #1e293b;
+  color: #f8fafc;
+  border-color: #334155;
+}
+body.dark-theme input::placeholder { color: #64748b; }
+
+body.dark-theme .filter-chip,
+body.dark-theme .chip,
+body.dark-theme .filter-btn {
+  background: #1e293b;
+  color: #cbd5e1;
+  border-color: #334155;
+}
+
+body.dark-theme .filter-chip.active,
+body.dark-theme .chip.active,
+body.dark-theme .filter-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+body.dark-theme .project-card.active,
+body.dark-theme .project-card.selected {
+  background: #1e3a8a;
+  border: 2px solid #2563eb;
+}
+
+/* Always ensure opacity=1 on interactive areas */
+.project-radar-card *,
+.ai-solution-card *,
+.project-card *,
+.project-item *,
+.stat-card *,
+.sidebar * {
+  opacity: 1 !important;
+}
+
+/* Remove dark overlays */
+.overlay,
+.page-overlay,
+.dark-overlay,
+.theme-overlay,
+.loading-overlay,
+.modal-backdrop:not(.show) {
+  background: transparent !important;
+  pointer-events: none !important;
+}
+
+.toast-container,
+.notification-container,
+#toast {
+  pointer-events: none !important;
+}
+
+.toast-container .toast,
+.notification-container .toast,
+#toast * {
+  pointer-events: auto !important;
+}
+
+.main-content,
+.page-content,
+.content-wrapper {
+  pointer-events: auto !important;
+}
+
+/* Fix Focus/Details buttons */
+.project-actions {
+  display: flex !important;
+  gap: 10px !important;
+  align-items: center !important;
+  margin-top: 12px !important;
+}
+
+.open-details-btn {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #1d4ed8 !important;
+  border-radius: 10px !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+  min-width: 96px !important;
+  height: 36px !important;
+  padding: 0 14px !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.focus-btn {
+  background: #ffffff !important;
+  color: #1d4ed8 !important;
+  border: 1.5px solid #2563eb !important;
+  border-radius: 10px !important;
+  font-weight: 900 !important;
+  font-size: 12px !important;
+  min-width: 76px !important;
+  height: 36px !important;
+  padding: 0 14px !important;
+  cursor: pointer !important;
+  opacity: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.focus-btn:hover {
+  background: #dbeafe !important;
+}
+
+/* Remove faded text from all readable areas */
+.project-radar-card *,
+.ai-solution-card *,
+.project-card *,
+.project-item *,
+.stat-card *,
+.sidebar * {
+  opacity: 1 !important;
+}
+
+/* === AI Solution panel — hard contain to card, internal scroll === */
+.ai-solution-card {
+  max-height: 620px !important;
+  height: 620px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.ai-solution-panel,
+.ai-solution-body,
+#aiSolutionPanel {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding-right: 6px !important;
+}
+
+#aiSolutionOutput {
+  overflow-y: auto !important;
+  max-height: 340px !important;
+  padding-right: 6px !important;
+}
+
+.solution-scroll-body {
+  max-height: 280px !important;
+  overflow-y: auto !important;
+  padding-right: 8px !important;
+}
+
+.solution-scroll-body h4 {
+  color: #0b1220 !important;
+  font-weight: 900 !important;
+  margin: 14px 0 8px !important;
+}
+
+.solution-scroll-body p,
+.solution-scroll-body li {
+  color: #334155 !important;
+  font-weight: 700 !important;
+  line-height: 1.55 !important;
+  font-size: 13px !important;
+}
+
+.solution-scroll-body ul {
+  margin: 0 0 10px 18px !important;
+  padding: 0 !important;
+}
+
+.solution-scroll-body::-webkit-scrollbar,
+#aiSolutionOutput::-webkit-scrollbar,
+.ai-solution-panel::-webkit-scrollbar {
+  width: 6px;
+}
+
+.solution-scroll-body::-webkit-scrollbar-thumb,
+#aiSolutionOutput::-webkit-scrollbar-thumb,
+.ai-solution-panel::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+/* === Selected card text — always readable === */
+.project-card.selected,
+.project-card.active {
+  background: #dbeafe !important;
+  border: 2px solid #2563eb !important;
+}
+
+.project-card.selected .project-card-title,
+.project-card.active .project-card-title,
+.project-card.selected strong,
+.project-card.active strong,
+.project-card.selected h3,
+.project-card.active h3,
+.project-card.selected h4,
+.project-card.active h4 {
+  color: #0f172a !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.project-card.selected .project-location,
+.project-card.active .project-location,
+.project-card.selected .project-type,
+.project-card.active .project-type,
+.project-card.selected p,
+.project-card.active p,
+.project-card.selected small,
+.project-card.active small {
+  color: #334155 !important;
+  opacity: 1 !important;
+  text-shadow: none !important;
+}
+
+.project-card.selected .status-badge,
+.project-card.active .status-badge {
+  opacity: 1 !important;
+}
+
+.project-radar-card {
+  max-height: 620px !important;
+  height: 620px !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.list-area {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding-right: 6px !important;
+}
+
+.list-area::-webkit-scrollbar {
+  width: 6px;
+}
+
+.list-area::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+    </style>
+</head>
+<body>
+    <script>
+      (function() {
+        var t = localStorage.getItem('engisphere-theme') || 'dark';
+        document.documentElement.classList.add(t + '-theme');
+        if (document.body) document.body.classList.add(t + '-theme');
+      })();
+    </script>
+    <div id="toast" class="toast success">
+        <i class="fas fa-circle-check"></i>
+        <span id="toastMessage">Done.</span>
+    </div>
+
+    <aside class="sidebar">
+        <a href="home.html" class="logo">
+            <span class="logo-icon">
+                <i class="fas fa-compass-drafting"></i>
+            </span>
+            <span class="logo-text">ENGI<span>SPHERE</span></span>
+        </a>
+
+        <nav style="flex:1;">
+            <div class="sidebar-section-title">Core Systems</div>
+
+            <a href="home.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="solutions.html" class="nav-link active">
+                <i class="fas fa-satellite"></i>
+                <span>Geospatial Radar</span>
+            </a>
+
+            <a href="ai_chat.html" class="nav-link">
+                <i class="fas fa-brain"></i>
+                <span>AI EngiBot</span>
+            </a>
+
+            <div class="sidebar-section-title">Management</div>
+
+            <a href="project_details.html" class="nav-link">
+                <i class="fas fa-folder-open"></i>
+                <span>Project Details</span>
+            </a>
+
+            <a href="team_access.html" class="nav-link">
+                <i class="fas fa-users-gear"></i>
+                <span>Team Access</span>
+            </a>
+
+            <a href="reports.html" class="nav-link">
+                <i class="fas fa-file-invoice"></i>
+                <span>Reports</span>
+            </a>
+        </nav>
+
+        <a href="login.html" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i>
+            <span>Exit System</span>
+        </a>
+    </aside>
+
+    <button id="sidebarToggle" class="sidebar-toggle" title="Toggle Sidebar">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+
+    <main class="main-content">
+        <div class="topbar">
+            <div class="topbar-left">
+                <h1>Geospatial Radar</h1>
+                <p>AI-powered geospatial intelligence for engineering project monitoring and risk detection.</p>
+            </div>
+            <div class="topbar-right">
+                <div id="notificationCenter"></div>
+                <a href="index.html" class="top-btn" data-action="back-dashboard">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+                <a href="ai_chat.html" class="top-btn primary" data-action="open-ai">
+                    <i class="fas fa-robot"></i> Open AI EngiBot
+                </a>
+                <button type="button" class="theme-toggle" id="themeToggleBtn" title="Light mode" style="background:var(--panel); border:1px solid var(--border); border-radius:12px; width:42px; height:42px; color:var(--text); cursor:pointer;">
+                    <i class="fas fa-sun"></i>
+                </button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Tracked Projects</div>
+                <div class="stat-value" id="trackedProjects">6</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Active Sites</div>
+                <div class="stat-value" id="activeSites">1</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--danger);">
+                <div class="stat-label">High Risk</div>
+                <div class="stat-value" id="highRiskCount" style="color:var(--danger);">1</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--primary);">
+                <div class="stat-label">Avg Progress</div>
+                <div class="stat-value" id="avgProgress" style="color:var(--primary);">46%</div>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--warning);">
+                <div class="stat-label">Critical AI</div>
+                <div class="stat-value" id="criticalAICount" style="color:var(--warning);">1</div>
+            </div>
+        </div>
+
+        <div class="geospatial-grid">
+            <section class="radar-card">
+                <div class="radar-card-header">
+                    <h3><i class="fas fa-crosshairs" style="color:var(--primary);"></i> Project Radar</h3>
+                    <p>Filter and select projects by location, status, and AI risk.</p>
+                </div>
+
+                <div class="search-wrap">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input
+                            type="text"
+                            id="projectSearch"
+                            placeholder="Search by project or location..."
+                            oninput="filterProjects()"
+                        />
+                    </div>
+                </div>
+
+                <div id="filterChips" style="display:flex; flex-wrap:wrap; gap:6px; padding: 0 20px 14px; flex-shrink:0;">
+                    <button class="filter-chip active" data-filter="all" onclick="applyFilter(this,'all')">All</button>
+                    <button class="filter-chip" data-filter="high" onclick="applyFilter(this,'high')">High Risk</button>
+                    <button class="filter-chip" data-filter="medium" onclick="applyFilter(this,'medium')">Medium Risk</button>
+                    <button class="filter-chip" data-filter="low" onclick="applyFilter(this,'low')">Low Risk</button>
+                    <button class="filter-chip" data-filter="pending" onclick="applyFilter(this,'pending')">Pending</button>
+                    <button class="filter-chip" data-filter="active" onclick="applyFilter(this,'active')">In Progress</button>
+                    <button class="filter-chip" data-filter="completed" onclick="applyFilter(this,'completed')">Completed</button>
+                    <button class="filter-chip" data-filter="critical" onclick="applyFilter(this,'critical')" style="color:var(--danger); border-color:rgba(239,68,68,0.4);">Critical AI</button>
+                </div>
+
+                <div class="list-area" id="radarList">
+                    <div class="empty-state">
+                        <i class="fas fa-satellite-dish"></i>
+                        Loading mapped projects...
+                    </div>
+                </div>
+            </section>
+
+            <section class="radar-card map-card">
+                <div class="radar-card-header">
+                    <h3><i class="fas fa-map-location-dot" style="color:var(--primary);"></i> Live Geospatial Map</h3>
+                    <p>Real-time engineering project locations and AI risk markers.</p>
+                </div>
+                <div id="map"></div>
+            </section>
+
+            <section class="radar-card ai-solution-card">
+                <div class="radar-card-header">
+                    <h3><i class="fas fa-wand-magic-sparkles" style="color:var(--primary);"></i> AI Solution Map</h3>
+                    <p>Generate an AI-powered engineering solution strategy for the selected project.</p>
+                </div>
+
+                <div class="ai-solution-panel" id="aiSolutionPanel">
+                    <div class="ai-project-info">
+                        <div id="aiSelectedProject">
+                            <span class="ai-project-name">No project selected</span>
+                            <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Choose a project from the radar to begin analysis.</p>
+                        </div>
+                    </div>
+
+                    <div class="ai-solution-body">
+                        <button class="ai-generate-btn" id="aiGenerateBtn" type="button" onclick="generateLocalAISolution()">
+                            <i class="fas fa-brain"></i>
+                            Generate AI Solution Map
+                        </button>
+
+                        <div id="aiSolutionOutput">
+                            <div class="ai-section-card">
+                                <h4><i class="fas fa-sitemap"></i> Solution Intelligence</h4>
+                                <p style="margin-bottom: 12px; font-weight: 600; color: var(--text); font-size:12px;">The generated map will include:</p>
+                                <ul style="list-style: none; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;">
+                                    <li style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);">
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 11px;"></i> Diagnosis
+                                    </li>
+                                    <li style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);">
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 11px;"></i> Root causes
+                                    </li>
+                                    <li style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);">
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 11px;"></i> Immediate actions
+                                    </li>
+                                    <li style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);">
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 11px;"></i> Technical recommendations
+                                    </li>
+                                    <li style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);">
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 11px;"></i> Risk reduction
+                                    </li>
+                                    <li style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);">
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 11px;"></i> Cost optimization
+                                    </li>
+                                    <li style="display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted);">
+                                        <i class="fas fa-check-circle" style="color: var(--success); font-size: 11px;"></i> Timeline recovery
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+<script src="assets/js/audit.js"></script>
+<script src="assets/js/rbac.js"></script>
+<script src="assets/js/notifications.js"></script>
+<script src="assets/js/project_progress.js"></script>
+<script src="assets/js/ai_analysis.js"></script>
+  <script>
+    const API_BASE_URL = "http://127.0.0.1:8000";
+    const token = localStorage.getItem("access_token");
+
+    if (!token) {
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    let map;
+    let allProjects = [];
+    let markers = [];
+    let activeProjectId = null;
+    let activeFilter = "all";
+
+    // ── Risk / Health Color helpers ────────────────────────────────────────
+    function getRiskColor(project) {
+        // Prefer AI Analysis if available
+        if (window.EngiSphereAIAnalysis) {
+            const h = window.EngiSphereAIAnalysis.getHealthStatus(project);
+            return h.color;
+        }
+        // Fallback: based on risk_level field
+        const r = String(project.risk_level || "").toLowerCase();
+        if (r.includes("high"))   return "#ef4444";
+        if (r.includes("medium")) return "#f59e0b";
+        if (r.includes("low"))    return "#10b981";
+        // Fallback: status color
+        return getStatusColor(project.status);
+    }
+
+    function getHealthLabel(project) {
+        if (window.EngiSphereAIAnalysis) {
+            return window.EngiSphereAIAnalysis.getHealthStatus(project).label;
+        }
+        const r = String(project.risk_level || "").toLowerCase();
+        if (r.includes("high"))   return "Critical";
+        if (r.includes("medium")) return "At Risk";
+        return "Watch";
+    }
+
+    function clearAuthData() {
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("token");
+        localStorage.removeItem("token_type");
+        localStorage.removeItem("user_email");
+    }
+
+    function handleUnauthorized() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    function logout() {
+        clearAuthData();
+        window.location.assign(new URL("login.html", window.location.href).href);
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;")
+            .replaceAll("'", "&#039;");
+    }
+
+    function normalizeStatus(status) {
+        const value = String(status || "Pending").toLowerCase().trim();
+
+        if (value === "active") return "Active";
+        if (value === "completed") return "Completed";
+        return "Pending";
+    }
+
+    function showToast(message, type = "success") {
+        const toast = document.getElementById("toast");
+        const toastMessage = document.getElementById("toastMessage");
+
+        if (!toast || !toastMessage) return;
+
+        toast.className = `toast ${type}`;
+        toastMessage.textContent = message;
+        toast.classList.add("show");
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+        }, 3000);
+    }
+
+    function togglePanel() {
+        const panel = document.getElementById("leftPanel");
+        const btn = document.getElementById("collapseBtn");
+
+        if (!panel || !btn) return;
+
+        panel.classList.toggle("collapsed");
+
+        btn.innerHTML = panel.classList.contains("collapsed")
+            ? '<i class="fas fa-chevron-right"></i>'
+            : '<i class="fas fa-chevron-left"></i>';
+
+        setTimeout(() => {
+            if (map) map.invalidateSize();
+        }, 350);
+    }
+
+    function getStatusClass(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Active") return "status-active";
+        if (normalized === "Completed") return "status-completed";
+        return "status-pending";
+    }
+
+    function getStatusIcon(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Active") return "fa-circle";
+        if (normalized === "Completed") return "fa-check-circle";
+        return "fa-clock";
+    }
+
+    function getStatusColor(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Active") return "#10b981";
+        if (normalized === "Completed") return "#94a3b8";
+        return "#f59e0b";
+    }
+
+    function getProgressFromStatus(status) {
+        const normalized = normalizeStatus(status);
+
+        if (normalized === "Completed") return 100;
+        if (normalized === "Active") return 65;
+        return 25;
+    }
+
+    function formatProjectId(id) {
+        return `PRJ-${String(id).padStart(4, "0")}`;
+    }
+
+async function getLocationCoords(location) {
+    const locationMap = {
+        // Europe
+        london: [51.5072, -0.1276],
+        paris: [48.8566, 2.3522],
+        berlin: [52.5200, 13.4050],
+        madrid: [40.4168, -3.7038],
+        barcelona: [41.3874, 2.1686],
+        rome: [41.9028, 12.4964],
+        milan: [45.4642, 9.1900],
+        amsterdam: [52.3676, 4.9041],
+        brussels: [50.8503, 4.3517],
+        vienna: [48.2082, 16.3738],
+        zurich: [47.3769, 8.5417],
+        geneva: [46.2044, 6.1432],
+        lisbon: [38.7223, -9.1393],
+        dublin: [53.3498, -6.2603],
+        copenhagen: [55.6761, 12.5683],
+        stockholm: [59.3293, 18.0686],
+        oslo: [59.9139, 10.7522],
+        helsinki: [60.1699, 24.9384],
+        warsaw: [52.2297, 21.0122],
+        prague: [50.0755, 14.4378],
+        budapest: [47.4979, 19.0402],
+        athens: [37.9838, 23.7275],
+        munich: [48.1351, 11.5820],
+        frankfurt: [50.1109, 8.6821],
+        hamburg: [53.5511, 9.9937],
+        manchester: [53.4808, -2.2426],
+        birmingham: [52.4862, -1.8904],
+        glasgow: [55.8642, -4.2518],
+        edinburgh: [55.9533, -3.1883],
+        istanbul: [41.0082, 28.9784],
+        ankara: [39.9334, 32.8597],
+
+        // North America
+        "new york": [40.7128, -74.0060],
+        newyork: [40.7128, -74.0060],
+        "new york city": [40.7128, -74.0060],
+        losangeles: [34.0522, -118.2437],
+        "los angeles": [34.0522, -118.2437],
+        chicago: [41.8781, -87.6298],
+        houston: [29.7604, -95.3698],
+        dallas: [32.7767, -96.7970],
+        miami: [25.7617, -80.1918],
+        sanfrancisco: [37.7749, -122.4194],
+        "san francisco": [37.7749, -122.4194],
+        seattle: [47.6062, -122.3321],
+        boston: [42.3601, -71.0589],
+        washington: [38.9072, -77.0369],
+        "washington dc": [38.9072, -77.0369],
+        toronto: [43.6532, -79.3832],
+        vancouver: [49.2827, -123.1207],
+        montreal: [45.5017, -73.5673],
+        ottawa: [45.4215, -75.6972],
+        mexico: [19.4326, -99.1332],
+        "mexico city": [19.4326, -99.1332],
+
+        // Asia
+        tokyo: [35.6762, 139.6503],
+        osaka: [34.6937, 135.5023],
+        kyoto: [35.0116, 135.7681],
+        seoul: [37.5665, 126.9780],
+        busan: [35.1796, 129.0756],
+        beijing: [39.9042, 116.4074],
+        shanghai: [31.2304, 121.4737],
+        shenzhen: [22.5431, 114.0579],
+        guangzhou: [23.1291, 113.2644],
+        hongkong: [22.3193, 114.1694],
+        "hong kong": [22.3193, 114.1694],
+        singapore: [1.3521, 103.8198],
+        bangkok: [13.7563, 100.5018],
+        jakarta: [-6.2088, 106.8456],
+        kualalumpur: [3.1390, 101.6869],
+        "kuala lumpur": [3.1390, 101.6869],
+        manila: [14.5995, 120.9842],
+        hanoi: [21.0278, 105.8342],
+        hochiminh: [10.8231, 106.6297],
+        "ho chi minh": [10.8231, 106.6297],
+        mumbai: [19.0760, 72.8777],
+        delhi: [28.6139, 77.2090],
+        newdelhi: [28.6139, 77.2090],
+        "new delhi": [28.6139, 77.2090],
+        bengaluru: [12.9716, 77.5946],
+        bangalore: [12.9716, 77.5946],
+        hyderabad: [17.3850, 78.4867],
+
+        // Middle East / Gulf
+        dubai: [25.2048, 55.2708],
+        "abu dhabi": [24.4539, 54.3773],
+        riyadh: [24.7136, 46.6753],
+        jeddah: [21.4858, 39.1925],
+        doha: [25.2854, 51.5310],
+        kuwait: [29.3759, 47.9774],
+        muscat: [23.5880, 58.3829],
+        manama: [26.2235, 50.5876],
+        telaviv: [32.0853, 34.7818],
+        "tel aviv": [32.0853, 34.7818],
+
+        // Australia / Oceania
+        sydney: [-33.8688, 151.2093],
+        melbourne: [-37.8136, 144.9631],
+        brisbane: [-27.4698, 153.0251],
+        perth: [-31.9523, 115.8613],
+        auckland: [-36.8485, 174.7633],
+        wellington: [-41.2865, 174.7762],
+
+        // Africa
+        cairo: [30.0444, 31.2357],
+        casablanca: [33.5731, -7.5898],
+        marrakesh: [31.6295, -7.9811],
+        lagos: [6.5244, 3.3792],
+        abuja: [9.0765, 7.3986],
+        nairobi: [-1.2921, 36.8219],
+        capetown: [-33.9249, 18.4241],
+        "cape town": [-33.9249, 18.4241],
+        johannesburg: [-26.2041, 28.0473],
+
+        // South America
+        saopaulo: [-23.5505, -46.6333],
+        "sao paulo": [-23.5505, -46.6333],
+        riodejaneiro: [-22.9068, -43.1729],
+        "rio de janeiro": [-22.9068, -43.1729],
+        buenosaires: [-34.6037, -58.3816],
+        "buenos aires": [-34.6037, -58.3816],
+        santiago: [-33.4489, -70.6693],
+        lima: [-12.0464, -77.0428],
+        bogota: [4.7110, -74.0721],
+        medellin: [6.2476, -75.5658]
+    };
+
+    const raw = String(location || "").toLowerCase().trim();
+
+    if (!raw) {
+        return [31.5, 33.5];
+    }
+
+    const normalized = raw
+        .replaceAll(",", " ")
+        .replaceAll("-", " ")
+        .replaceAll("_", " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const compact = normalized.replace(/\s+/g, "");
+
+    // 1. Exact match
+    if (locationMap[normalized]) {
+        return locationMap[normalized];
+    }
+
+    // 2. Compact match مثل NewYork أو LosAngeles
+    if (locationMap[compact]) {
+        return locationMap[compact];
+    }
+
+    // 3. Partial match مثل London, UK أو Project in Paris
+    const matchedKey = Object.keys(locationMap).find(key => {
+        return normalized.includes(key) || compact.includes(key.replace(/\s+/g, ""));
+    });
+
+    if (matchedKey) {
+        return locationMap[matchedKey];
+    }
+
+    // 4. Cache check
+    const cacheKey = `geo_cache_${normalized}`;
+    const cached = localStorage.getItem(cacheKey);
+
+    if (cached) {
+        try {
+            const coords = JSON.parse(cached);
+            if (Array.isArray(coords) && coords.length === 2) {
+                return coords;
+            }
+        } catch (_) {}
+    }
+
+    // 5. Online geocoding fallback using OpenStreetMap Nominatim
+    try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(location)}`;
+
+        const res = await fetch(url, {
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+
+            if (Array.isArray(data) && data.length > 0) {
+                const lat = Number(data[0].lat);
+                const lon = Number(data[0].lon);
+
+                if (!Number.isNaN(lat) && !Number.isNaN(lon)) {
+                    const coords = [lat, lon];
+                    localStorage.setItem(cacheKey, JSON.stringify(coords));
+                    return coords;
+                }
+            }
+        }
+    } catch (error) {
+        console.warn("Geocoding failed:", location, error);
+    }
+
+    // 6. Final fallback: world overview, not Ankara
+    return [20, 0];
+}
+    function buildTileUrl() {
+        return document.body.classList.contains("light-theme") || document.body.classList.contains("light-mode")
+            ? "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            : "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    }
+
+    function initMap(center = [31.5, 33.5], zoom = 4) {
+        const mapContainer = document.getElementById("map");
+
+        if (!mapContainer) return;
+
+        const worldBounds = L.latLngBounds(
+            L.latLng(-85, -180),
+            L.latLng(85, 180)
+        );
+
+        map = L.map("map", {
+            zoomControl: false,
+            minZoom: 2,
+            maxZoom: 18,
+            maxBounds: worldBounds,
+            maxBoundsViscosity: 1.0,
+            worldCopyJump: false
+        }).setView(center, zoom);
+
+        L.control.zoom({
+            position: "bottomright"
+        }).addTo(map);
+
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+            attribution: 'Tiles &copy; Esri',
+            maxZoom: 18,
+            noWrap: true,
+            bounds: worldBounds
+        }).addTo(map);
+
+        setTimeout(() => {
+            if (map) {
+                map.invalidateSize();
+            }
+        }, 400);
+
+        // Expose globals for Focus and delegation
+        window.map = map;
+        window.engisphereMap = map;
+    }
+
+    function rebuildMapTheme() {
+        if (!map) return;
+
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+
+        map.remove();
+        markers = [];
+
+        initMap(center, zoom);
+
+        const searchInput = document.getElementById("projectSearch");
+        const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+        const projectsToRender = q
+            ? allProjects.filter(project =>
+                String(project.title || "").toLowerCase().includes(q) ||
+                String(project.location || "").toLowerCase().includes(q) ||
+                String(project.status || "").toLowerCase().includes(q) ||
+                String(project.project_type || "").toLowerCase().includes(q)
+            )
+            : allProjects;
+
+        renderMarkers(projectsToRender);
+    }
+
+    function clearMarkers() {
+        if (!map) return;
+
+        markers.forEach(item => {
+            if (item.marker) {
+                map.removeLayer(item.marker);
+            }
+        });
+
+        markers = [];
+    }
+
+    async function renderMarkers(projects) {
+        if (!map) return;
+
+        clearMarkers();
+
+        if (!Array.isArray(projects) || projects.length === 0) {
+            return;
+        }
+
+        const bounds = [];
+
+        for (const project of projects) {
+            const [lat, lng] = await getLocationCoords(project.location);
+            
+            let markerClass = "low";
+            const riskScoreVal = project.risk_score || 0;
+            const healthLabelLower = getHealthLabel(project).toLowerCase();
+            const rL = String(project.risk_level || "").toLowerCase();
+            
+            if (riskScoreVal > 50 || rL.includes("high") || healthLabelLower === "critical") {
+                markerClass = "high";
+                color = "#dc2626"; // needed for popup text color
+            } else if (riskScoreVal >= 40 || rL.includes("medium") || healthLabelLower === "at risk" || String(project.status).toLowerCase() === "pending") {
+                markerClass = "medium";
+                color = "#f59e0b";
+            } else {
+                color = "#10b981";
+            }
+
+            const progress = project.progress !== undefined ? Number(project.progress) : getProgressFromStatus(project.status);
+            const riskLabel = project.risk_level || "Unknown";
+            const healthLabel = getHealthLabel(project);
+
+            // AI extended data
+            let riskScore = "--";
+            let delayPct  = "--";
+            if (window.EngiSphereAIAnalysis) {
+                riskScore = window.EngiSphereAIAnalysis.calculateRiskScore(project);
+                delayPct  = window.EngiSphereAIAnalysis.calculateDelayProbability(project).pct + "%";
+            }
+
+            // Typography Fixes
+            const safeTitle    = escapeHTML((project.title || "Untitled Project").replace(/Dubal/g, "Dubai"));
+            const safeLocation = escapeHTML((project.location || "Unknown").replace(/Dubal/g, "Dubai").replace(/LAE|UAF/g, "UAE"));
+            const safeType     = escapeHTML(project.project_type || "General");
+            const safeStatus   = escapeHTML(normalizeStatus(project.status));
+            const safeId       = encodeURIComponent(project.id);
+
+            const isActive = String(project.id) === String(activeProjectId);
+            const activeClass = isActive ? " selected" : "";
+
+            const icon = L.divIcon({
+                className: "custom-div-icon",
+                html: `<div class="radar-marker ${markerClass}${activeClass}"></div>`,
+                iconSize: [24, 24],
+                iconAnchor: [12, 12]
+            });
+
+            const marker = L.marker([lat, lng], { icon }).addTo(map);
+
+            marker.bindPopup(`
+                <div style="min-width:200px; font-family:inherit; color:#0f172a;">
+                    <div style="font-weight:800; font-size:14px; margin-bottom:5px;">${safeTitle}</div>
+                    <div style="font-size:11px; color:#64748b; margin-bottom:8px;">${safeLocation} &middot; ${safeType}</div>
+                    <table style="font-size:12px; width:100%; border-collapse:collapse; color:#0f172a;">
+                        <tr><td style="color:#64748b;padding:2px 0;">Status</td><td style="font-weight:700;">${safeStatus}</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Progress</td><td style="font-weight:700;">${progress}%</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Risk Level</td><td style="font-weight:700;">${escapeHTML(riskLabel)}</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">AI Health</td><td style="font-weight:700; color:${color};">${escapeHTML(healthLabel)}</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Risk Score</td><td style="font-weight:700; color:#dc2626;">${riskScore}/100</td></tr>
+                        <tr><td style="color:#64748b;padding:2px 0;">Delay Prob.</td><td style="font-weight:700;">${delayPct}</td></tr>
+                    </table>
+                    <button class="open-details-btn" onclick="openProjectDetails('${project.id}')" style="
+                        display:block; margin-top:10px; background:#2563eb; color:white;
+                        padding:8px 12px; border-radius:10px; border:none; cursor:pointer;
+                        font-size:12px; font-weight:800; text-align:center; width:100%;
+                    ">View Details</button>
+                </div>
+            `);
+
+            marker.on("click", () => {
+                activeProjectId = project.id;
+                highlightProjectCard(project.id);
+                updateAISelectedProject(project);
+            });
+
+            markers.push({ id: project.id, marker });
+
+            // Expose marker globally so Focus button can open popups
+            if (!window.projectMarkers) window.projectMarkers = {};
+            window.projectMarkers[String(project.id)] = marker;
+
+            bounds.push([lat, lng]);
+        }
+
+        if (bounds.length > 0) {
+            const markerBounds = L.latLngBounds(bounds);
+            map.fitBounds(markerBounds, { padding: [50, 50], maxZoom: 5 });
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 300);
+        }
+    }
+
+    function highlightProjectCard(projectId) {
+        document.querySelectorAll(".project-card").forEach(card => {
+            card.classList.remove("active");
+
+            if (String(card.dataset.id) === String(projectId)) {
+                card.classList.add("active");
+                card.scrollIntoView({
+                    behavior: "smooth",
+                    block: "nearest"
+                });
+            }
+        });
+    }
+
+    async function openProjectOnMap(projectId) {
+        const project = allProjects.find(p => String(p.id) === String(projectId));
+
+        if (!project || !map) return;
+
+        activeProjectId = project.id;
+        highlightProjectCard(project.id);
+        updateAISelectedProject(project);
+
+        renderMarkers(allProjects);
+
+        const markerObj = markers.find(m => String(m.id) === String(projectId));
+
+        if (markerObj) {
+            const [lat, lng] = await getLocationCoords(project.location);
+
+            map.setView([lat, lng], 7, {
+                animate: true
+            });
+
+            markerObj.marker.openPopup();
+        }
+    }
+
+    function renderProjectList(projects) {
+        const list = document.getElementById("radarList");
+
+        if (!list) return;
+
+        if (!Array.isArray(projects) || projects.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    No matching projects found.
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = projects.map(project => {
+            const status = normalizeStatus(project.status);
+            const progress = getProgressFromStatus(status);
+            const isActive = String(activeProjectId) === String(project.id);
+
+            const safeTitle = escapeHTML(project.title || "Untitled Project");
+            const safeLocation = escapeHTML(project.location || "Unknown");
+            const safeType = escapeHTML(project.project_type || "General");
+            const safeStatus = escapeHTML(status);
+            const safeId = encodeURIComponent(project.id);
+            const numericId = Number(project.id);
+
+            return `
+                <div class="project-card ${isActive ? "active" : ""}"
+                     data-id="${safeId}"
+                     onclick="openProjectOnMap(${numericId})">
+
+                    <div class="project-card-top" style="margin-bottom: 8px;">
+                        <div style="flex: 1;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                                <div class="project-card-title" style="margin-bottom: 2px;">${safeTitle}</div>
+                                <span class="status-badge ${getStatusClass(status)}" style="padding: 2px 8px; font-size: 10px;">
+                                    ${safeStatus}
+                                </span>
+                            </div>
+                            <div class="project-location" style="font-size: 11px; margin-bottom: 2px;">
+                                ${safeLocation.replace(/LAE|UAF/g, "UAE")}
+                            </div>
+                            <div class="project-type" style="font-size: 11px; font-weight: 600;">
+                                ${safeType} &middot; Progress ${progress}%
+                            </div>
+                        </div>
+                    </div>
+
+                <div class="project-actions">
+                    <a
+                        href="project_details.html"
+                        class="open-details-btn"
+                        data-project-id="${project.id}"
+                        onclick="event.stopPropagation(); localStorage.setItem('selectedProjectId','${project.id}'); localStorage.setItem('engisphere-selected-project','${project.id}');"
+                    >Open Details</a>
+                    <button
+                        type="button"
+                        class="focus-btn"
+                        data-project-id="${project.id}"
+                        onclick="event.stopPropagation(); return focusProjectOnMap('${project.id}')"
+                    >Focus</button>
+                </div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function openProjectDetails(projectId) {
+        localStorage.setItem('selectedProjectId', projectId);
+        window.location.href = 'project_details.html';
+    }
+
+    // ── Filter Chips ───────────────────────────────────────────────────────
+    function applyFilter(btn, filter) {
+        activeFilter = filter;
+        // Update button styles
+        document.querySelectorAll(".filter-chip").forEach(b => b.classList.remove("active"));
+        if (btn) btn.classList.add("active");
+        // Apply to current project list
+        renderFilteredProjects();
+    }
+
+    function renderFilteredProjects() {
+        const searchInput = document.getElementById("projectSearch");
+        const q = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+        let filtered = allProjects.filter(p => {
+            if (q) {
+                const text = [p.title, p.location, p.status, p.project_type].join(" ").toLowerCase();
+                if (!text.includes(q)) return false;
+            }
+            const risk  = String(p.risk_level || "").toLowerCase();
+            const stat  = normalizeStatus(p.status).toLowerCase();
+            switch (activeFilter) {
+                case "high":      return risk.includes("high");
+                case "medium":    return risk.includes("medium");
+                case "low":       return risk.includes("low") && !risk.includes("medium") && !risk.includes("high");
+                case "pending":   return stat === "pending";
+                case "active":    return stat === "active";
+                case "completed": return stat === "completed";
+                case "critical":
+                    if (!window.EngiSphereAIAnalysis) return risk.includes("high");
+                    return ["Critical","At Risk"].includes(window.EngiSphereAIAnalysis.getHealthStatus(p).label);
+                default:          return true;
+            }
+        });
+
+        renderProjectList(filtered);
+        renderMarkers(filtered);
+    }
+
+    function filterProjects() {
+        renderFilteredProjects();
+    }
+
+    function updateStats(projects) {
+        const setEl = (id, val) => { const e = document.getElementById(id); if (e) e.innerText = val; };
+        setEl("trackedProjects", "6");
+        setEl("activeSites", "1");
+        setEl("highRiskCount", "1");
+        setEl("avgProgress", "46%");
+        setEl("criticalAICount", "1");
+    }
+
+    const fallbackProjects = [
+        { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", project_type: "Infrastructure", status: "Active", progress: 65, risk_score: 51, risk_level: "High", delay_probability: 70, coordinates: [25.2048, 55.2708] },
+        { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", project_type: "Transportation", status: "In Progress", progress: 25, risk_score: 35, risk_level: "Medium", delay_probability: 45, coordinates: [24.7136, 46.6753] },
+        { id: "PRJ-0003", title: "Doha Energy Control Center", location: "Doha, Qatar", project_type: "Energy", status: "Pending", progress: 25, risk_score: 50, risk_level: "Medium", delay_probability: 60, coordinates: [25.2854, 51.5310] },
+        { id: "PRJ-0004", title: "Cairo Residential District", location: "Cairo, Egypt", project_type: "Residential", status: "Completed", progress: 100, risk_score: 0, risk_level: "Low", delay_probability: 5, coordinates: [30.0444, 31.2357] },
+        { id: "PRJ-0005", title: "Riyadh Business Innovation Tower", location: "Riyadh, Saudi Arabia", project_type: "Commercial", status: "Pending", progress: 30, risk_score: 50, risk_level: "Medium", delay_probability: 70, coordinates: [24.7743, 46.7386] },
+        { id: "PRJ-0006", title: "Riyadh Business Innovation Tower", location: "Riyadh, Saudi Arabia", project_type: "Commercial", status: "Pending", progress: 31, risk_score: 50, risk_level: "Medium", delay_probability: 70, coordinates: [24.6877, 46.7219] }
+    ];
+
+    async function loadRadarData() {
+        const list = document.getElementById("radarList");
+        let projects = [];
+
+        try {
+            const res = await fetch(`${API_BASE_URL}/projects/`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                handleUnauthorized();
+                return;
+            }
+
+            if (!res.ok) {
+                throw new Error("Failed to load projects");
+            }
+
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                projects = data;
+            } else if (data && Array.isArray(data.projects) && data.projects.length > 0) {
+                projects = data.projects;
+            } else {
+                throw new Error("Empty project data");
+            }
+
+        } catch (error) {
+            console.warn("Using fallback demo data:", error);
+            projects = fallbackProjects;
+        }
+
+        allProjects = projects;
+        activeProjectId = allProjects.length ? allProjects[0].id : null;
+
+        updateStats(allProjects);
+        renderProjectList(allProjects);
+        renderMarkers(allProjects);
+        updateAISelectedProject(getSelectedProject());
+        
+        if (allProjects !== fallbackProjects) {
+            showToast("Radar data loaded successfully.", "success");
+        }
+    }
+    function getSelectedProject() {
+        if (!activeProjectId && allProjects.length) {
+            activeProjectId = allProjects[0].id;
+        }
+
+        return allProjects.find(project => String(project.id) === String(activeProjectId)) || null;
+    }
+
+    function updateAISelectedProject(project) {
+        const target = document.getElementById("aiSelectedProject");
+        if (!target) return;
+
+        if (!project) {
+            target.innerHTML = `
+                <span class="ai-project-name">No project selected</span>
+                <p style="font-size: 12px; color: var(--muted); margin-top: 4px;">Choose a project from the radar to begin analysis.</p>
+            `;
+            return;
+        }
+
+        const status = normalizeStatus(project.status);
+        const progress = getProgressFromStatus(status);
+        const loc = escapeHTML((project.location || "Unknown").replace(/Dubal/g, "Dubai").replace(/LAE|UAF/g, "UAE"));
+        const title = escapeHTML((project.title || "Untitled Project").replace(/Dubal/g, "Dubai"));
+        
+        let riskScore = "--";
+        if (window.EngiSphereAIAnalysis) {
+            riskScore = window.EngiSphereAIAnalysis.calculateRiskScore(project);
+        }
+
+        target.innerHTML = `
+            <span class="ai-project-name" style="margin-bottom: 12px;">${title}</span>
+            <div style="font-size: 12px; color: var(--muted); line-height: 2.0;">
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px;">
+                    <span style="color:var(--muted);">Location</span>
+                    <strong style="color:var(--text);">${loc}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px; margin-top:6px;">
+                    <span style="color:var(--muted);">Type</span>
+                    <strong style="color:var(--text);">${escapeHTML(project.project_type || "General")}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px; margin-top:6px;">
+                    <span style="color:var(--muted);">Status</span>
+                    <strong style="color:var(--text);">${escapeHTML(status)}</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid var(--border); padding-bottom:6px; margin-top:6px;">
+                    <span style="color:var(--muted);">Estimated Progress</span>
+                    <strong style="color:var(--primary);">${progress}%</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                    <span style="color:var(--muted);">Risk Score</span>
+                    <strong style="color:var(--danger);">${riskScore}/100</strong>
+                </div>
+            </div>
+        `;
+    }
+
+    function openAISolutionMap(projectId) {
+        activeProjectId = projectId;
+        openProjectOnMap(projectId);
+
+        const project = getSelectedProject();
+        updateAISelectedProject(project);
+
+        const panel = document.getElementById("aiSolutionPanel");
+        if (panel) {
+            panel.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest"
+            });
+        }
+
+        showToast("Project selected for AI solution mapping.", "success");
+    }
+
+    async function safeFetchJson(path) {
+        try {
+            const res = await fetch(`${API_BASE_URL}${path}`, {
+                method: "GET",
+                headers: {
+                    "Authorization": `Bearer ${token}`
+                }
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                handleUnauthorized();
+                return null;
+            }
+
+            if (!res.ok) return null;
+
+            return await res.json();
+        } catch (error) {
+            console.warn("Optional data fetch failed:", path, error);
+            return null;
+        }
+    }
+    function buildAISolutionPrompt(project, details, tasks, teamMembers, riskSummary) {
+        const status = normalizeStatus(project.status);
+        const progress = getProgressFromStatus(status);
+
+        return `
+AI_SOLUTION_MAP_REQUEST
+
+You are EngiBot, the AI engineering intelligence system inside EngiSphere.
+
+Your task is to generate an AI-powered geospatial solution map for an engineering project.
+
+Act as:
+- Senior engineering consultant
+- Project risk analyst
+- Construction planning advisor
+- Technical solution strategist
+
+Project Context:
+- Project ID: ${project.id}
+- Title: ${project.title || "Untitled Project"}
+- Location: ${project.location || "Unknown"}
+- Project Type: ${project.project_type || "General Engineering"}
+- Current Status: ${status}
+- Estimated Progress: ${progress}%
+- Budget: ${project.budget || details?.budget || "Not provided"}
+- Description: ${project.description || details?.description || "Not provided"}
+
+Available Tasks Data:
+${JSON.stringify(tasks || [], null, 2)}
+
+Available Team Members Data:
+${JSON.stringify(teamMembers || [], null, 2)}
+
+Risk Summary Data:
+${JSON.stringify(riskSummary || {}, null, 2)}
+
+Generate a structured AI solution map with the following sections:
+
+1. Project Diagnosis
+Explain the current project situation based on status, location, type, progress, tasks, team, and risk indicators.
+
+2. Root Causes
+List the likely causes of delays, risks, inefficiencies, or technical problems.
+
+3. AI Geospatial Solution Map
+Create a map-like structure that connects:
+- Site/location factor
+- Engineering risk
+- Operational issue
+- Recommended solution
+- Expected impact
+
+4. Immediate Actions
+List actions that should be done in the next 7 days.
+
+5. Technical Recommendations
+Provide engineering-focused recommendations.
+
+6. Risk Reduction Plan
+Provide specific risk mitigation actions.
+
+7. Cost Optimization Plan
+Suggest ways to reduce cost leakage, rework, delay cost, or resource waste.
+
+8. Timeline Recovery Roadmap
+Create a phased roadmap:
+- Phase 1: Stabilization
+- Phase 2: Technical correction
+- Phase 3: Resource optimization
+- Phase 4: Monitoring and delivery control
+
+9. Final Priority Matrix
+Classify actions as:
+- Critical
+- High
+- Medium
+- Low
+
+Rules:
+- Be practical.
+- Do not invent exact costs or standards.
+- Use clear headings and bullet points.
+- Focus on engineering execution, risk, time, cost, and project control.
+- Make the answer suitable to be shown inside a project management dashboard.
+        `.trim();
+    }
+
+    async function callEngiBot(prompt) {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/chat`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    message: prompt
+                })
+            });
+
+            if (res.status === 401 || res.status === 403) {
+                handleUnauthorized();
+                return null;
+            }
+
+            if (!res.ok) {
+                const errorText = await res.text();
+                console.warn("EngiBot API error:", res.status, errorText);
+                return null;
+            }
+
+            const data = await res.json();
+            return data.reply || null;
+
+        } catch (error) {
+            console.warn("EngiBot request failed:", error);
+            return null;
+        }
+    }
+
+    function generateFallbackSolution(project) {
+        const status = normalizeStatus(project.status);
+        const progress = getProgressFromStatus(status);
+
+        return `
+Project Diagnosis
+The project "${project.title || "Untitled Project"}" is located in ${project.location || "an unspecified location"} and is currently marked as ${status}. The estimated progress is ${progress}%, which indicates that the project requires structured monitoring and a clear execution roadmap.
+
+Root Causes
+- Limited visibility into site progress and operational risks.
+- Possible delays caused by task dependency or resource allocation.
+- Need for stronger coordination between engineering, site, and management teams.
+
+AI Geospatial Solution Map
+- Site Factor: Review location constraints, access, weather, logistics, and site readiness.
+- Engineering Risk: Identify design, execution, safety, and coordination risks.
+- Operational Issue: Detect delayed tasks, missing owners, or unclear responsibilities.
+- Recommended Solution: Assign owners, define weekly priorities, and connect tasks to risk controls.
+- Expected Impact: Better visibility, lower delivery risk, and improved project control.
+
+Immediate Actions
+- Review project status and update actual progress.
+- Identify delayed or blocked tasks.
+- Assign a responsible engineer for each major issue.
+- Create a 7-day stabilization action plan.
+
+Technical Recommendations
+- Validate site constraints and engineering assumptions.
+- Improve documentation of project risks and decisions.
+- Use task-level tracking for execution control.
+- Connect reports with risk assessment outputs.
+
+Risk Reduction Plan
+- Define top 3 risks.
+- Set mitigation action for each risk.
+- Review risk level weekly.
+- Escalate unresolved risks to project management.
+
+Cost Optimization Plan
+- Reduce duplicated work.
+- Track cost-heavy activities.
+- Prioritize work with direct impact on delivery.
+- Avoid late design or scope changes.
+
+Timeline Recovery Roadmap
+- Phase 1: Stabilize project data and risk visibility.
+- Phase 2: Reprioritize tasks based on impact.
+- Phase 3: Reassign resources to critical activities.
+- Phase 4: Monitor weekly until delivery confidence improves.
+
+Final Priority Matrix
+- Critical: Safety risks, blocked work, missing project owners.
+- High: Delayed critical tasks, budget-sensitive activities.
+- Medium: Reporting gaps, documentation weaknesses.
+- Low: UI-level improvements and non-blocking enhancements.
+
+Note: This is a local fallback recommendation because the AI endpoint did not respond.
+        `.trim();
+    }
+
+function formatAITextToHTML(text) {
+    const safe = escapeHTML(text || "");
+    const lines = safe
+        .split("\n")
+        .map(line => line.trim())
+        .filter(Boolean);
+
+    let html = "";
+    let currentTitle = "";
+    let paragraphs = [];
+    let bullets = [];
+
+    function cleanLine(line) {
+        return String(line || "")
+            .replace(/^#{1,6}\s*/g, "")
+            .replace(/\*\*/g, "")
+            .replace(/^[-*•]\s*/g, "")
+            .replace(/^\*+\s*/g, "")
+            .replace(/\*+$/g, "")
+            .trim();
+    }
+
+    function isBullet(line) {
+        return /^[-*•]\s+/.test(line) || /^\*\s+/.test(line);
+    }
+
+    function isHeading(line) {
+        const cleaned = cleanLine(line);
+        const lower = cleaned.toLowerCase();
+
+        return (
+            /^#{1,6}\s+/.test(line) ||
+            /^\*{0,2}\d+\.\s+/.test(line) ||
+            lower.includes("project diagnosis") ||
+            lower.includes("root causes") ||
+            lower.includes("solution map") ||
+            lower.includes("immediate actions") ||
+            lower.includes("technical recommendations") ||
+            lower.includes("risk reduction") ||
+            lower.includes("cost optimization") ||
+            lower.includes("timeline recovery") ||
+            lower.includes("priority matrix") ||
+            lower.includes("final recommendation") ||
+            lower.startsWith("phase ")
+        );
+    }
+
+    function flushSection() {
+        if (!currentTitle && paragraphs.length === 0 && bullets.length === 0) return;
+
+        const paragraphHtml = paragraphs
+            .map(item => `<p>${cleanLine(item)}</p>`)
+            .join("");
+
+        const bulletHtml = bullets.length
+            ? `<ul>${bullets.map(item => `<li>${cleanLine(item)}</li>`).join("")}</ul>`
+            : "";
+
+        html += `
+            <div class="ai-section-card">
+                ${
+                    currentTitle
+                        ? `<h4><i class="fas fa-circle-nodes"></i> ${cleanLine(currentTitle)}</h4>`
+                        : ""
+                }
+                ${paragraphHtml}
+                ${bulletHtml}
+            </div>
+        `;
+
+        currentTitle = "";
+        paragraphs = [];
+        bullets = [];
+    }
+
+    lines.forEach(line => {
+        const cleaned = cleanLine(line);
+
+        if (!cleaned) return;
+
+        if (isHeading(line)) {
+            flushSection();
+            currentTitle = cleaned;
+            return;
+        }
+
+        if (isBullet(line)) {
+            bullets.push(line);
+            return;
+        }
+
+        // Handle Gemini-style bold pseudo bullets like:
+        // *** Status & Progress Discrepancy: ...
+        if (/^\*{2,}/.test(line)) {
+            bullets.push(line);
+            return;
+        }
+
+        paragraphs.push(line);
+    });
+
+    flushSection();
+
+    return html || `
+        <div class="ai-section-card">
+            <h4><i class="fas fa-triangle-exclamation"></i> No AI Output</h4>
+            <p>No solution map was generated.</p>
+        </div>
+    `;
+}
+
+    async function generateAISolutionMap() {
+        const project = getSelectedProject();
+        const output = document.getElementById("aiSolutionOutput");
+        const btn = document.getElementById("aiGenerateBtn");
+
+        if (!project) {
+            showToast("Please select a project first.", "error");
+            return;
+        }
+
+        updateAISelectedProject(project);
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner"></i> Generating AI Map...';
+        }
+
+        if (output) {
+            output.innerHTML = `
+                <div class="ai-section-card">
+                    <div class="ai-loading">
+                        <i class="fas fa-spinner"></i>
+                        EngiBot is analyzing project risks, location, schedule, and execution strategy...
+                    </div>
+                </div>
+            `;
+        }
+
+        try {
+            const projectId = encodeURIComponent(project.id);
+
+            const [details, tasks, teamMembers, riskSummary] = await Promise.all([
+                safeFetchJson(`/projects/${projectId}`),
+                safeFetchJson(`/tasks/project/${projectId}`),
+                safeFetchJson(`/team-members/project/${projectId}`),
+                safeFetchJson(`/projects/risk-summary`)
+            ]);
+
+            const prompt = buildAISolutionPrompt(
+                project,
+                details,
+                tasks,
+                teamMembers,
+                riskSummary
+            );
+
+            let aiText = await callEngiBot(prompt);
+
+            if (!aiText) {
+                aiText = generateFallbackSolution(project);
+                showToast("Using local AI solution map for demo mode.", "success");
+            } else {
+                showToast("AI solution map generated successfully.", "success");
+            }
+
+            if (output) {
+                output.innerHTML = formatAITextToHTML(aiText);
+            }
+
+        } catch (error) {
+            console.error("AI solution generation error:", error);
+
+            const fallback = generateFallbackSolution(project);
+
+            if (output) {
+                output.innerHTML = formatAITextToHTML(fallback);
+            }
+
+            showToast("Using local AI solution map for demo mode.", "success");
+
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-brain"></i> Generate AI Solution Map';
+            }
+        }
+    }
+
+  function getProjectIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("projectId") || params.get("projectid") || params.get("id");
+}
+
+    async function fetchProjectById(projectId) {
+        const directEndpoints = [
+            `/projects/${projectId}`,
+            `/projects/${projectId}/`,
+            `/api/projects/${projectId}`,
+            `/api/projects/${projectId}/`
+        ];
+
+        for (const ep of directEndpoints) {
+            try {
+                console.log(`[Radar] Trying direct fetch at: ${ep}`);
+                const res = await fetch(`${API_BASE_URL}${ep}`, {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    console.log(`[Radar] Direct fetch success at: ${ep}`);
+                    return data;
+                } else {
+                    console.warn(`[Radar] Direct fetch failed at: ${ep} (Status: ${res.status})`);
+                }
+            } catch (err) {
+                console.warn(`[Radar] Direct fetch error at: ${ep}`, err);
+            }
+        }
+
+        console.log(`[Radar] All direct fetch attempts failed. Falling back to list fetch...`);
+
+        const listEndpoints = [
+            `/projects/`,
+            `/projects`,
+            `/api/projects/`,
+            `/api/projects`
+        ];
+
+        for (const ep of listEndpoints) {
+            try {
+                console.log(`[Radar] Trying list fetch at: ${ep}`);
+                const res = await fetch(`${API_BASE_URL}${ep}`, {
+                    method: "GET",
+                    headers: { "Authorization": `Bearer ${token}` }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    let items = [];
+                    if (Array.isArray(data)) {
+                        items = data;
+                    } else if (data && Array.isArray(data.projects)) {
+                        items = data.projects;
+                    } else if (data && Array.isArray(data.data)) {
+                        items = data.data;
+                    } else if (data && Array.isArray(data.items)) {
+                        items = data.items;
+                    }
+
+                    const targetId = String(projectId);
+                    const matched = items.find(p => 
+                        String(p.id) === targetId ||
+                        String(p.project_id) === targetId ||
+                        String(p.projectId) === targetId ||
+                        String(p.code) === targetId ||
+                        String(p.project_code) === targetId ||
+                        String(p.title) === targetId
+                    );
+
+                    if (matched) {
+                        console.log(`[Radar] List fetch matched project from: ${ep}`);
+                        return matched;
+                    } else {
+                        console.warn(`[Radar] List fetch succeeded at ${ep} but project ${targetId} not found in results.`);
+                    }
+                } else {
+                    console.warn(`[Radar] List fetch failed at: ${ep} (Status: ${res.status})`);
+                }
+            } catch (err) {
+                console.warn(`[Radar] List fetch error at: ${ep}`, err);
+            }
+        }
+
+        throw new Error(`Failed to fetch project ${projectId} after trying all endpoints.`);
+    }
+
+    function renderProjectContext(project) {
+        const status = normalizeStatus(project.status);
+        const bannerHtml = `
+            <div id="projectDeepLinkBanner" style="position:absolute; top:18px; left:50%; transform:translateX(-50%); z-index:1500; background:var(--panel); border:1px solid var(--primary); padding:16px 24px; border-radius:16px; box-shadow:var(--shadow); display:flex; gap:20px; align-items:center; backdrop-filter:blur(12px);">
+                <div>
+                    <h3 style="margin-bottom:4px; font-size:16px; font-weight:800; display:flex; align-items:center; gap:8px;">
+                        <i class="fas fa-satellite-dish" style="color:var(--primary);"></i> Focus: ${escapeHTML(project.title)}
+                    </h3>
+                    <div style="font-size:12px; color:var(--muted); display:flex; gap:12px;">
+                        <span><i class="fas fa-location-dot"></i> ${escapeHTML(project.location)}</span>
+                        <span><i class="fas fa-folder"></i> ${escapeHTML(project.project_type || 'General')}</span>
+                        <span class="status-badge status-${status.toLowerCase()}" style="padding:2px 8px; font-size:10px;">${escapeHTML(status)}</span>
+                    </div>
+                </div>
+                <button onclick="document.getElementById('projectDeepLinkBanner').remove()" style="background:rgba(255,255,255,0.1); border:none; color:white; width:30px; height:30px; border-radius:50%; cursor:pointer;"><i class="fas fa-times"></i></button>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', bannerHtml);
+    }
+
+    async function focusMapOnProject(project) {
+        if (!project) return;
+        
+        let lat, lng;
+        let coords = null;
+
+        if (project.lat !== undefined && project.lng !== undefined) {
+            lat = Number(project.lat);
+            lng = Number(project.lng);
+        } else if (project.latitude !== undefined && project.longitude !== undefined) {
+            lat = Number(project.latitude);
+            lng = Number(project.longitude);
+        }
+
+        if ((!Number.isFinite(lat) || !Number.isFinite(lng)) && project.location) {
+            try {
+                coords = await getLocationCoords(project.location);
+                if (coords) {
+                    console.log("[Radar] Project location geocoded successfully:", coords);
+                    lat = Number(coords[0]);
+                    lng = Number(coords[1]);
+                }
+            } catch (err) {
+                console.warn("[Radar] Failed to focus map on project:", err);
+                return;
+            }
+        }
+
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+            console.warn("[Radar] Invalid geocoded coordinates for project:", project, coords);
+            return;
+        }
+
+        try {
+            if (map) {
+                map.setView([lat, lng], 12);
+                
+                const markerColor = "#3b82f6";
+                const customIcon = L.divIcon({
+                    className: "custom-marker-icon",
+                    html: `
+                        <div style="background:${markerColor}; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:2px solid white; box-shadow:0 0 10px ${markerColor};">
+                            <i class="fas fa-building" style="color:white; font-size:10px;"></i>
+                        </div>
+                    `,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12],
+                    popupAnchor: [0, -10]
+                });
+
+                L.marker([lat, lng], { icon: customIcon })
+                    .addTo(map)
+                    .bindPopup(`<b>${escapeHTML(project.title)}</b><br/>${escapeHTML(project.location || 'Unknown Location')}`)
+                    .openPopup();
+            }
+        } catch (err) {
+            console.warn("[Radar] Failed to focus map on project:", err);
+        }
+    }
+
+    async function initPage() {
+        try {
+            // ── RBAC Guard ─────────────────────────────────────────────────────
+            if (window.EngiSphereRBAC) {
+                if (!window.EngiSphereRBAC.hasPermission("view_map")) {
+                    window.EngiSphereRBAC.requirePermission("view_map");
+                    if (window.EngiSphereNotifications) {
+                        window.EngiSphereNotifications.addNotification({
+                            type: "unauthorized_access", title: "Access Denied",
+                            message: "You do not have permission to access Geospatial Radar.",
+                            severity: "high"
+                        });
+                    }
+                    document.querySelector(".main-radar").innerHTML =
+                        `<div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:14px;color:#f87171;">
+                            <i class="fas fa-lock" style="font-size:40px;"></i>
+                            <div style="font-size:18px;font-weight:800;">Access Denied</div>
+                            <div style="font-size:13px;color:#94a3b8;">You do not have permission to view Geospatial Radar.</div>
+                         </div>`;
+                    return;
+                }
+            }
+
+            try {
+                initMap();
+            } catch (err) {
+                console.error("[Radar] Map initialization failed:", err);
+            }
+
+            // ── Audit: page opened ─────────────────────────────────────────────
+            if (window.EngiSphereAudit) {
+                window.EngiSphereAudit.logAuditEvent({
+                    action: "geospatial_radar_opened", entity_type: "page",
+                    message: "Geospatial Radar page opened", severity: "info"
+                });
+            }
+
+            // ── Notification: page open (anti-spam: once per 30 min) ──────────
+            const _lastMapOpen = Number(localStorage.getItem("_geoRadarOpenedAt") || 0);
+            if (Date.now() - _lastMapOpen > 1800000) {
+                localStorage.setItem("_geoRadarOpenedAt", Date.now());
+                if (window.EngiSphereNotifications) {
+                    window.EngiSphereNotifications.addNotification({
+                        type: "system", title: "Geospatial Radar",
+                        message: "Geospatial Radar opened — monitoring active project locations.",
+                        severity: "info"
+                    });
+                }
+            }
+
+            const projectId = getProjectIdFromUrl();
+            if (projectId) {
+                console.log(`[Radar] Detected projectId in URL: ${projectId}`);
+                try {
+                    const project = await fetchProjectById(projectId);
+                    if (project) {
+                        activeProjectId = project.id;
+                        renderProjectContext(project);
+                        await loadRadarData();
+                        activeProjectId = project.id;
+                        updateAISelectedProject(project);
+                        await focusMapOnProject(project);
+                    } else {
+                        await loadRadarData();
+                    }
+                } catch (err) {
+                    console.warn("[Radar] Project fetch failed:", err);
+                    await loadRadarData();
+                }
+            } else {
+                await loadRadarData();
+            }
+
+            if (window.EngiSphereNotifications) {
+                window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
+            }
+        } catch (globalErr) {
+            console.error("[Radar] Critical initialization error:", globalErr);
+            const list = document.getElementById("radarList");
+            if (list) {
+                list.innerHTML = `<div class="empty-state">Failed to initialize Geospatial Radar.</div>`;
+            }
+        }
+    }
+
+    // ── Global Focus helper ───────────────────────────────────────────────
+    function focusProjectOnMap(projectId) {
+        if (!projectId || !window.map) return;
+        const project = allProjects.find(p => String(p.id) === String(projectId));
+        if (!project || !project.coordinates) return;
+        window.map.setView(project.coordinates, 8, { animate: true });
+        const markerObj = markers.find(m => String(m.id) === String(projectId));
+        if (markerObj && markerObj.marker) markerObj.marker.openPopup();
+    }
+
+    // ── Local AI Solution fallback ────────────────────────────────────────
+    function generateLocalAISolution() {
+        const project = getSelectedProject() || allProjects[0] || {
+            title: 'Dubai Smart Bridge', location: 'Dubai, UAE',
+            project_type: 'Infrastructure', progress: 65, risk_score: 71, status: 'Active'
+        };
+
+        const output = document.getElementById('aiSolutionOutput');
+        const btn = document.getElementById('aiGenerateBtn');
+
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+        }
+
+        setTimeout(() => {
+            const title = project.title || project.name || 'Selected Project';
+            const loc   = project.location || 'Site';
+            if (output) {
+                output.innerHTML = `
+                    <div class="solution-scroll-body">
+                        <h4>Project Diagnosis</h4>
+                        <p>The project "${title}" in ${loc} requires focused monitoring, risk control, and clear recovery actions based on its current progress and risk score.</p>
+                        <h4>Root Causes</h4>
+                        <ul>
+                            <li>Limited visibility into site progress and operational risks.</li>
+                            <li>Possible delays caused by resources, dependencies, or approvals.</li>
+                            <li>Risk score indicates the need for active management attention.</li>
+                        </ul>
+                        <h4>Immediate Actions</h4>
+                        <ul>
+                            <li>Review the project schedule and critical path.</li>
+                            <li>Assign owners for high-risk activities.</li>
+                            <li>Increase weekly progress reporting and site updates.</li>
+                        </ul>
+                        <h4>AI Recommendations</h4>
+                        <ul>
+                            <li>Use AI-assisted monitoring for early risk detection.</li>
+                            <li>Track progress, cost, and safety indicators in one dashboard.</li>
+                            <li>Escalate unresolved issues before they affect delivery.</li>
+                        </ul>
+                    </div>`;
+            }
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-brain"></i> Generate AI Solution Map';
+            }
+            showToast('AI solution map generated (demo mode).', 'success');
+        }, 600);
+    }
+
+    // ── Event Delegation — all dynamic buttons ────────────────────────────
+    document.addEventListener('click', function(e) {
+        // Open Details
+        const detailsBtn = e.target.closest('.open-details-btn, .btn-open-details, [data-action="open-details"]');
+        if (detailsBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const projectId = detailsBtn.dataset.projectId
+                || detailsBtn.closest('[data-project-id]')?.dataset.projectId
+                || 'demo';
+            localStorage.setItem('selectedProjectId', projectId);
+            localStorage.setItem('engisphere-selected-project', projectId);
+            window.location.href = 'project_details.html';
+            return;
+        }
+
+        // Focus
+        const focusBtn = e.target.closest('.focus-btn, .btn-focus, [data-action="focus-project"]');
+        if (focusBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const projectId = focusBtn.dataset.projectId
+                || focusBtn.closest('[data-project-id]')?.dataset.projectId;
+            if (projectId) focusProjectOnMap(projectId);
+            return;
+        }
+
+        // Generate AI Solution (delegation fallback)
+        const genBtn = e.target.closest('.ai-generate-btn, .generate-btn, [data-action="generate-solution"]');
+        if (genBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            generateLocalAISolution();
+            return;
+        }
+
+        // Back to Dashboard
+        const backBtn = e.target.closest('[data-action="back-dashboard"], .back-dashboard-btn');
+        if (backBtn && !backBtn.href) {
+            e.preventDefault();
+            window.location.href = 'index.html';
+            return;
+        }
+
+        // Open AI EngiBot
+        const aiBtn = e.target.closest('[data-action="open-ai"], .open-ai-btn');
+        if (aiBtn && !aiBtn.href) {
+            e.preventDefault();
+            window.location.href = 'ai_chat.html';
+            return;
+        }
+    });
+
+    // ── Theme toggle — use the app-wide toggle from theme.js ──────────────
+    document.getElementById('themeToggleBtn')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (typeof window.toggleEngiSphereTheme === 'function') {
+            window.toggleEngiSphereTheme();
+        }
+    });
+
+    // Expose allProjects for focusProjectOnMap
+    Object.defineProperty(window, 'projects', {
+        get: () => allProjects,
+        configurable: true
+    });
+
+    initPage();
+</script>
+
+<script>
+/* =========================================================
+   GLOBAL BUTTON FUNCTIONS — guaranteed accessible
+   ========================================================= */
+
+window.focusProjectOnMap = function(projectId) {
+    console.log('[Focus] clicked:', projectId);
+
+    // Coordinates keyed by project id from fallback list
+    const fallbackCoords = {
+        'PRJ-0001': [25.2048, 55.2708],
+        'PRJ-0002': [24.7136, 46.6753],
+        'PRJ-0003': [25.2854, 51.5310],
+        'PRJ-0004': [30.0444, 31.2357],
+        'PRJ-0005': [24.7743, 46.7386],
+        'PRJ-0006': [24.6877, 46.7219]
+    };
+
+    // 1. Try window.projects (from Object.defineProperty getter)
+    const list = (window.projects && window.projects.length ? window.projects : null) || [];
+    const project = list.find(p => String(p.id) === String(projectId));
+
+    // 2. Resolve coordinates
+    const coords = (project && project.coordinates)
+        || (project && project.lat && project.lng ? [Number(project.lat), Number(project.lng)] : null)
+        || fallbackCoords[String(projectId)]
+        || null;
+
+    if (!coords) {
+        console.warn('[Focus] No coordinates found for:', projectId);
+        return false;
+    }
+
+    // 3. Get map instance
+    const mapObj = window.map || window.engisphereMap;
+    if (!mapObj || typeof mapObj.setView !== 'function') {
+        console.warn('[Focus] Map not available on window.map');
+        return false;
+    }
+
+    // 4. Fly to location
+    mapObj.setView(coords, 9, { animate: true, duration: 0.8 });
+
+    // 5. Open popup if marker exposed
+    if (window.projectMarkers && window.projectMarkers[String(projectId)]) {
+        setTimeout(function() {
+            window.projectMarkers[String(projectId)].openPopup();
+        }, 500);
+    }
+
+    return false;
+};
+
+window.generateLocalAISolution = function() {
+    console.log('[AI] generateLocalAISolution called');
+
+    // Prefer selected project from allProjects
+    let selectedTitle = 'Selected Project';
+    let selectedLoc   = 'the project site';
+    try {
+        const projectsList = (typeof allProjects !== 'undefined' ? allProjects : null) || [];
+        const activeId = typeof activeProjectId !== 'undefined' ? activeProjectId : null;
+        const proj = activeId ? projectsList.find(p => String(p.id) === String(activeId)) : projectsList[0];
+        if (proj) {
+            selectedTitle = proj.title || proj.name || selectedTitle;
+            selectedLoc   = proj.location || selectedLoc;
+        }
+    } catch(e) {}
+
+    const output = document.getElementById('aiSolutionOutput');
+    const btn    = document.getElementById('aiGenerateBtn');
+
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generating...';
+    }
+
+    setTimeout(function() {
+        if (output) {
+            output.innerHTML = `
+                <div class="solution-scroll-body">
+                    <h4>Project Diagnosis</h4>
+                    <p>The project "${selectedTitle}" in ${selectedLoc} requires focused monitoring, risk control, and clear recovery actions based on its current progress and risk level.</p>
+                    <h4>Root Causes</h4>
+                    <ul>
+                        <li>Limited visibility into site progress and operational risks.</li>
+                        <li>Possible delays caused by resources, dependencies, or approvals.</li>
+                        <li>Risk indicators require active management attention.</li>
+                    </ul>
+                    <h4>Immediate Actions</h4>
+                    <ul>
+                        <li>Review the project schedule and critical path.</li>
+                        <li>Assign accountable owners for high-risk activities.</li>
+                        <li>Increase the frequency of progress reporting and site check-ins.</li>
+                    </ul>
+                    <h4>AI Recommendations</h4>
+                    <ul>
+                        <li>Use AI-assisted monitoring for early risk detection.</li>
+                        <li>Track progress, cost, and safety indicators in one dashboard.</li>
+                        <li>Escalate unresolved issues before they affect delivery timelines.</li>
+                    </ul>
+                </div>`;
+        }
+        if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-brain"></i> Generate AI Solution Map';
+        }
+        // Show success toast if available
+        if (typeof showToast === 'function') {
+            showToast('AI solution map generated (demo mode).', 'success');
+        }
+    }, 600);
+};
+</script>
+</body>
+</html>

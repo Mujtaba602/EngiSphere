@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="assets/js/theme.js"></script>
 
   <title>EngiSphere | Register</title>
 
@@ -20,6 +21,51 @@
     --danger: #ef4444;
     --success: #10b981;
     --shadow: 0 22px 60px rgba(15, 23, 42, 0.075);
+  }
+
+  body.dark-theme {
+    --ink: #ffffff;
+    --muted: #cbd5e1;
+    --soft: #020617;
+    --panel: #0f172a;
+    --line: rgba(255, 255, 255, 0.10);
+  }
+
+  body.light-theme {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --soft: #f8fafc;
+    --panel: #ffffff;
+    --line: #e2e8f0;
+  }
+
+  body.light-theme .right,
+  body.light-theme .card,
+  body.light-theme .success-box,
+  body.light-theme .success-overlay {
+    background: #ffffff;
+    border-color: #e2e8f0;
+  }
+
+  body.light-theme .submit-btn {
+    box-shadow: 0 12px 26px rgba(37, 99, 235, 0.1);
+  }
+
+  .theme-toggle {
+    background: rgba(15, 23, 42, 0.05);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 10px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 14px;
+  }
+
+  body.dark-theme .theme-toggle {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.1);
   }
 
   * {
@@ -107,17 +153,17 @@
   overflow: visible;
 }
 
-.brand-icon {
+ .brand-icon {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: 18px;
   display: grid;
   place-items: center;
-  background: rgba(37, 99, 235, 0.95);
+  background: #2563eb;
   color: #ffffff;
   font-size: 18px;
   flex: 0 0 auto;
-  box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
 }
 
 .brand-text {
@@ -129,8 +175,8 @@
   text-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
 }
 
-.brand-text span {
-  color: #93c5fd;
+ .brand-text span {
+  color: #3b82f6;
 }
 
   .hero {
@@ -505,6 +551,10 @@
     <i class="fas fa-circle-check"></i>
     <span id="toastMessage">Done.</span>
   </div>
+
+  <button class="theme-toggle" id="themeToggleBtn" style="position: fixed; top: 20px; right: 20px; z-index: 10000;">
+    <i class="fas fa-moon"></i>
+  </button>
 
   <div id="successOverlay" class="success-overlay">
     <div class="success-box">

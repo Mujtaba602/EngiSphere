@@ -97,7 +97,7 @@ window.EngiSphereAIAnalysis = (function () {
 
     function getHealthStatus(project) {
         const score = calculateRiskScore(project);
-        if (score <= 25) return { label: "Healthy",   color: "#10b981", score };
+        if (score < 40)  return { label: "Healthy",   color: "#10b981", score };
         if (score <= 50) return { label: "Watch",     color: "#f59e0b", score };
         if (score <= 75) return { label: "At Risk",   color: "#f97316", score };
         return               { label: "Critical",  color: "#ef4444", score };

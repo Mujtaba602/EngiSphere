@@ -3,973 +3,1731 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EngiSphere | AI EngiBot</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    <title>EngiSphere | AI EngiBot Console</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-glow: rgba(59, 130, 246, 0.5);
-            --bg: #020617;
-            --sidebar: #0f172a;
-            --card: rgba(15, 23, 42, 0.65);
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #f8fafc;
-            --muted: #94a3b8;
+            /* Premium Engineering SaaS Palette */
+            --bg-main: #f8fafc;
+            --bg-soft: #eef4ff;
+            --sidebar: #ffffff;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-soft: #e2e8f0;
+
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #dbeafe;
+
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
+
+            --shadow-premium: 0 12px 30px rgba(15, 23, 42, 0.04);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 260px;
+            --sidebar-collapsed-width: 80px;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        body.dark-theme {
+            --bg-main: #020617;
+            --bg-soft: #071225;
+            --sidebar: #0f172a;
+            --card-bg: rgba(15, 23, 42, 0.6);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.25);
+            --primary-soft: rgba(37, 99, 235, 0.12);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg);
-            color: var(--text);
+            background: var(--bg-main);
+            color: var(--text-main);
             display: flex;
             height: 100vh;
             overflow: hidden;
-            transition: background 0.3s, color 0.3s;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        /* Premium Visual Depth Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(var(--border-soft) 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body.dark-theme::before { opacity: 0.1; }
+
+        .bg-glow {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(37, 99, 235, 0.08) 0%, transparent 70%);
+            transform: translate(-50%, -60%);
+            pointer-events: none;
+            z-index: 0;
         }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.2); border-radius: 999px; }
 
+        /* Sidebar */
         .sidebar {
-            width: 260px;
+            width: var(--sidebar-width);
             background: var(--sidebar);
-            border-right: 1px solid var(--border);
+            border-right: 1px solid var(--border-soft);
             display: flex;
             flex-direction: column;
-            padding: 30px 20px;
-            z-index: 1000;
-            transition: background 0.3s;
+            padding: 28px 18px;
+            transition: var(--transition);
+            z-index: 2000;
+            height: 100vh;
+            flex-shrink: 0;
+            position: relative;
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: 800;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 40px;
-            letter-spacing: -1.5px;
-            text-shadow: 0 0 15px rgba(59, 130, 246, 0.35);
+        .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; text-decoration: none; }
+        .logo-icon {
+            width: 38px; height: 38px; border-radius: 18px;
+            display: grid; place-items: center;
+            background: var(--primary); color: #fff;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+            flex-shrink: 0;
         }
+        .logo-text { font-size: 20px; font-weight: 800; color: var(--text-main); letter-spacing: -0.8px; line-height: 1; }
+        .logo-text span { color: var(--primary); }
 
-        .nav-section {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin: 15px 0 5px 15px;
-            letter-spacing: 1px;
-        }
-
+        .nav-section { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 14px 0 6px 14px; letter-spacing: 1px; }
         .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 18px;
-            text-decoration: none;
-            color: var(--muted);
-            border-radius: 14px;
-            font-weight: 600;
-            font-size: 13px;
-            transition: 0.3s;
-            margin-bottom: 4px;
+            display: flex; align-items: center; gap: 14px;
+            padding: 12px 16px; border-radius: 14px;
+            color: var(--text-muted); text-decoration: none;
+            font-weight: 600; font-size: 13.5px; transition: var(--transition);
         }
+        .nav-link:hover, .nav-link.active { background: var(--primary-soft); color: var(--primary); }
+        .exit-link { margin-top: auto; color: var(--danger) !important; }
 
-        .nav-link:hover,
-        .nav-link.active {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--primary);
-            box-shadow: inset 4px 0 0 var(--primary);
-        }
-
-        .exit-link {
-            color: var(--danger) !important;
-            margin-top: auto;
-        }
-
-        .exit-link:hover {
-            background: rgba(239, 68, 68, 0.08);
-            color: var(--danger) !important;
-            box-shadow: inset 4px 0 0 var(--danger);
-        }
-
+        /* Main Workspace */
         .main-chat {
             flex: 1;
             display: flex;
             flex-direction: column;
             position: relative;
-            background-color: var(--bg);
-            background-image:
-                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 30px 30px;
-            transition: background 0.3s;
+            z-index: 1;
         }
 
-        .main-chat::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(circle at 50% 30%, rgba(59, 130, 246, 0.05), transparent 60%);
-            z-index: 0;
-            pointer-events: none;
-        }
-
+        /* HEADER */
+        /* PREMIUM HEADER REDESIGN */
         .chat-header {
-            padding: 20px 32px;
-            border-bottom: 1px solid var(--border);
+            height: 76px;
+            padding: 0 28px;
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            background: rgba(10, 15, 28, 0.85);
-            backdrop-filter: blur(20px);
-            z-index: 10;
-            gap: 20px;
-            flex-wrap: wrap;
-            transition: background 0.3s;
+            justify-content: space-between;
+            gap: 24px;
+            z-index: 1000;
+            transition: var(--transition);
         }
 
-        .bot-info h2 {
-            font-size: 18px;
-            font-weight: 800;
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
+        body.dark-theme .chat-header {
+            background: rgba(15, 23, 42, 0.82);
+            border-bottom-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .bot-brand { display: flex; align-items: center; gap: 16px; }
+        .brand-icon-box {
+            width: 42px; height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff; border-radius: 12px;
+            display: grid; place-items: center; font-size: 18px;
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.2);
+        }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-text h2 { 
+            font-size: 16px; font-weight: 800; color: var(--text-main); 
+            letter-spacing: 0.5px; line-height: 1.2; 
         }
 
         .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--success);
-            background: rgba(16,185,129,0.1);
-            padding: 4px 10px;
-            border-radius: 50px;
-            margin-top: 6px;
-            border: 1px solid rgba(16,185,129,0.2);
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 9px; font-weight: 800; color: var(--success);
+            background: rgba(16, 185, 129, 0.08); padding: 4px 10px; border-radius: 50px;
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            text-transform: uppercase; margin-top: 2px;
+        }
+        .status-pill::before { 
+            content: ''; width: 6px; height: 6px; background: var(--success); 
+            border-radius: 50%; box-shadow: 0 0 8px var(--success); 
         }
 
-        .sys-metrics {
-            display: flex;
-            gap: 18px;
-            font-size: 11px;
-            font-family: 'Fira Code', monospace;
-            color: var(--muted);
-            flex-wrap: wrap;
+        .ai-status-chip {
+            height: 32px; padding: 0 14px; border-radius: 999px;
+            background: #f1f5ff; border: 1px solid rgba(37, 99, 235, 0.12);
+            color: #334155; font-size: 11px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px; transition: var(--transition);
+        }
+        .ai-status-chip .dot { width: 7px; height: 7px; background: #10b981; border-radius: 50%; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+
+        .header-actions { display: flex; gap: 8px; align-items: center; }
+        .theme-toggle, .clear-btn, .new-chat-btn, .history-select-wrapper select {
+            height: 34px; border-radius: 99px; background: var(--bg-soft);
+            border: 1px solid var(--border-soft); color: var(--text-main);
+            cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center;
+            font-size: 11.5px; font-weight: 600;
+        }
+        .theme-toggle { width: 34px; border-radius: 50%; padding: 0; }
+        .clear-btn { padding: 0 14px; gap: 6px; }
+        .new-chat-btn { 
+            padding: 0 14px; gap: 6px; 
+            background: rgba(37, 99, 235, 0.05); color: var(--primary); 
+            border-color: rgba(37, 99, 235, 0.1);
+        }
+        .clear-btn:hover { background: #fee2e2; color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+        .new-chat-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .theme-toggle:hover { border-color: var(--primary); background: var(--primary-soft); }
+
+        /* Custom History Dropdown */
+        .history-dropdown { position: relative; }
+        .history-trigger {
+            height: 34px; padding: 0 14px; border-radius: 99px;
+            background: var(--bg-soft); border: 1px solid var(--border-soft);
+            color: var(--text-main); font-size: 11.5px; font-weight: 600;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: var(--transition);
+        }
+        .history-trigger:hover { border-color: var(--primary); background: var(--primary-soft); }
+        .history-trigger span { 
+            max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; 
         }
 
-        .metric span {
-            color: var(--primary);
-            font-weight: 600;
+        .history-menu {
+            position: absolute; top: 42px; right: 0; width: 280px;
+            background: var(--card-bg); border: 1px solid var(--border-soft);
+            border-radius: 16px; box-shadow: var(--shadow-premium);
+            padding: 8px; z-index: 3000; display: none;
+            animation: menuFade 0.2s ease-out;
+            backdrop-filter: blur(20px);
+        }
+        @keyframes menuFade { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .history-header { 
+            font-size: 9px; font-weight: 800; color: var(--text-muted); 
+            text-transform: uppercase; padding: 8px 12px; border-bottom: 1px solid var(--border-soft);
+            margin-bottom: 6px; letter-spacing: 1px;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-            align-items: center;
+        .history-items { max-height: 300px; overflow-y: auto; padding-right: 4px; }
+        .history-items::-webkit-scrollbar { width: 4px; }
+        .history-items::-webkit-scrollbar-thumb { background: var(--border-soft); border-radius: 10px; }
+
+        .history-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 10px 12px; border-radius: 10px; cursor: pointer;
+            transition: var(--transition); gap: 10px; margin-bottom: 2px;
+        }
+        .history-item:hover { background: var(--bg-soft); }
+        .history-item.active { background: var(--primary-soft); }
+        .history-item.active .item-title { color: var(--primary); font-weight: 700; }
+
+        .item-main { display: flex; align-items: center; gap: 8px; flex: 1; overflow: hidden; }
+        .item-indicator { font-size: 10px; color: var(--primary); width: 12px; opacity: 0; }
+        .history-item.active .item-indicator { opacity: 1; }
+        .item-title { 
+            font-size: 12.5px; color: var(--text-main); font-weight: 500;
+            overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
         }
 
-        .mini-btn,
-        .theme-toggle {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 10px 14px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.3s;
+        .delete-chat-btn {
+            width: 26px; height: 26px; border-radius: 50%; border: none;
+            background: transparent; color: var(--text-muted);
+            display: grid; place-items: center; cursor: pointer;
+            transition: var(--transition); font-size: 12px;
+        }
+        .delete-chat-btn:hover { background: #fee2e2; color: #ef4444; }
+
+        body.dark-theme .ai-status-chip {
+            background: rgba(15, 23, 42, 0.88); border-color: rgba(96, 165, 250, 0.2);
+            color: #cbd5e1;
+        }
+        body.dark-theme .ai-status-chip .dot { background: #34d399; box-shadow: 0 0 8px rgba(52, 211, 153, 0.4); }
+
+        body.dark-theme .theme-toggle, 
+        body.dark-theme .clear-btn {
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .mini-btn:hover,
-        .theme-toggle:hover {
+        body.dark-theme .input-wrapper {
+            background: #0f172a;
+            border-color: rgba(148, 163, 184, 0.22);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+        }
+        body.dark-theme #userInput { color: #e5e7eb; }
+        body.dark-theme #userInput::placeholder { color: #94a3b8; opacity: 0.8; }
+        body.dark-theme .input-wrapper:focus-within {
+            border-color: rgba(96, 165, 250, 0.55);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18), 0 18px 45px rgba(0, 0, 0, 0.35);
+        }
+        body.dark-theme .secure-note { color: rgba(203, 213, 225, 0.65); }
+
+        /* DARK MODE BOT RESPONSES & REPORTS */
+        body.dark-theme .bot .msg-bubble {
+            background: #0f172a;
+            border: 1px solid rgba(96, 165, 250, 0.22);
+            color: #e5e7eb;
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+        }
+
+        body.dark-theme .bot-intel-header {
+            color: #60a5fa;
+            border-color: rgba(148, 163, 184, 0.18);
+        }
+
+        body.dark-theme .ai-section {
+            background: rgba(2, 6, 23, 0.72);
+            border-color: rgba(148, 163, 184, 0.18);
+            color: #cbd5e1;
+        }
+
+        body.dark-theme .ai-section h4 { color: #60a5fa; }
+        body.dark-theme .ai-section p,
+        body.dark-theme .ai-section li { color: #e5e7eb; }
+
+        body.dark-theme .ai-section.exec {
+            background: rgba(37, 99, 235, 0.12);
+            border-color: rgba(96, 165, 250, 0.35);
+        }
+
+        body.dark-theme .ai-section.exec h4 { color: #93c5fd; }
+        body.dark-theme .ai-section.exec p,
+        body.dark-theme .ai-section.exec li { color: #dbeafe; }
+
+        body.dark-theme .bot-actions { border-top-color: rgba(148, 163, 184, 0.18); }
+        body.dark-theme .action-btn { color: #94a3b8; }
+        body.dark-theme .action-btn:hover { color: #60a5fa; }
+        body.dark-theme .action-btn.success { color: #34d399; }
+
+        body.dark-theme .welcome-card {
+            background: rgba(15, 23, 42, 0.95);
+            border-color: rgba(96, 165, 250, 0.2);
+        }
+        body.dark-theme .welcome-card h3 { color: #fff; }
+        body.dark-theme .protocol-header {
+            background: rgba(37, 99, 235, 0.1);
+            color: #60a5fa;
+            border-color: rgba(96, 165, 250, 0.2);
+        }
+        body.dark-theme .prompt-module {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(148, 163, 184, 0.15);
+        }
+        body.dark-theme .prompt-module div b { color: #f1f5f9; }
+        body.dark-theme .prompt-module div span { color: #94a3b8; }
+        body.dark-theme .welcome-card p { color: #cbd5e1; }
+        body.dark-theme .status-item { color: #e5e7eb; }
+        body.dark-theme .prompt-module:hover {
+            background: rgba(37, 99, 235, 0.1);
             border-color: var(--primary);
-            color: var(--primary);
+        }
+
+        /* CHAT CONTAINER */
+        .chat-container {
+            flex: 1;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
         }
 
         .chat-box {
             flex: 1;
             overflow-y: auto;
-            padding: 30px 32px 20px;
+            padding: 60px 0 240px !important; 
+            scroll-behavior: smooth;
+        }
+
+        .chat-thread {
+            max-width: 880px;
+            margin: 0 auto;
+            width: 100%;
+            padding: 0 24px;
             display: flex;
             flex-direction: column;
-            gap: 22px;
-            scroll-behavior: smooth;
-            z-index: 1;
+            gap: 32px;
         }
 
-        .quick-prompts {
+        /* PREMIUM WELCOME CARD */
+        .welcome-block {
+            max-width: 820px;
+            margin: 0 auto;
+            width: 100%;
             display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: -4px;
+            flex-direction: column;
+            gap: 60px;
+            animation: fadeIn 0.6s ease-out;
+            padding-bottom: 40px;
         }
 
-        .prompt-chip {
-            background: rgba(59,130,246,0.08);
-            color: #cbd5e1;
-            border: 1px solid rgba(59,130,246,0.15);
-            padding: 10px 14px;
-            border-radius: 999px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .welcome-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-soft);
+            border-radius: 32px;
+            padding: 48px;
+            box-shadow: var(--shadow-premium);
+            text-align: center;
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
         }
 
-        .prompt-chip:hover {
-            color: white;
-            border-color: var(--primary);
-            background: rgba(59,130,246,0.14);
+        .welcome-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; width: 150px; height: 150px;
+            background: radial-gradient(circle at top right, rgba(37, 99, 235, 0.05), transparent 70%);
+            pointer-events: none;
         }
 
-        .msg-row {
-            display: flex;
+        .protocol-header { font-size: 11px; font-weight: 800; color: var(--primary); letter-spacing: 2px; margin-bottom: 16px; opacity: 0.8; }
+        .welcome-card h3 { font-size: 28px; font-weight: 800; color: var(--text-main); margin-bottom: 16px; letter-spacing: -0.5px; }
+        .welcome-card p { font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+        .status-row {
+            display: flex; justify-content: center; gap: 24px; margin-bottom: 32px;
+            padding: 12px; background: var(--bg-soft); border-radius: 16px; width: fit-content; margin-left: auto; margin-right: auto;
+        }
+        .status-item { display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; color: var(--text-main); }
+        .status-item i { font-size: 10px; color: var(--success); }
+
+        .cap-chips { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+        .cap-chip {
+            font-size: 11px; font-weight: 700; color: var(--primary);
+            background: var(--primary-soft); padding: 8px 16px; border-radius: 50px;
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+
+        /* PREMIUM PROMPT GRID */
+        .prompt-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
             width: 100%;
         }
 
-        .msg-row.user {
-            justify-content: flex-end;
+        .prompt-module {
+            background: var(--card-bg);
+            border: 1px solid var(--border-soft);
+            border-radius: 20px;
+            padding: 24px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            backdrop-filter: blur(10px);
         }
+
+        .prompt-module i { font-size: 20px; color: var(--primary); }
+        .prompt-module div b { font-size: 14px; color: var(--text-main); display: block; margin-bottom: 4px; }
+        .prompt-module div span { font-size: 11px; color: var(--text-muted); line-height: 1.4; display: block; }
+
+        .prompt-module:hover {
+            border-color: var(--primary);
+            background: var(--primary-soft);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.08);
+        }
+
+        /* MESSAGES */
+        .msg-row { display: flex; width: 100%; }
+        .msg-row.user { justify-content: flex-end; }
+        .msg-row.bot { justify-content: flex-start; }
 
         .msg-bubble {
-            max-width: 78%;
-            padding: 20px 24px;
-            border-radius: 20px;
-            font-size: 14px;
-            line-height: 1.7;
+            padding: 18px 22px;
+            border-radius: 18px;
+            font-size: 14.5px;
+            line-height: 1.6;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             position: relative;
         }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
 
         .user .msg-bubble {
-            background: linear-gradient(135deg, var(--primary), #2563eb);
-            color: white;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
             border-bottom-right-radius: 4px;
-            box-shadow: 0 15px 35px rgba(59,130,246,0.25);
-            font-weight: 500;
+            max-width: 70%;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.15);
         }
 
         .bot .msg-bubble {
-            background: rgba(15, 23, 42, 0.72);
-            color: var(--text);
+            background: #ffffff;
+            border: 1px solid rgba(148, 163, 184, 0.18);
             border-bottom-left-radius: 4px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-left: 3px solid var(--primary);
-            backdrop-filter: blur(15px);
+            max-width: 85%;
+        }
+        
+        .bot .msg-bubble[style*="max-width:720px"],
+        .bot .msg-bubble[style*="max-width:820px"] {
+            max-width: 100% !important;
         }
 
-        .bot-header {
+        /* Ensure the last bot message always clears the fixed input area */
+        .msg-row.bot:last-child {
+            margin-bottom: 280px !important;
+        }
+
+        .bot-intel-header {
+            font-size: 10px; font-weight: 800; color: var(--primary);
+            text-transform: uppercase; letter-spacing: 1.5px;
+            margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+            padding-bottom: 12px; border-bottom: 1px solid var(--border-soft);
+        }
+
+        .ai-section {
+            background: var(--bg-soft); border-radius: 16px;
+            padding: 20px; margin-bottom: 16px; border: 1px solid var(--border-soft);
+        }
+        .ai-section:last-child { margin-bottom: 0; }
+        .ai-section h4 { font-size: 12px; font-weight: 800; color: var(--primary); margin-bottom: 10px; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .ai-section p { font-size: 14.5px; color: var(--text-main); }
+        .ai-section.exec { background: var(--primary-soft); border-color: var(--primary); }
+
+        /* BOT ACTIONS */
+        .bot-actions {
+            display: flex;
+            gap: 14px;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid rgba(148, 163, 184, 0.12);
+            align-items: center;
+        }
+        .action-btn {
+            background: transparent;
+            border: none;
+            padding: 0;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 11px;
-            font-weight: 800;
-            color: var(--muted);
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 10px;
-        }
-
-        .bot-header i {
-            color: var(--primary);
-            font-size: 14px;
-        }
-
-        .msg-content {
-            color: #e2e8f0;
-        }
-
-        .typing-indicator {
-            display: flex;
             gap: 6px;
-            padding: 5px 0;
+            transition: var(--transition);
         }
+        .action-btn:hover { color: var(--primary); }
+        .action-btn i { font-size: 11px; opacity: 0.8; }
+        .action-btn.success { color: var(--success); }
 
-        .typing-indicator span {
-            width: 6px;
-            height: 6px;
-            background: var(--primary);
-            border-radius: 50%;
-            animation: bounce 1.4s infinite ease-in-out both;
-        }
-
-        .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
-        .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
-
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1.2); background: #fff; }
-        }
-
+        /* INPUT COMPOSER */
         .chat-input-area {
-            padding: 0 32px 26px 32px;
-            z-index: 10;
+            position: absolute;
+            bottom: 40px; left: 0; right: 0;
+            z-index: 2000;
         }
 
         .input-wrapper {
+            max-width: 820px;
+            width: 90%;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid rgba(37, 99, 235, 0.25);
+            border-radius: 100px;
+            padding: 8px 8px 8px 30px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            background: rgba(15, 23, 42, 0.85);
-            border: 1px solid rgba(59,130,246,0.3);
-            border-radius: 24px;
-            padding: 10px 14px 10px 22px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.35);
-            backdrop-filter: blur(20px);
-            transition: 0.3s;
+            gap: 16px;
+            box-shadow: 0 15px 35px -5px rgba(0,0,0,0.1);
         }
-
-        .input-wrapper:focus-within {
-            border-color: var(--primary);
-            box-shadow: 0 20px 40px rgba(59,130,246,0.18);
-            transform: translateY(-2px);
-        }
+        .input-wrapper:focus-within { border-color: var(--primary); box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15); }
 
         #userInput {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-size: 15px;
-            outline: none;
-            padding: 10px 0;
-            font-family: inherit;
-        }
-
-        #userInput::placeholder {
-            color: var(--muted);
+            flex: 1; background: transparent; border: none; outline: none;
+            color: var(--text-main); font-size: 15px; font-family: inherit;
         }
 
         .send-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            background: var(--primary);
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-            transition: 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 18px var(--primary-glow);
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--primary); border: none; color: #fff;
+            cursor: pointer; display: grid; place-items: center; transition: var(--transition);
         }
+        .send-btn:hover { background: var(--primary-dark); transform: scale(1.05); }
 
-        .send-btn:hover {
-            transform: scale(1.05);
-            background: #60a5fa;
-        }
+        .secure-note { text-align: center; font-size: 10px; color: var(--text-muted); margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 6px; }
 
-        .send-btn:disabled {
-            background: #1e293b;
-            box-shadow: none;
-            cursor: not-allowed;
-            color: var(--muted);
-        }
+        .typing { display: flex; gap: 6px; }
+        .typing span { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; }
+        .typing span:nth-child(2) { animation-delay: 0.2s; }
+        .typing span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
 
-        .input-footer {
-            text-align: center;
-            font-size: 11px;
-            color: var(--muted);
-            margin-top: 12px;
-            letter-spacing: 0.5px;
-        }
+        /* Sidebar Collapse Logic */
+        body.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
+        body.sidebar-collapsed .logo-text, body.sidebar-collapsed .nav-section, body.sidebar-collapsed .nav-link span { display: none; }
+        body.sidebar-collapsed .nav-link { justify-content: center; padding: 12px 0; width: 48px; margin-left: auto; margin-right: auto; }
+        body.sidebar-collapsed .nav-link i { font-size: 18px; margin: 0; }
 
-        .ai-response {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            color: #dbe4ef;
-            line-height: 1.9;
-            font-size: 14px;
+        .sidebar-toggle {
+            position: fixed; left: calc(var(--sidebar-width) - 18px); top: 24px;
+            z-index: 3000; width: 36px; height: 36px; background: var(--card-bg);
+            border: 1px solid var(--border-soft); color: var(--primary); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; cursor: pointer;
+            transition: var(--transition); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); outline: none;
         }
-
-        .ai-response p {
-            margin: 0;
-        }
-
-        .ai-section-title {
-            margin: 18px 0 10px 0;
-            font-size: 16px;
-            font-weight: 800;
-            color: #ffffff;
-            padding-bottom: 8px;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .ai-list {
-            margin: 8px 0 14px 20px;
-            padding-left: 10px;
-            display: grid;
-            gap: 8px;
-        }
-
-        .ai-list li {
-            color: #dbe4ef;
-        }
-
-        .ai-response strong {
-            color: #ffffff;
-            font-weight: 800;
-        }
-
-        body.light-mode {
-            --bg: #f3f7fc;
-            --sidebar: #ffffff;
-            --card: rgba(255,255,255,0.9);
-            --border: rgba(15, 23, 42, 0.08);
-            --text: #0f172a;
-            --muted: #64748b;
-            background: #f3f7fc;
-            color: #0f172a;
-        }
-
-        body.light-mode .sidebar {
-            background: #ffffff;
-            border-right: 1px solid rgba(15, 23, 42, 0.08);
-        }
-
-        body.light-mode .main-chat {
-            background: radial-gradient(circle at top left, #ffffff, #eef4fb);
-            background-image:
-                linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
-        }
-
-        body.light-mode .chat-header {
-            background: rgba(255,255,255,0.8);
-        }
-
-        body.light-mode .msg-bubble.bot,
-        body.light-mode .input-wrapper {
-            background: rgba(255,255,255,0.9);
-            color: #0f172a;
-            border-color: rgba(15, 23, 42, 0.08);
-            box-shadow: 0 12px 30px rgba(15,23,42,0.07);
-        }
-
-        body.light-mode .msg-content,
-        body.light-mode .ai-response,
-        body.light-mode .bot-info h2,
-        body.light-mode #userInput,
-        body.light-mode .ai-section-title,
-        body.light-mode .ai-response strong {
-            color: #0f172a;
-        }
-
-        body.light-mode .prompt-chip {
-            color: #334155;
-            background: rgba(37,99,235,0.06);
-        }
-
-        body.light-mode .prompt-chip:hover {
-            color: #0f172a;
-        }
+        .sidebar-toggle:hover { background: var(--primary); color: white; transform: scale(1.1); }
+        body.sidebar-collapsed .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
+        .sidebar-toggle i { transition: transform 0.3s ease; }
+        body.sidebar-collapsed .sidebar-toggle i { transform: rotate(180deg); }
 
         @media (max-width: 900px) {
-            .sidebar { display: none; }
-            .msg-bubble { max-width: 90%; }
-            .chat-header, .chat-box, .chat-input-area {
-                padding-left: 18px;
-                padding-right: 18px;
-            }
+            .welcome-card { padding: 32px; }
+            .status-row { flex-direction: column; gap: 12px; width: 100%; }
+            .input-wrapper { width: 95%; }
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
-        <div class="logo"><i class="fas fa-shield-halved"></i> ENGISPHERE</div>
+    <div class="bg-glow"></div>
+    <button id="sidebarToggle" class="sidebar-toggle" title="Toggle Sidebar">
+        <i class="fas fa-chevron-left"></i>
+    </button>
+    <aside class="sidebar">
+        <a href="home.html" class="logo">
+            <span class="logo-icon"><i class="fas fa-compass-drafting"></i></span>
+            <span class="logo-text">ENGI<span>SPHERE</span></span>
+        </a>
 
-        <nav style="flex: 1;">
+        <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
-            <a href="home.html" class="nav-link"><i class="fas fa-home"></i> Home</a>
-            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
-            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i> Geospatial Radar</a>
-            <a href="ai_chat.html" class="nav-link active"><i class="fas fa-brain"></i> AI EngiBot</a>
+            <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i><span>Geospatial Radar</span></a>
+            <a href="ai_chat.html" class="nav-link active"><i class="fas fa-brain"></i><span>AI EngiBot</span></a>
 
             <div class="nav-section">Management</div>
-            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-tree"></i> Project Details</a>
-            <a href="profile.html" class="nav-link"><i class="fas fa-user-astronaut"></i> My Profile</a>
-            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i> Team Access</a>
-           <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i> Reports</a>
+            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-open"></i><span>Project Details</span></a>
+            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span>Team Access</span></a>
+            <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i><span>Reports</span></a>
         </nav>
 
-        <a href="#" onclick="logout()" class="nav-link exit-link">
-            <i class="fas fa-power-off"></i> Exit System
+        <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i><span>Exit System</span>
         </a>
-    </div>
+    </aside>
 
-    <div class="main-chat">
-        <div class="chat-header">
-            <div class="bot-info">
-                <h2><i class="fas fa-microchip" style="color: var(--primary);"></i> ENGIBOT INTELLIGENCE</h2>
-                <div class="status-pill">
-                    <i class="fas fa-circle" style="font-size:6px;"></i> NEURAL CORE SECURE
+    <main class="main-chat">
+        <header class="chat-header">
+            <div class="bot-brand">
+                <div class="brand-icon-box">
+                    <i class="fas fa-microchip"></i>
+                </div>
+                <div class="brand-text">
+                    <h2>ENGIBOT INTELLIGENCE</h2>
+                    <div class="status-pill">NEURAL CORE SECURE</div>
                 </div>
             </div>
 
-            <div class="sys-metrics">
-                <div class="metric">Model: <span>Gemini Core</span></div>
-                <div class="metric">Latency: <span id="latency">12ms</span></div>
-                <div class="metric">Mode: <span>Engineering Assist</span></div>
+            <div class="ai-status-chip">
+                <div class="dot"></div>
+                Engineering AI Ready
             </div>
 
             <div class="header-actions">
-                <div id="notificationCenter"></div>
-                <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn">
-                    <i class="fas fa-moon"></i>
+                <div class="history-dropdown" id="historyDropdown">
+                    <button class="history-trigger" id="historyTrigger" onclick="toggleHistoryMenu()">
+                        <span id="activeChatTitle">Chats</span> <i class="fas fa-chevron-down" style="font-size: 10px; opacity: 0.6;"></i>
+                    </button>
+                    <div class="history-menu" id="historyMenu">
+                        <div class="history-header">Chat History</div>
+                        <div id="historyItems" class="history-items"></div>
+                    </div>
+                </div>
+                <button class="new-chat-btn" onclick="startNewChat()" title="Start New Conversation">
+                    <i class="fas fa-plus"></i> New
                 </button>
-                <button class="mini-btn" onclick="clearChat()">
+                <button class="theme-toggle" onclick="toggleAppTheme()" id="themeToggleBtn" title="Toggle Theme">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+                <button class="clear-btn" onclick="clearChat()" title="Clear Active Conversation">
                     <i class="fas fa-broom"></i> Clear
                 </button>
             </div>
-        </div>
+        </header>
 
-        <div id="portfolioAnalysisPanel" style="
-            padding: 16px 32px 0; z-index: 2; position: relative;
-            max-height: 420px; overflow-y: auto; display: none;">
-            <div style="
-                background: rgba(15,23,42,0.72); border: 1px solid rgba(59,130,246,0.2);
-                border-radius: 16px; padding: 18px 20px; backdrop-filter: blur(12px);">
-                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-                    <div style="font-size:13px; font-weight:800; color:#f8fafc; display:flex; align-items:center; gap:8px;">
-                        <i class="fas fa-brain" style="color:var(--primary);"></i>
-                        AI Project Portfolio Analysis
+        <div class="chat-container">
+            <div class="chat-box" id="chatBox">
+                <div class="chat-thread" id="chatThread">
+                    <div id="welcomeWrapper" class="welcome-block">
+                        <div class="welcome-card" id="welcomeCard">
+                        <div class="protocol-header">PROTOCOL INITIALIZED</div>
+                        <h3>Welcome to EngiBot Intelligence</h3>
+                        <p style="text-align: left; margin-bottom: 24px;">Hello, I’m EngiBot. I help with engineering project intelligence, including risk analysis, timeline recovery, procurement issues, structural concerns, architecture decisions, and executive planning.</p>
+                        
+                        <div style="text-align: left; font-size: 14px; color: var(--text-muted); margin-bottom: 24px;">
+                            <div style="font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Try asking:</div>
+                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                <div>• Analyze structural integrity risks for a warehouse project</div>
+                                <div>• Recover from procurement delays in a hospital construction project</div>
+                                <div>• Identify critical path risks in a multi-disciplinary engineering project</div>
+                                <div>• Recommend a scalable backend architecture for an engineering SaaS platform</div>
+                                <div>• Generate an executive risk summary for an infrastructure project</div>
+                            </div>
+                        </div>
+                        
+                        <div class="status-row">
+                            <div class="status-item"><i class="fas fa-shield-check"></i> Secure Session</div>
+                            <div class="status-item"><i class="fas fa-database"></i> Engineering Context</div>
+                            <div class="status-item"><i class="fas fa-file-invoice"></i> Structured Output</div>
+                        </div>
                     </div>
-                    <button onclick="document.getElementById('portfolioAnalysisPanel').style.display='none';"
-                        style="background:transparent; border:none; color:var(--muted); cursor:pointer; font-size:16px;">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div id="portfolioAnalysisContent"></div>
-            </div>
-        </div>
 
-        <div class="chat-box" id="chatBox">
-            <div class="msg-row bot">
-                <div class="msg-bubble">
-                    <div class="bot-header"><i class="fas fa-terminal"></i> PROTOCOL INITIALIZED</div>
-                    <div class="msg-content">
-                        <div class="ai-response">
-                            <p><strong>Handshake successful.</strong> EngiBot is online.</p>
-                            <p>Welcome to <strong>EngiSphere AI EngiBot</strong>. I can help you with:</p>
-                            <ul class="ai-list">
-                                <li>Project risk analysis</li>
-                                <li>Software architecture suggestions</li>
-                                <li>Feasibility discussions</li>
-                                <li>Engineering planning and documentation</li>
-                            </ul>
-                            <p>Enter your question below or use one of the quick prompts.</p>
+                    <div class="prompt-grid">
+                        <div class="prompt-module" onclick="usePrompt('Analyze structural integrity risks for a warehouse project')">
+                            <i class="fas fa-building"></i>
+                            <div>
+                                <b>Structural Integrity</b>
+                                <span>Foundation, load, and slab risks</span>
+                            </div>
+                        </div>
+                        <div class="prompt-module" onclick="usePrompt('Recover from procurement delays in a hospital construction project')">
+                            <i class="fas fa-hospital"></i>
+                            <div>
+                                <b>Procurement Delay</b>
+                                <span>Hospital equipment & MEP recovery</span>
+                            </div>
+                        </div>
+                        <div class="prompt-module" onclick="usePrompt('Identify critical path risks in a multi-disciplinary engineering project')">
+                            <i class="fas fa-triangle-exclamation"></i>
+                            <div>
+                                <b>Critical Path</b>
+                                <span>Multi-disciplinary dependency review</span>
+                            </div>
+                        </div>
+                        <div class="prompt-module" onclick="usePrompt('Recommend a scalable backend architecture for an engineering SaaS platform')">
+                            <i class="fas fa-server"></i>
+                            <div>
+                                <b>SaaS Architecture</b>
+                                <span>Backend, API, and multi-tenant scaling</span>
+                            </div>
+                        </div>
+                        <div class="prompt-module" onclick="usePrompt('Generate an executive risk summary for an infrastructure project')">
+                            <i class="fas fa-user-tie"></i>
+                            <div>
+                                <b>Executive Summary</b>
+                                <span>High-level risk & recovery brief</span>
+                            </div>
+                        </div>
+                        <div class="prompt-module" onclick="loadPortfolioAnalysis()">
+                            <i class="fas fa-chart-pie"></i>
+                            <div>
+                                <b>Portfolio Scan</b>
+                                <span>Compare risk across active projects</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="quick-prompts">
-                <button class="prompt-chip" onclick="loadPortfolioAnalysis()">
-                    <i class="fas fa-brain" style="margin-right:5px;"></i>AI Portfolio Analysis
-                </button>
-                <button class="prompt-chip" onclick="usePrompt('Give me a short risk analysis for my current projects.')">Risk Analysis</button>
-                <button class="prompt-chip" onclick="usePrompt('Suggest a software architecture for an AI-driven engineering management platform.')">Architecture Suggestion</button>
-                <button class="prompt-chip" onclick="usePrompt('How can I improve my graduation project presentation?')">Presentation Help</button>
-                <button class="prompt-chip" onclick="usePrompt('What are the main risks in a software engineering graduation project?')">Graduation Risks</button>
+            <div class="chat-input-area">
+                <div class="input-wrapper">
+                    <input type="text" id="userInput" placeholder="Ask EngiBot..." onkeypress="handleEnter(event)">
+                    <button class="send-btn" id="sendBtn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                <div class="secure-note"><i class="fas fa-lock" style="font-size:9px;"></i> Secure engineering session</div>
             </div>
         </div>
+    </main>
 
-        <div class="chat-input-area">
-            <div class="input-wrapper">
-                <input
-                    type="text"
-                    id="userInput"
-                    placeholder="Ask EngiBot about your project, risks, architecture, or planning..."
-                    onkeypress="handleEnter(event)"
-                >
-                <button class="send-btn" id="sendBtn" onclick="sendMessage()">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
+    <div id="portfolioAnalysisPanel" style="position:fixed; top:100px; left:50%; transform:translateX(-50%); width:90%; max-width:800px; display:none; z-index:5000;">
+        <div style="background:var(--card-bg); padding:32px; border-radius:24px; border:1px solid var(--border-soft); box-shadow:var(--shadow-premium); backdrop-filter:blur(20px);">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:24px;">
+                <h4 style="font-weight:800; display:flex; align-items:center; gap:12px;"><i class="fas fa-chart-pie" style="color:var(--primary);"></i> Portfolio Intelligence Scan</h4>
+                <button onclick="document.getElementById('portfolioAnalysisPanel').style.display='none';" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer;"><i class="fas fa-times"></i></button>
             </div>
-
-            <div class="input-footer">
-                <i class="fas fa-lock" style="font-size: 9px; margin-right: 5px;"></i>
-                Secure API-connected engineering assistant session.
-            </div>
+            <div id="portfolioAnalysisContent"></div>
         </div>
     </div>
 
-   <script src="assets/js/audit.js"></script>
-   <script src="assets/js/rbac.js"></script>
-   <script src="assets/js/notifications.js"></script>
-   <script src="assets/js/project_progress.js"></script>
-   <script src="assets/js/ai_analysis.js"></script>
-   <script>
-    const API_BASE_URL = "http://127.0.0.1:8000";
-    const token = localStorage.getItem("access_token");
+    <script src="assets/js/sidebar.js"></script>
+    <script>
+        const API_BASE_URL = "http://127.0.0.1:8001";
+        const token = localStorage.getItem("token") || localStorage.getItem("access_token");
+        if (!token) window.location.assign("login.html");
 
-    if (!token) {
-        window.location.assign(new URL("login.html", window.location.href).href);
-    }
+        const chatBox = document.getElementById("chatBox");
+        const chatThread = document.getElementById("chatThread");
+        const userInput = document.getElementById("userInput");
+        const sendBtn = document.getElementById("sendBtn");
+        let isSending = false;
+        const ENGIBOT_CONVERSATIONS_KEY = "engibot_conversations_v1";
+        const ENGIBOT_ACTIVE_ID_KEY = "engibot_active_conversation_id_v1";
+        const ENGIBOT_SAVED_RESPONSES_KEY = "engibot_saved_responses_v1";
+        const OLD_STORAGE_KEY = "engibot_chat_history_v1";
+        const GENERIC_TITLES = ["hi", "hello", "hey", "can you help me", "help", "test", "thanks", "thank you", "ok", "great"];
+        
+        let isRestoringChatHistory = false;
+        let activeConversation = null;
 
-    const chatBox = document.getElementById("chatBox");
-    const userInput = document.getElementById("userInput");
-    const sendBtn = document.getElementById("sendBtn");
+        document.addEventListener("DOMContentLoaded", () => {
+            applyAppTheme();
+            userInput.focus();
+            
+            // Initializing multi-conversation engine
+            initConversationEngine();
 
-    let isSending = false;
+            // Close history menu on outside click
+            document.addEventListener("click", (e) => {
+                const menu = document.getElementById("historyMenu");
+                const trigger = document.getElementById("historyTrigger");
+                if (menu && trigger && !menu.contains(e.target) && !trigger.contains(e.target)) {
+                    menu.style.display = "none";
+                }
+            });
 
-    function clearAuthData() {
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("token");
-        localStorage.removeItem("token_type");
-        localStorage.removeItem("user_email");
-    }
+        });
 
-    function handleUnauthorized() {
-        clearAuthData();
-        window.location.assign(new URL("login.html", window.location.href).href);
-    }
+        function handleEnter(e) { if (e.key === "Enter") sendMessage(); }
+        function scrollToBottom() { setTimeout(() => { chatBox.scrollTop = chatBox.scrollHeight; }, 50); }
 
-    function logout() {
-        clearAuthData();
-        window.location.assign(new URL("login.html", window.location.href).href);
-    }
-
-    setInterval(() => {
-        const latencyEl = document.getElementById("latency");
-
-        if (latencyEl) {
-            latencyEl.innerText = Math.floor(Math.random() * 15 + 8) + "ms";
+        // --- MULTI-CONVERSATION ENGINE ---
+        function loadAllConversations() {
+            try {
+                return JSON.parse(localStorage.getItem(ENGIBOT_CONVERSATIONS_KEY) || "[]");
+            } catch (e) { return []; }
         }
-    }, 3000);
 
-    function applySavedTheme() {
-        const savedTheme = localStorage.getItem("engisphere_theme") || "dark";
-        const btn = document.getElementById("themeToggleBtn");
-
-        if (savedTheme === "light") {
-            document.body.classList.add("light-mode");
-            if (btn) btn.innerHTML = '<i class="fas fa-sun"></i>';
-        } else {
-            document.body.classList.remove("light-mode");
-            if (btn) btn.innerHTML = '<i class="fas fa-moon"></i>';
+        function saveAllConversations(list) {
+            localStorage.setItem(ENGIBOT_CONVERSATIONS_KEY, JSON.stringify(list));
+            updateHistoryUI();
         }
-    }
 
-    function toggleTheme() {
-        const isLight = document.body.classList.toggle("light-mode");
-        localStorage.setItem("engisphere_theme", isLight ? "light" : "dark");
+        function initConversationEngine() {
+            let conversations = loadAllConversations();
+            
+            // Import old single-chat data if exists
+            const oldHistory = localStorage.getItem(OLD_STORAGE_KEY);
+            if (oldHistory && conversations.length === 0) {
+                try {
+                    const messages = JSON.parse(oldHistory);
+                    const imported = {
+                        id: "chat_imported_" + Date.now(),
+                        title: "Imported Session",
+                        createdAt: Date.now(),
+                        updatedAt: Date.now(),
+                        messages: messages
+                    };
+                    conversations.push(imported);
+                    saveAllConversations(conversations);
+                    localStorage.removeItem(OLD_STORAGE_KEY);
+                    localStorage.setItem(ENGIBOT_ACTIVE_ID_KEY, imported.id);
+                } catch(e) { console.error("Import failed", e); }
+            }
 
-        const btn = document.getElementById("themeToggleBtn");
+            const activeId = localStorage.getItem(ENGIBOT_ACTIVE_ID_KEY);
+            activeConversation = conversations.find(c => c.id === activeId);
 
-        if (btn) {
-            btn.innerHTML = isLight
-                ? '<i class="fas fa-sun"></i>'
-                : '<i class="fas fa-moon"></i>';
+            if (!activeConversation) {
+                if (conversations.length > 0) {
+                    activeConversation = conversations[0];
+                    localStorage.setItem(ENGIBOT_ACTIVE_ID_KEY, activeConversation.id);
+                } else {
+                    startNewChat(false); // Create initial empty chat
+                }
+            }
+
+            updateHistoryUI();
+            restoreChatHistory();
         }
-    }
 
-    function handleEnter(e) {
-        if (e.key === "Enter") {
+        function startNewChat(reload = true) {
+            let conversations = loadAllConversations();
+            const newChat = {
+                id: "chat_" + Date.now(),
+                title: "New EngiBot Chat",
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+                messages: []
+            };
+            conversations.unshift(newChat); // Add to top
+            saveAllConversations(conversations);
+            localStorage.setItem(ENGIBOT_ACTIVE_ID_KEY, newChat.id);
+            activeConversation = newChat;
+
+            if (reload) {
+                window.location.reload();
+            }
+        }
+
+        function switchConversation(id) {
+            if (!id) return;
+            localStorage.setItem(ENGIBOT_ACTIVE_ID_KEY, id);
+            window.location.reload();
+        }
+
+        function toggleHistoryMenu() {
+            const menu = document.getElementById("historyMenu");
+            if (!menu) return;
+            const isVisible = menu.style.display === "block";
+            menu.style.display = isVisible ? "none" : "block";
+            if (!isVisible) updateHistoryUI();
+        }
+
+        function deleteConversation(id, event) {
+            if (event) event.stopPropagation();
+            if (!confirm("Delete this chat? This cannot be undone.")) return;
+
+            let conversations = loadAllConversations();
+            const activeId = localStorage.getItem(ENGIBOT_ACTIVE_ID_KEY);
+            
+            // Remove the conversation
+            conversations = conversations.filter(c => c.id !== id);
+            saveAllConversations(conversations);
+
+            if (id === activeId) {
+                if (conversations.length > 0) {
+                    localStorage.setItem(ENGIBOT_ACTIVE_ID_KEY, conversations[0].id);
+                    window.location.reload();
+                } else {
+                    startNewChat(true); // Create fresh chat
+                }
+            } else {
+                updateHistoryUI();
+            }
+        }
+
+        function updateHistoryUI() {
+            const itemsContainer = document.getElementById("historyItems");
+            const titleSpan = document.getElementById("activeChatTitle");
+            if (!itemsContainer) return;
+            
+            const conversations = loadAllConversations();
+            const activeId = localStorage.getItem(ENGIBOT_ACTIVE_ID_KEY);
+            
+            // Update the trigger label
+            const active = conversations.find(c => c.id === activeId);
+            if (active) {
+                let cleanLabel = active.title;
+                const isGeneric = GENERIC_TITLES.some(t => cleanLabel.toLowerCase().trim() === t);
+                if (isGeneric || cleanLabel === "New EngiBot Chat") cleanLabel = "Current Chat";
+                titleSpan.innerText = cleanLabel;
+            }
+
+            itemsContainer.innerHTML = "";
+            if (conversations.length === 0) {
+                itemsContainer.innerHTML = '<div style="font-size:11px; color:var(--text-muted); padding:12px; text-align:center;">No history yet</div>';
+                return;
+            }
+
+            conversations.forEach(c => {
+                let displayTitle = c.title || "Untitled Chat";
+                const isGeneric = GENERIC_TITLES.some(t => displayTitle.toLowerCase().trim() === t);
+                if (isGeneric || displayTitle === "New EngiBot Chat") displayTitle = "New Conversation";
+                
+                const item = document.createElement("div");
+                item.className = `history-item ${c.id === activeId ? 'active' : ''}`;
+                item.onclick = () => switchConversation(c.id);
+                
+                item.innerHTML = `
+                    <div class="item-main">
+                        <i class="fas fa-check item-indicator"></i>
+                        <div class="item-title">${displayTitle}</div>
+                    </div>
+                    <button class="delete-chat-btn" onclick="deleteConversation('${c.id}', event)" title="Delete Chat">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                itemsContainer.appendChild(item);
+            });
+        }
+
+        function persistMessage(role, html, width = "620px") {
+            if (isRestoringChatHistory || !activeConversation) return;
+            
+            activeConversation.messages.push({ role, html, width, timestamp: Date.now() });
+            activeConversation.updatedAt = Date.now();
+
+            // Auto-title generation from first message (Filter out generic titles)
+            if (activeConversation.title === "New EngiBot Chat" && role === "user") {
+                const cleanText = html.toLowerCase().trim();
+                const isGeneric = GENERIC_TITLES.some(t => cleanText === t || cleanText === t + "?" || cleanText === t + "!");
+                
+                if (!isGeneric && html.length >= 12) {
+                    activeConversation.title = html.substring(0, 40).trim() + (html.length > 40 ? "..." : "");
+                }
+            }
+
+            // Sync with global storage
+            let conversations = loadAllConversations();
+            const idx = conversations.findIndex(c => c.id === activeConversation.id);
+            if (idx !== -1) {
+                conversations[idx] = activeConversation;
+                saveAllConversations(conversations);
+            }
+        }
+
+        function restoreChatHistory() {
+            if (!activeConversation || !activeConversation.messages || activeConversation.messages.length === 0) return false;
+
+            isRestoringChatHistory = true;
+            chatThread.innerHTML = ""; // Clear visual
+
+            activeConversation.messages.forEach(msg => {
+                const alignment = msg.role === "user" ? "justify-content: flex-end;" : "justify-content: flex-start;";
+                const bubbleClass = msg.role === "user" ? "user" : "bot";
+                const bubbleStyle = msg.role === "bot" ? `max-width:${msg.width || '620px'}; margin-bottom: 24px;` : "";
+                
+                const html = `
+                    <div class="msg-row ${bubbleClass}" style="${alignment}">
+                        <div class="msg-bubble" style="${bubbleStyle}">${msg.html}</div>
+                    </div>
+                `;
+                chatThread.insertAdjacentHTML("beforeend", html);
+                
+                const lastRow = chatThread.lastElementChild;
+                if (msg.role === "bot" && lastRow) {
+                    lastRow.style.marginBottom = "280px";
+                }
+            });
+
+            scrollToBottom();
+            isRestoringChatHistory = false;
+            return true;
+        }
+
+        function formatSimpleResponse(text) {
+            // Clean artifacts
+            let clean = String(text)
+                .replace(/\s\s+/g, ' ')
+                .replace(/\.\s:/g, ':')
+                .trim();
+            
+            // Handle bullet points
+            if (clean.includes('- ')) {
+                const parts = clean.split('- ');
+                const intro = parts[0];
+                const bullets = parts.slice(1);
+                return `
+                    <div style="font-size:15px; line-height:1.6; color:var(--text-main);">
+                        ${intro ? `<p style="margin-bottom:12px;">${intro}</p>` : ''}
+                        <ul style="margin:0 0 12px 18px; padding:0; list-style-type:disc;">
+                            ${bullets.map(b => `<li style="margin-bottom:6px;">${b.trim()}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+            return `<div style="font-size:15px; line-height:1.6; color:var(--text-main);">${clean}</div>`;
+        }
+
+        function cleanBullet(text) {
+            if (!text) return "";
+            return text.replace(/^[\*\-\•\d\.\:\s]+/, '').trim();
+        }
+
+        function renderStructuredReport(data, status = "INTELLIGENCE SYNCED") {
+            const icons = ['fa-magnifying-glass-chart', 'fa-triangle-exclamation', 'fa-bolt', 'fa-calendar-check', 'fa-user-tie'];
+            const labels = ['Brief Analysis', 'Key Delivery Risks', 'Recovery Actions', 'Timeline Recommendation', 'Executive Note'];
+            
+            let html = `<div class="bot-intel-header"><i class="fas fa-microchip"></i> ${status}</div>`;
+            html += '<div style="display:flex; flex-direction:column; gap:16px;">';
+
+            const sections = [
+                data.briefAnalysis,
+                data.keyDeliveryRisks,
+                data.recoveryActions,
+                data.timelineRecommendation,
+                data.executiveNote
+            ];
+
+            sections.forEach((contentArray, idx) => {
+                if (!contentArray || contentArray.length === 0) return;
+
+                let contentHtml = "";
+                if (contentArray.length > 1) {
+                    contentHtml = `<ul style="margin:8px 0 0 16px; padding:0; list-style-type:disc;">${contentArray.map(b => `<li style="margin-bottom:4px; font-size:14px;">${cleanBullet(b)}</li>`).join('')}</ul>`;
+                } else {
+                    contentHtml = `<p style="font-size:14.5px; line-height:1.6;">${cleanBullet(contentArray[0])}</p>`;
+                }
+
+                html += `
+                    <div class="ai-section ${idx === 4 ? 'exec' : ''}">
+                        <h4 style="font-size:12px; font-weight:800; color:var(--primary); margin-bottom:8px; text-transform:uppercase; display:flex; align-items:center; gap:8px;">
+                            <i class="fas ${icons[idx]}"></i> ${labels[idx]}
+                        </h4>
+                        ${contentHtml}
+                    </div>
+                `;
+            });
+
+            return html + '</div>';
+        }
+
+        function formatAIResponse(text) {
+            if (!text) return "<p>No data received from intelligence core.</p>";
+            
+            let clean = String(text).replace(/[#\*\_]/g, "").replace(/\s\s+/g, ' ').trim();
+
+            const sectionMap = {
+                'Brief Analysis': ['analysis', 'summary', 'overview', 'context'],
+                'Key Delivery Risks': ['risk', 'exposure', 'blocker', 'threat'],
+                'Recovery Actions': ['action', 'recovery', 'mitigation', 'strategy'],
+                'Timeline Recommendation': ['timeline', 'schedule', 'milestone', 'target'],
+                'Executive Note': ['executive', 'conclusion', 'summary note', 'leadership']
+            };
+
+            const sections = Object.keys(sectionMap);
+            let responseData = {
+                briefAnalysis: [],
+                keyDeliveryRisks: [],
+                recoveryActions: [],
+                timelineRecommendation: [],
+                executiveNote: []
+            };
+
+            const dataKeys = Object.keys(responseData);
+
+            sections.forEach((s, idx) => {
+                let content = "";
+                sectionMap[s].forEach(keyword => {
+                    if (content) return;
+                    const regex = new RegExp(`${keyword}(.*?)(?=${sections.join('|')}|$)`, 'i');
+                    const match = clean.match(regex);
+                    if (match && match[1].trim().length > 5) content = match[1].trim();
+                });
+
+                if (content) {
+                    responseData[dataKeys[idx]] = content.split(/[.;]|\n/).filter(b => b.trim().length > 5);
+                }
+            });
+
+            const hasContent = Object.values(responseData).some(arr => arr.length > 0);
+            if (!hasContent) return renderStructuredReport(getGenericEngineeringReport(), "LOCAL FALLBACK ACTIVE");
+
+            return renderStructuredReport(responseData);
+        }
+
+        function detectIntent(message) {
+            const m = message.toLowerCase();
+            
+            // Priority check: If it's a global override, we don't even classify it as engineering
+            if (getGlobalOverrideResponse(m)) return "global_override";
+
+            if (m.match(/\b(hello|hi|hey|welcome|مرحبا|السلام)\b/)) return "greeting";
+            if (m.match(/\b(thanks|thank you|شكرا)\b/)) return "thanks";
+            if (m.match(/\b(help|what can you do|what do you do|capabilities|how can you help|features)\b/)) return "capability";
+            
+            const engineeringKeywords = [
+                'risk', 'analyze', 'analysis', 'report', 'project', 'timeline', 'delay', 'procurement', 'mep', 
+                'contractor', 'architecture', 'critical path', 'metro', 'bridge', 'energy', 'portfolio', 
+                'executive', 'delivery', 'recovery', 'planning', 'system design', 'database', 'backend', 'frontend', 'deployment',
+                'saas', 'software', 'platform', 'multi-tenant', 'multi tenant', 'tenant', 'tenant isolation', 'data isolation', 
+                'rbac', 'role-based', 'permissions', 'authorization', 'authentication', 'construction', 'structural', 'integrity',
+                'warehouse', 'steel', 'foundation', 'load', 'slab', 'hospital', 'healthcare', 'medical'
+            ];
+            
+            const isDefinition = m.match(/\b(what is|define|explain|meaning of)\b/);
+            const isEngineering = engineeringKeywords.some(k => m.includes(k));
+            
+            if (isDefinition && isEngineering) return "engineering_report";
+            if (isDefinition && !isEngineering) return "out_of_domain";
+            if (isEngineering) return "engineering_report";
+            
+            return "clarify";
+        }
+
+        function getGlobalOverrideResponse(message) {
+            const q = message.toLowerCase().trim();
+            
+            if (q.includes("capital of france") || q.includes("france capital")) {
+                return "The capital of France is Paris. EngiBot is primarily designed for engineering project intelligence, including risk analysis, construction delays, procurement issues, structural concerns, architecture decisions, and executive planning.";
+            }
+
+            if (q.includes("capital of iraq") || q.includes("iraq capital")) {
+                return "The capital of Iraq is Baghdad. EngiBot is primarily designed for engineering project intelligence, including risk analysis, construction delays, procurement issues, structural concerns, architecture decisions, and executive planning.";
+            }
+
+            if (q.includes("what is ai") || q.includes("what is artificial intelligence") || q.includes("define ai") || q.includes("explain ai")) {
+                return "AI, or Artificial Intelligence, refers to systems that can perform tasks requiring human-like intelligence, such as reasoning, pattern recognition, language understanding, and decision support. In EngiSphere, AI is used to support engineering project analysis, risk review, planning, and structured recommendations.";
+            }
+
+            if (q.includes("who are you") || q.includes("what are you")) {
+                return "I'm EngiBot, the AI engineering assistant inside EngiSphere. I help analyze engineering project risks, delays, procurement issues, structural concerns, technical architecture, and executive planning.";
+            }
+
+            if (q.includes("what is engisphere") || q.includes("tell me about engisphere") || q.includes("what is this project") || q.includes("explain your project") || q.includes("what does this system do")) {
+                return "EngiSphere is an AI-assisted engineering project intelligence platform designed to support engineering teams in analyzing project risks, delays, procurement issues, structural concerns, geospatial context, reports, and decision-making. It includes a geospatial radar module, EngiBot assistant, project management sections, reporting support, light/dark mode, and chat history.";
+            }
+            
+            return null;
+        }
+
+        function getFixedResponse(intent, message = "") {
+            switch(intent) {
+                case 'greeting':
+                    return "Hello, I’m EngiBot. I help with engineering project intelligence, including risk analysis, timeline recovery, procurement issues, structural concerns, architecture decisions, and executive planning. You can ask: - Analyze structural integrity risks for a warehouse project - Recover from procurement delays in a hospital construction project - Handle supplier delays for long-lead equipment in a data center project - Design tenant isolation for an engineering SaaS platform - Identify critical path risks in a multi-disciplinary engineering project";
+                case 'capability':
+                    return "I can help you turn engineering and software project information into clear decisions: - Project risk analysis and critical path review - Timeline recovery and milestone planning - Architecture suggestions for frontend, backend, database, and deployment - Portfolio scanning across multiple active projects - Executive-ready summaries for leadership reviews. Share a project name, constraint, or objective and I’ll structure the next step.";
+                case 'thanks':
+                    return "You’re welcome. Send me a project, risk, timeline issue, or architecture question and I’ll help structure the analysis.";
+                case 'clarify':
+                    return "Please provide more details about the project, project type, location, or the specific engineering constraint you'd like me to analyze.";
+                case 'out_of_domain':
+                    return "For EngiSphere, I mainly focus on engineering project intelligence, risk analysis, and technical planning. However, I can help with brief general info if needed, but I recommend asking about project risks, timelines, or structural/SaaS architecture.";
+                default:
+                    return "";
+            }
+        }
+
+        function getDeterministicReport(text) {
+            const m = text.toLowerCase();
+            
+            // Critical Path Override
+            if (m.includes("critical path") || m.includes("multi-disciplinary") || m.includes("multidisciplinary")) {
+                return {
+                    briefAnalysis: [
+                        "Critical path risk occurs when dependent engineering activities delay the projects minimum completion date.",
+                        "Multi-disciplinary projects amplify this risk because civil, MEP, structural, procurement, and commissioning workstreams are tightly linked."
+                    ],
+                    keyDeliveryRisks: [
+                        "Late interface definitions between disciplines can block downstream design, procurement, installation, and commissioning.",
+                        "Approval cycle delays may prevent design freeze, package release, and authority submissions from progressing on time.",
+                        "Long-lead equipment, specialist resources, or unresolved technical clashes can push critical milestones."
+                    ],
+                    recoveryActions: [
+                        "Run a 72-hour dependency mapping workshop across civil, MEP, structural, procurement, and commissioning teams.",
+                        "Freeze priority interface drawings and assign clear owners for unresolved clashes, approvals, and procurement blockers.",
+                        "Escalate long-lead procurement items and define substitute sourcing or resequencing options."
+                    ],
+                    timelineRecommendation: [
+                        "Validate the critical path within 72 hours using dependency mapping and milestone owner confirmation.",
+                        "Launch a two-week recovery sprint focused on interfaces, approvals, procurement, and commissioning readiness.",
+                        "Rebaseline only after dependency ownership, risk exposure, and recovery actions are confirmed."
+                    ],
+                    executiveNote: [
+                        "The main threat is not one isolated activity, but unmanaged dependency chains across engineering disciplines.",
+                        "Leadership should prioritize interface control, approval acceleration, procurement recovery, and milestone discipline."
+                    ]
+                };
+            }
+
+            // Riyadh Metro Override
+            if (m.includes("riyadh") || m.includes("metro") || m.includes("zone b")) {
+                return {
+                    briefAnalysis: [
+                        "Riyadh Metro Expansion Zone B requires tight coordination between station interfaces, route works, permits, and systems integration.",
+                        "The main delivery exposure is driven by overlapping civil, MEP, rail systems, procurement, and contractor dependencies."
+                    ],
+                    keyDeliveryRisks: [
+                        "Station interface delays may block MEP integration, architectural finishes, testing access, and operational readiness.",
+                        "Route coordination issues can create clashes between track alignment, utilities, traffic management, and adjacent works.",
+                        "Permit approvals, long-lead procurement, and contractor synchronization may delay milestone recovery."
+                    ],
+                    recoveryActions: [
+                        "Establish a daily interface control room covering stations, route sections, MEP, systems, permits, and contractors.",
+                        "Prioritize procurement expediting for long-lead systems and define alternate sourcing for critical equipment.",
+                        "Lock a milestone recovery plan with clear owners for permits, interface closures, testing, and handover packages."
+                    ],
+                    timelineRecommendation: [
+                        "Complete a 72-hour readiness review for station interfaces, route coordination, permits, and procurement blockers.",
+                        "Launch a two-week recovery sprint focused on MEP integration, contractor synchronization, and critical approvals.",
+                        "Rebaseline Zone B milestones only after interface risks, permit dependencies, and procurement dates are validated."
+                    ],
+                    executiveNote: [
+                        "Zone B success depends on controlling station interfaces, route coordination, and contractor synchronization.",
+                        "Leadership should focus on permit acceleration, procurement recovery, and disciplined milestone governance."
+                    ]
+                };
+            }
+            return null;
+        }
+
+        function getGenericEngineeringFallback(message) {
+            const m = message.toLowerCase();
+            
+            // 0) Definition handler for engineering topics
+            if (m.match(/\b(what is|define|explain|meaning of)\b/)) {
+                if (m.includes("risk management")) {
+                    return {
+                        briefAnalysis: [
+                            "Risk management in construction is the process of identifying, assessing, prioritizing, and controlling risks that may affect cost, schedule, safety, quality, scope, or compliance.",
+                            "Effective risk management moves a project from a reactive posture to a proactive governance framework focused on outcome certainty."
+                        ],
+                        keyDeliveryRisks: [
+                            "Schedule: Timeline delays due to unmanaged dependencies, external approvals, or resource bottlenecks.",
+                            "Cost: Overruns from unforeseen ground conditions, scope creep, or market volatility in materials.",
+                            "Safety & Quality: Compliance risks during high-risk installation phases or structural modifications.",
+                            "Procurement: Supply chain disruptions affecting long-lead equipment or specialist materials."
+                        ],
+                        recoveryActions: [
+                            "Identify risks early using cross-disciplinary workshops, historical benchmarks, and stakeholder interviews.",
+                            "Assess probability and impact using a standard 5x5 matrix to prioritize high-exposure items.",
+                            "Assign clear owners for each risk and define specific mitigation, monitoring, and fallback actions."
+                        ],
+                        timelineRecommendation: [
+                            "Establish a live Risk Register within 48 hours of project kick-off or major phase transitions.",
+                            "Run weekly risk reviews with project leads and monthly executive risk briefings to ensure alignment."
+                        ],
+                        executiveNote: [
+                            "Strong risk management reduces delays, claims, and rework by creating a predictable and transparent delivery environment."
+                        ]
+                    };
+                }
+                // General definition fallback for engineering
+                return {
+                    briefAnalysis: ["I've analyzed your query regarding engineering definitions or technical processes. A clear understanding of these concepts is vital for project success and risk control."],
+                    keyDeliveryRisks: ["Lack of conceptual clarity can lead to design misalignment, scope gaps, or incorrect technical assumptions during execution."],
+                    recoveryActions: ["Review technical specifications, consult subject matter experts, and align definitions across all project stakeholders early in the lifecycle."],
+                    timelineRecommendation: ["Define all core technical and operational terms during the initiation phase to avoid downstream coordination delays."],
+                    executiveNote: ["Standardized definitions and processes ensure consistency across multi-disciplinary engineering teams."]
+                };
+            }
+
+            // A) Structural / Warehouse fallback
+            if (m.match(/\b(structural|integrity|warehouse|steel|foundation|load|slab)\b/)) {
+                return {
+                    briefAnalysis: [
+                        "The main concern is whether the warehouse structure can safely carry operational, environmental, and equipment loads without excessive deflection, cracking, settlement, or connection failure.",
+                        "Structural integrity risk should be reviewed across foundations, slabs, columns, roof framing, lateral stability, and any future expansion assumptions."
+                    ],
+                    keyDeliveryRisks: [
+                        "Incomplete load assumptions, undocumented modifications, or missing as-built records can hide overstressed members or unsafe load paths.",
+                        "Foundation settlement, slab cracking, corrosion, poor drainage, or roof framing fatigue can create progressive safety and serviceability risks.",
+                        "Racking systems, suspended services, equipment loads, and forklift operations may exceed the original design basis if not verified."
+                    ],
+                    recoveryActions: [
+                        "Complete a structural condition survey covering foundations, slab performance, columns, roof members, connections, corrosion, and visible distress.",
+                        "Validate actual operational loads against the original design criteria, including storage density, racking layout, equipment, and traffic loads.",
+                        "Prioritize remediation for critical defects such as settlement, major cracking, corrosion, connection weakness, or overloaded structural zones."
+                    ],
+                    timelineRecommendation: [
+                        "Conduct an initial site inspection and document review within 72 hours.",
+                        "Complete load verification, defect classification, and risk ranking within two weeks.",
+                        "Implement urgent temporary controls immediately for any unsafe zones, then schedule permanent strengthening or repair works."
+                    ],
+                    executiveNote: [
+                        "The key risk is not only visible damage, but hidden mismatch between current warehouse use and the original structural design basis.",
+                        "Leadership should require rapid condition assessment, load validation, and immediate controls for any high-risk operating areas."
+                    ]
+                };
+            }
+
+            // B) Hospital Procurement fallback (Must have both Hospital AND Procurement keywords)
+            const hospitalKeywords = ["hospital", "healthcare", "medical", "clinical", "patient", "clinic"];
+            const strongProcurementSignals = ["procurement", "supplier", "vendor", "long-lead", "long lead", "equipment", "material", "submittal", "submittals", "shipment", "shipping", "logistics", "manufacturing", "factory", "purchase order", "po", "sourcing"];
+            const hasHospitalDomain = hospitalKeywords.some(k => m.includes(k));
+            const hasStrongProcurementSignal = strongProcurementSignals.some(k => m.includes(k));
+            
+            // For routing, we strictly require a strong procurement signal
+            const hasProcurementSignal = hasStrongProcurementSignal;
+
+            if (hasHospitalDomain && hasProcurementSignal) {
+                return {
+                    briefAnalysis: [
+                        "Procurement delays in hospital construction can directly affect MEP coordination, medical equipment installation, testing, commissioning, and authority approvals.",
+                        "The most critical exposure is usually long-lead systems and specialist packages that are required before clinical readiness and handover."
+                    ],
+                    keyDeliveryRisks: [
+                        "Late vendor submittals, delayed approvals, or unavailable long-lead medical equipment can block room readiness and commissioning sequences.",
+                        "Substitution decisions may trigger redesign, compliance review, interface changes, or authority re-approval.",
+                        "Weak coordination between procurement, MEP, clinical planning, and contractors can create cascading milestone delays."
+                    ],
+                    recoveryActions: [
+                        "Create a procurement recovery register covering long-lead items, vendor status, approval dates, delivery risks, and responsible owners.",
+                        "Escalate critical suppliers and define expediting, partial shipment, alternate sourcing, or approved substitution options.",
+                        "Resequence construction and commissioning activities around available equipment while protecting critical clinical areas and authority requirements."
+                    ],
+                    timelineRecommendation: [
+                        "Complete a procurement impact review within 72 hours for all critical hospital systems and medical equipment.",
+                        "Run a two-week procurement recovery sprint focused on approvals, supplier commitments, logistics, and installation dependencies.",
+                        "Rebaseline only after confirmed delivery dates, approved substitutions, and commissioning impacts are validated."
+                    ],
+                    executiveNote: [
+                        "Hospital procurement delays are high-risk because they affect both construction progress and clinical operational readiness.",
+                        "Leadership should focus on supplier escalation, approval acceleration, protected clinical priorities, and disciplined recovery tracking."
+                    ]
+                };
+            }
+
+            // C) Generic Procurement / Data Center fallback (Procurement signal but NOT hospital)
+            if (hasProcurementSignal) {
+                return {
+                    briefAnalysis: [
+                        "The request indicates procurement or supplier-related delay exposure that may affect construction sequencing, installation readiness, commissioning, and milestone certainty.",
+                        "The priority is to identify which long-lead items, approvals, logistics constraints, and vendor commitments are controlling the delivery path."
+                    ],
+                    keyDeliveryRisks: [
+                        "Late supplier commitments, incomplete submittals, or uncertain manufacturing slots can delay installation and downstream commissioning.",
+                        "Missing approved alternatives or delayed technical approvals can prevent timely substitution or resequencing decisions.",
+                        "Weak coordination between procurement, design, construction, logistics, and commissioning teams can create cascading schedule impacts."
+                    ],
+                    recoveryActions: [
+                        "Build a procurement recovery register covering each delayed item, vendor owner, approval status, manufacturing date, shipment date, site need date, and mitigation option.",
+                        "Escalate critical suppliers and confirm expediting, split shipment, alternate sourcing, substitution, or resequencing decisions.",
+                        "Align procurement recovery with the construction schedule so available workfronts, installation dependencies, and commissioning priorities remain protected."
+                    ],
+                    timelineRecommendation: [
+                        "Complete a 72-hour procurement impact review for all delayed or high-risk long-lead items.",
+                        "Run a two-week supplier recovery sprint focused on approvals, vendor commitments, logistics visibility, and alternate sourcing.",
+                        "Rebaseline affected milestones only after delivery dates, mitigation actions, and commissioning impacts are confirmed."
+                    ],
+                    executiveNote: [
+                        "Procurement delay risk becomes critical when supplier uncertainty starts controlling installation and commissioning readiness.",
+                        "Leadership should focus on vendor escalation, approval speed, logistics visibility, and disciplined recovery ownership."
+                    ]
+                };
+            }
+
+            // D) Software Architecture / SaaS fallback
+            if (m.match(/\b(backend|architecture|saas|software|platform|multi-tenant|multi tenant|tenant|tenant isolation|data isolation|rbac|role-based|permissions|authorization|authentication|api|database|cloud|deployment|scalability|scalable)\b/)) {
+                return {
+                    briefAnalysis: [
+                        "A multi-tenant engineering project management SaaS requires strong separation between tenants, scalable project data handling, secure APIs, and reliable deployment operations.",
+                        "The architecture should support role-based access, auditability, reporting workloads, file/document handling, and future AI-assisted project intelligence."
+                    ],
+                    keyDeliveryRisks: [
+                        "Poor tenant isolation can create data leakage, permission failures, and compliance risk.",
+                        "A weak database model may struggle with project hierarchies, documents, schedules, risks, comments, and reporting queries at scale.",
+                        "Missing observability, background processing, and deployment automation can reduce reliability as usage grows."
+                    ],
+                    recoveryActions: [
+                        "Use a modular backend with clear domains for tenants, users, projects, tasks, risks, documents, reports, and audit logs.",
+                        "Implement tenant isolation at the database and API layers using tenant IDs, strict authorization middleware, and automated permission tests.",
+                        "Add background workers for file processing, notifications, reporting, AI tasks, and long-running imports."
+                    ],
+                    timelineRecommendation: [
+                        "Start with a secure MVP architecture using a relational database, API layer, authentication, role-based permissions, and audit logs.",
+                        "Add caching, queues, object storage, observability, and horizontal scaling once core workflows are stable.",
+                        "Validate scalability through load testing, tenant isolation tests, backup/restore drills, and deployment rollback testing."
+                    ],
+                    executiveNote: [
+                        "The architectural priority is secure tenant isolation combined with scalable project data operations.",
+                        "Leadership should avoid overbuilding early, but must not compromise authentication, authorization, auditability, and data separation."
+                    ]
+                };
+            }
+
+            // D) General engineering fallback
+            return {
+                briefAnalysis: [
+                    "The request appears to involve engineering delivery, risk exposure, technical coordination, or project execution constraints.",
+                    "A structured review should focus on scope clarity, dependencies, approvals, resources, procurement, and milestone ownership."
+                ],
+                keyDeliveryRisks: [
+                    "Undefined scope, unresolved dependencies, delayed approvals, or unclear ownership can create cascading delivery delays.",
+                    "Procurement constraints, resource gaps, technical clashes, or poor interface management may affect critical milestones.",
+                    "Weak reporting discipline can hide risks until they become expensive recovery issues."
+                ],
+                recoveryActions: [
+                    "Map the key dependencies, approvals, resources, procurement items, and technical blockers affecting the requested objective.",
+                    "Assign clear owners for each risk and define mitigation actions, escalation paths, and decision deadlines.",
+                    "Establish a short-cycle recovery rhythm with daily blockers review and weekly executive-level risk reporting."
+                ],
+                timelineRecommendation: [
+                    "Complete an initial constraint and dependency review within 72 hours.",
+                    "Run a two-week recovery sprint focused on the highest-impact blockers and decision points.",
+                    "Rebaseline the plan only after ownership, recovery actions, and remaining risk exposure are confirmed."
+                ],
+                executiveNote: [
+                    "The primary management challenge is converting unclear risks into owned actions with measurable recovery progress.",
+                    "Leadership should focus on dependency ownership, decision speed, resource alignment, and disciplined milestone control."
+                ]
+            };
+        }
+
+        async function sendMessage() {
+            if (isSending) return;
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            const welcome = document.getElementById("welcomeWrapper");
+            if (welcome) welcome.remove();
+
+            chatThread.insertAdjacentHTML("beforeend", `<div class="msg-row user"><div class="msg-bubble">${text}</div></div>`);
+            persistMessage("user", text);
+            
+            userInput.value = "";
+            setSendingState(true);
+            scrollToBottom();
+
+            const intent = detectIntent(text);
+            const typingId = "typing-" + Date.now();
+            chatThread.insertAdjacentHTML("beforeend", `<div class="msg-row bot" id="${typingId}" data-prompt="${text}"><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`);
+            scrollToBottom();
+
+            // 1. Handle Priority Overrides Immediately
+            if (intent === "global_override") {
+                setTimeout(() => {
+                    renderBotResponse(typingId, getGlobalOverrideResponse(text), "LOCAL ASSISTANT", "clarify", text);
+                    setSendingState(false);
+                }, 600);
+                return;
+            }
+
+            // 2. Handle non-engineering report intent
+            if (intent !== "engineering_report") {
+                setTimeout(() => {
+                    renderBotResponse(typingId, getFixedResponse(intent, text), "LOCAL ASSISTANT", intent, text);
+                    setSendingState(false);
+                }, 600);
+                return;
+            }
+
+            // 3. Handle deterministic engineering reports
+            const deterministic = getDeterministicReport(text);
+            if (deterministic) {
+                setTimeout(() => {
+                    renderBotResponse(typingId, deterministic, "DETERMINISTIC INTELLIGENCE", intent, text);
+                    setSendingState(false);
+                }, 800);
+                return;
+            }
+
+            // 4. Handle query-aware engineering fallback
+            setTimeout(() => {
+                renderBotResponse(typingId, getGenericEngineeringFallback(text), "ENGINEERING INTELLIGENCE", intent, text);
+                setSendingState(false);
+            }, 800);
+        }
+
+        function renderBotResponse(id, data, status = "INTELLIGENCE SYNCED", intent = "engineering_report", promptText = "") {
+            const el = document.getElementById(id);
+            if (!el) return;
+            
+            let contentHtml = "";
+            let bubbleWidth = "620px";
+
+            if (intent === "engineering_report" && typeof data === 'object') {
+                bubbleWidth = "720px";
+                contentHtml = renderStructuredReport(data, status);
+            } else if (intent === "engineering_report" && typeof data === 'string') {
+                bubbleWidth = "720px";
+                contentHtml = formatAIResponse(data);
+            } else {
+                // Non-engineering intents (clarify, out_of_domain, greeting, etc.)
+                // This ensures NO engineering template/header is ever shown
+                contentHtml = formatSimpleResponse(data);
+            }
+
+            const actionsHtml = `
+                <div class="bot-actions">
+                    <button class="action-btn" onclick="copyBotResponse(this, '${id}')"><i class="fas fa-copy"></i> Copy</button>
+                    <button class="action-btn" onclick="regenerateBotResponse(this, '${id}')"><i class="fas fa-rotate"></i> Regenerate</button>
+                    <button class="action-btn" onclick="shareBotResponse(this, '${id}')"><i class="fas fa-share-nodes"></i> Share</button>
+                    <button class="action-btn" onclick="saveBotResponse(this, '${id}')"><i class="fas fa-bookmark"></i> Save</button>
+                </div>
+            `;
+
+            el.innerHTML = `
+                <div class="msg-bubble" style="max-width:${bubbleWidth}; margin-bottom: 24px;" data-prompt="${promptText}">
+                    <div id="content-${id}">${contentHtml}</div>
+                    ${actionsHtml}
+                </div>
+            `;
+            persistMessage("bot", el.innerHTML, bubbleWidth);
+            
+            // Ensure the last assistant message has extra margin for overlap fix
+            el.style.marginBottom = "280px";
+            
+            scrollToBottom();
+            setTimeout(() => { 
+                el.scrollIntoView({ behavior: 'smooth', block: 'end' }); 
+            }, 100);
+            
+            // Double-force scroll to ensure final lines clear the fixed composer
+            setTimeout(() => {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 120);
+            setTimeout(() => {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 350);
+        }
+
+        function getFallbackResponse(text) {
+            const q = text.toLowerCase();
+            
+            // Greetings
+            if (q.match(/\b(hello|hi|hey|welcome|مرحبا|السلام)\b/)) {
+                return "Hello! I am EngiBot, your engineering intelligence assistant. I can help you analyze project risks, architecture decisions, and delivery constraints. What project would you like to review today?";
+            }
+
+            // Small talk / Politeness
+            if (q.match(/\b(thanks|thank you|ok|great|good|fine)\b/)) {
+                return "You're welcome. I'm here to ensure your engineering projects stay on track. Let me know if you need any specific analysis.";
+            }
+
+            // Vague / Help
+            if (q.match(/\b(help|what can you do|capabilities|ideas|explain)\b/)) {
+                return "I can generate structured engineering reports, analyze critical path risks, suggest technical architectures, and scan your project portfolio. Try asking: 'Analyze high-level delivery risks for Riyadh Metro Expansion Zone B.'";
+            }
+            
+            // Riyadh Metro / Infrastructure
+            if (q.includes("riyadh") || q.includes("metro")) {
+                return "Brief Analysis: Riyadh Metro Expansion Zone B is in a critical interface phase. Station integration is currently the primary blocker.\n\nKey Delivery Risks: MEP interface conflicts, station route coordination, and long-lead procurement delays are high.\n\nRecovery Actions: Fast-track station interface workshops. Synchronize contractor schedules via a 48-hour recovery sprint.\n\nTimeline Recommendation: Target milestone recovery through parallel execution. Projected schedule gain: 14-20 days.\n\nExecutive Note: Project remains viable but requires immediate trade synchronization and permit acceleration.";
+            }
+            
+            // Critical Path / Multi-disciplinary
+            if (q.includes("critical path") || q.includes("multi-disciplinary") || q.includes("blocker")) {
+                return "Brief Analysis: Multi-disciplinary projects face dependency fragmentation. Interface control is the primary risk factor.\n\nKey Delivery Risks: Discipline-to-discipline interface gaps, approval cycle latency, and resource conflict on critical nodes.\n\nRecovery Actions: Freeze design on interface-sensitive modules. Implement daily cross-discipline coordination syncs.\n\nTimeline Recommendation: 72-hour dependency review cycle. Enforce design-freeze milestones to prevent late-stage rework.\n\nExecutive Note: Leadership must prioritize interface resolution and expedite long-lead procurement decisions.";
+            }
+
+            // Architecture / Software / Monitoring
+            if (q.includes("architect") || q.includes("software") || q.includes("monitoring")) {
+                return "Brief Analysis: Infrastructure monitoring requires a high-availability microservices model for real-time telemetry.\n\nKey Delivery Risks: Backend API latency, data ingestion bottlenecks, and authentication module scalability.\n\nRecovery Actions: Implement Kafka-based ingestion layers. Optimize database geospatial indexing for radar tracking.\n\nTimeline Recommendation: Phase 1 deployment in 10-12 weeks following modular stress-testing and design freeze.\n\nExecutive Note: Architecture is sound. Focus on modular security and edge-case scaling for global infrastructure.";
+            }
+
+            // Dubai / Bridge / Deck
+            if (q.includes("dubai") || q.includes("bridge")) {
+                return "Brief Analysis: Dubai Smart Bridge structural phase is 98% complete. Transitioning to smart-utility integration.\n\nKey Delivery Risks: Deck installation tolerances, utility interface mismatches, and marine logistics safety controls.\n\nRecovery Actions: Deploy high-precision structural telemetry. Synchronize utility trade installation with deck completion.\n\nTimeline Recommendation: Night-shift acceleration for smart-system installation. Target Q4 operational readiness.\n\nExecutive Note: Technical integrity is high. Commercial risk management on finish trades is now the priority.";
+            }
+
+            // Doha / Energy / Grid
+            if (q.includes("doha") || q.includes("energy") || q.includes("grid")) {
+                return "Brief Analysis: Doha Energy Hub grid integration is at the 85% milestone. Equipment delivery is the primary constraint.\n\nKey Delivery Risks: Vendor coordination delays, commissioning sequence conflicts, and safety compliance backlogs.\n\nRecovery Actions: Expedite vendor site-visits. Re-sequence commissioning to allow for parallel equipment testing.\n\nTimeline Recommendation: 2-week recovery sprint on grid-tie modules. Maintain operational handover target for next quarter.\n\nExecutive Note: Energy security remains the primary KPI. Re-balancing grid load-testing is required.";
+            }
+
+            // Presentation / Demo / Value
+            if (q.includes("presentation") || q.includes("demo") || q.includes("graduation")) {
+                return "Brief Analysis: The EngiSphere platform solves infrastructure fragmentation through unified AI and Geospatial intelligence.\n\nKey Delivery Risks: Final UI polish for graduation demo and backend API response latency under high load.\n\nRecovery Actions: Enforce premium minimal design standards. Implement high-quality engineering fallbacks for intelligence stability.\n\nTimeline Recommendation: Final design freeze immediately. Performance optimization cycle in next 24 hours.\n\nExecutive Note: The project demonstrates high market value for engineering leadership and digital transformation.";
+            }
+
+            return "Brief Analysis: General engineering intelligence session active. Handshake verified with core project databases.\n\nKey Delivery Risks: Fragmented resource allocation and lack of centralized risk auditing across multiple multidisciplinary packages.\n\nRecovery Actions: Utilize the Geospatial Radar for high-level visibility and deploy AI EngiBot for site-level recovery planning.\n\nTimeline Recommendation: Review critical milestones every 7 days and enforce cross-team synchronization meetings.\n\nExecutive Note: Real-time intelligence is your strongest lever for preventing cost escalation and schedule slippage.";
+        }
+
+        function setSendingState(v) { isSending = v; sendBtn.disabled = v; sendBtn.innerHTML = v ? '<i class="fas fa-spinner fa-spin"></i>' : '<i class="fas fa-paper-plane"></i>'; userInput.disabled = v; if (!v) userInput.focus(); }
+        function usePrompt(t) { userInput.value = t; sendMessage(); }
+        function clearChat() { 
+            if (!activeConversation) return;
+            activeConversation.messages = [];
+            activeConversation.updatedAt = Date.now();
+            
+            let conversations = loadAllConversations();
+            const idx = conversations.findIndex(c => c.id === activeConversation.id);
+            if (idx !== -1) {
+                conversations[idx] = activeConversation;
+                saveAllConversations(conversations);
+            }
+            window.location.reload(); 
+        }
+        function toggleAppTheme() { const isDark = document.body.classList.toggle("dark-theme"); localStorage.setItem("engisphere-theme", isDark ? "dark" : "light"); updateThemeUI(isDark); }
+        function updateThemeUI(isDark) { const icon = document.getElementById("themeIcon"); if (icon) icon.className = isDark ? "fas fa-sun" : "fas fa-moon"; }
+        function applyAppTheme() { const saved = localStorage.getItem("engisphere-theme") || "dark"; const isDark = saved === "dark"; document.body.classList.toggle("dark-theme", isDark); updateThemeUI(isDark); }
+        function logout() { localStorage.clear(); window.location.assign("login.html"); }
+
+        // --- BOT ACTION HANDLERS ---
+        function copyBotResponse(btn, id) {
+            const content = document.getElementById(`content-${id}`);
+            if (!content) return;
+            const text = content.innerText;
+            navigator.clipboard.writeText(text);
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+            btn.classList.add('success');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('success'); }, 1500);
+        }
+
+        function shareBotResponse(btn, id) {
+            const content = document.getElementById(`content-${id}`);
+            if (!content) return;
+            const text = content.innerText;
+            if (navigator.share) {
+                navigator.share({ title: 'EngiBot Engineering Intelligence', text: text }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(text);
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Shared';
+                btn.classList.add('success');
+                setTimeout(() => { btn.innerHTML = original; btn.classList.remove('success'); }, 1500);
+            }
+        }
+
+        function saveBotResponse(btn, id) {
+            const content = document.getElementById(`content-${id}`);
+            if (!content) return;
+            const html = content.innerHTML;
+            const text = content.innerText;
+            
+            let saved = JSON.parse(localStorage.getItem(ENGIBOT_SAVED_RESPONSES_KEY) || "[]");
+            if (saved.some(s => s.id === id)) {
+                btn.innerHTML = '<i class="fas fa-bookmark"></i> Already Saved';
+                return;
+            }
+
+            saved.push({
+                id: id,
+                conversationId: activeConversation ? activeConversation.id : "unknown",
+                html: html,
+                text: text,
+                createdAt: Date.now()
+            });
+            localStorage.setItem(ENGIBOT_SAVED_RESPONSES_KEY, JSON.stringify(saved));
+            
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Saved';
+            btn.classList.add('success');
+            setTimeout(() => { btn.innerHTML = original; btn.classList.remove('success'); }, 1500);
+        }
+
+        function regenerateBotResponse(btn, id) {
+            if (isSending) return;
+            const row = document.getElementById(id);
+            if (!row) return;
+            const promptText = row.querySelector('.msg-bubble').getAttribute('data-prompt');
+            if (!promptText) return;
+
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Regenerating';
+            
+            // Delete the current bot response from activeConversation before re-running
+            // This ensures "replace" behavior in the data model too
+            if (activeConversation) {
+                const idx = activeConversation.messages.findIndex(m => m.html.includes(`id="content-${id}"`));
+                if (idx !== -1) {
+                    activeConversation.messages.splice(idx, 1);
+                    saveAllConversations(loadAllConversations());
+                }
+            }
+
+            // Remove visual row
+            row.remove();
+
+            // Re-trigger generation for the same prompt
+            userInput.value = promptText;
             sendMessage();
         }
-    }
 
-    function escapeHtml(text) {
-        const div = document.createElement("div");
-        div.textContent = String(text ?? "");
-        return div.innerHTML;
-    }
-
-    function formatAIResponse(text) {
-        if (!text) return "<p>No response returned.</p>";
-
-        let safe = String(text)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-
-        safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-        safe = safe.replace(/^###\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
-        safe = safe.replace(/^##\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
-        safe = safe.replace(/^#\s?(.*)$/gm, '<h3 class="ai-section-title">$1</h3>');
-        safe = safe.replace(/^\s*[-*]\s+(.*)$/gm, "<li>$1</li>");
-        safe = safe.replace(/(<li>.*<\/li>)/gs, '<ul class="ai-list">$1</ul>');
-        safe = safe.replace(/\n\n/g, "</p><p>");
-        safe = `<div class="ai-response"><p>${safe}</p></div>`;
-
-        safe = safe.replace(/<p>\s*<\/p>/g, "");
-        safe = safe.replace(/<\/ul>\s*<ul class="ai-list">/g, "");
-        safe = safe.replace(/<p>(\s*<h3 class="ai-section-title">)/g, "$1");
-        safe = safe.replace(/(<\/h3>)<\/p>/g, "$1");
-        safe = safe.replace(/<p>(\s*<ul class="ai-list">)/g, "$1");
-        safe = safe.replace(/(<\/ul>)<\/p>/g, "$1");
-
-        return safe;
-    }
-
-    function scrollToBottom() {
-        if (!chatBox) return;
-
-        chatBox.scrollTo({
-            top: chatBox.scrollHeight,
-            behavior: "smooth"
-        });
-    }
-
-    function appendUserMessage(text) {
-        const msgHtml = `
-            <div class="msg-row user">
-                <div class="msg-bubble">${escapeHtml(text)}</div>
-            </div>
-        `;
-
-        chatBox.insertAdjacentHTML("beforeend", msgHtml);
-        scrollToBottom();
-    }
-
-    function appendTypingIndicator() {
-        const id = "typing-" + Date.now();
-
-        const msgHtml = `
-            <div class="msg-row bot" id="${id}">
-                <div class="msg-bubble" style="padding: 15px 25px;">
-                    <div class="typing-indicator">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        chatBox.insertAdjacentHTML("beforeend", msgHtml);
-        scrollToBottom();
-
-        return id;
-    }
-
-    function replaceTypingWithBotMessage(typingElement, text, status = "DATA PROCESSED") {
-        if (!typingElement) return;
-
-        typingElement.outerHTML = `
-            <div class="msg-row bot">
-                <div class="msg-bubble">
-                    <div class="bot-header">
-                        <i class="fas fa-radar"></i> ${escapeHtml(status)}
-                    </div>
-                    <div class="msg-content">
-                        ${formatAIResponse(text)}
-                    </div>
-                </div>
-            </div>
-        `;
-
-        scrollToBottom();
-    }
-
-    function clearChat() {
-        if (!chatBox) return;
-
-        chatBox.innerHTML = `
-            <div class="msg-row bot">
-                <div class="msg-bubble">
-                    <div class="bot-header">
-                        <i class="fas fa-terminal"></i> SESSION RESET
-                    </div>
-                    <div class="msg-content">
-                        <div class="ai-response">
-                            <p>Chat session cleared. You can start a new engineering query now.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="quick-prompts">
-                <button class="prompt-chip" onclick="usePrompt('Give me a short risk analysis for my current projects.')">
-                    Risk Analysis
-                </button>
-                <button class="prompt-chip" onclick="usePrompt('Suggest a software architecture for an AI-driven engineering management platform.')">
-                    Architecture Suggestion
-                </button>
-                <button class="prompt-chip" onclick="usePrompt('How can I improve my graduation project presentation?')">
-                    Presentation Help
-                </button>
-                <button class="prompt-chip" onclick="usePrompt('What are the main risks in a software engineering graduation project?')">
-                    Graduation Risks
-                </button>
-            </div>
-        `;
-
-        if (userInput) {
-            userInput.focus();
-        }
-    }
-
-    function usePrompt(text) {
-        if (!userInput) return;
-
-        userInput.value = text;
-        userInput.focus();
-    }
-
-    function setSendingState(value) {
-        isSending = value;
-
-        if (sendBtn) {
-            sendBtn.disabled = value;
-            sendBtn.innerHTML = value
-                ? '<i class="fas fa-spinner fa-spin"></i>'
-                : '<i class="fas fa-paper-plane"></i>';
-        }
-
-        if (userInput) {
-            userInput.disabled = value;
-        }
-    }
-
-    async function sendMessage() {
-        if (isSending) return;
-
-        const text = userInput.value.trim();
-
-        if (!text) return;
-
-        appendUserMessage(text);
-
-        userInput.value = "";
-        setSendingState(true);
-
-        const typingId = appendTypingIndicator();
-        const typingElement = document.getElementById(typingId);
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/api/chat`, {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    message: text
-                })
-            });
-
-            if (response.status === 401 || response.status === 403) {
-                handleUnauthorized();
-                return;
-            }
-
-            let data = {};
-
+        async function loadPortfolioAnalysis() {
+            const panel = document.getElementById("portfolioAnalysisPanel");
+            const content = document.getElementById("portfolioAnalysisContent");
+            panel.style.display = "block";
+            content.innerHTML = `<p style="font-size:12px;">Scanning portfolio...</p>`;
             try {
-                data = await response.json();
-            } catch (_) {
-                data = {};
-            }
-
-            if (!response.ok) {
-                replaceTypingWithBotMessage(
-                    typingElement,
-                    data.detail || "AI service error. Please try again.",
-                    "SYSTEM ERROR"
-                );
-                return;
-            }
-
-            const reply = data.reply || "No response returned from AI service.";
-
-            replaceTypingWithBotMessage(
-                typingElement,
-                reply,
-                "DATA PROCESSED"
-            );
-
-        } catch (error) {
-            console.error("AI chat error:", error);
-
-            replaceTypingWithBotMessage(
-                typingElement,
-                "Unable to reach the AI service. Check that the backend server is running on http://127.0.0.1:8000.",
-                "CONNECTION ERROR"
-            );
-
-        } finally {
-            setSendingState(false);
-
-            if (userInput) {
-                userInput.focus();
-            }
+                const resp = await fetch(`${API_BASE_URL}/projects`, { headers: { "Authorization": `Bearer ${token}` } });
+                const projects = await resp.json();
+                content.innerHTML = `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">${projects.slice(0,4).map(p => `<div style="background:var(--bg-soft); padding:16px; border-radius:16px; font-size:13px; border:1px solid var(--border-soft);"><b>${p.title || p.name}</b><div style="margin-top:4px; color:var(--primary); font-weight:700;">${p.status}</div><div style="font-size:11px; margin-top:4px; color:var(--text-muted);">Risk: ${p.risk_level || 'Low'}</div></div>`).join('')}</div>`;
+            } catch (_) { content.innerHTML = `<p style="font-size:12px;">Data unavailable.</p>`; }
         }
-    }
-
-    applySavedTheme();
-
-    if (userInput) {
-        userInput.focus();
-    }
-
-    if (window.EngiSphereNotifications) {
-        window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
-    }
-
-    // ── AI Portfolio Analysis ──────────────────────────────────────────────
-
-    async function loadPortfolioAnalysis() {
-        const panel   = document.getElementById("portfolioAnalysisPanel");
-        const content = document.getElementById("portfolioAnalysisContent");
-        if (!panel || !content || !window.EngiSphereAIAnalysis) return;
-
-        panel.style.display = "block";
-        content.innerHTML   = `<p style="color:var(--muted);font-size:13px;">Loading projects...</p>`;
-
-        try {
-            const resp = await fetch(`${API_BASE_URL}/api/projects/`, {
-                headers: { "Authorization": `Bearer ${token}` }
-            });
-            if (!resp.ok) throw new Error("API error");
-            const projects = await resp.json();
-            window.EngiSphereAIAnalysis.renderPortfolioAnalysis(content, projects);
-        } catch (_) {
-            // Fallback: use localStorage progress data as minimal project list
-            try {
-                const raw = localStorage.getItem("engisphere_project_progress");
-                const progressMap = raw ? JSON.parse(raw) : {};
-                const localProjects = Object.values(progressMap).map(p => ({
-                    id:         p.project_id,
-                    title:      `Project ${p.project_id}`,
-                    status:     p.status,
-                    risk_level: p.risk_level,
-                    progress:   p.progress,
-                    updated_at: p.updated_at
-                }));
-                if (localProjects.length) {
-                    window.EngiSphereAIAnalysis.renderPortfolioAnalysis(content, localProjects);
-                } else {
-                    content.innerHTML = `<p style="color:var(--muted);font-size:13px;">No project data found. Open a project first to generate data.</p>`;
-                }
-            } catch (_) {
-                content.innerHTML = `<p style="color:var(--muted);font-size:13px;">Could not load projects.</p>`;
-            }
-        }
-    }
-</script>
+    </script>
 </body>
 </html>

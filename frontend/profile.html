@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="assets/js/theme.js"></script>
 
   <title>Profile | EngiSphere</title>
 
@@ -33,6 +34,16 @@
       --line: rgba(255, 255, 255, 0.10);
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
       --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
+    }
+
+    body.light-theme {
+      --ink: #0f172a;
+      --muted: #64748b;
+      --soft: #f8fafc;
+      --panel: #ffffff;
+      --line: #e2e8f0;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 16px 42px rgba(15, 23, 42, 0.06);
     }
 
     * {
@@ -233,7 +244,7 @@
     /* ===== PROFILE PAGE ===== */
     .profile-page {
       min-height: 100vh;
-      padding: 132px 7% 70px;
+      padding: 40px 7% 70px;
     }
 
     .page-header {
@@ -718,10 +729,10 @@
         width: 100%;
       }
     }
-    /* ===== PROFILE REFINED LAYOUT OVERRIDE ===== */
+/* ===== PROFILE REFINED LAYOUT OVERRIDE ===== */
 .profile-page {
   min-height: 100vh;
-  padding: 124px 7% 64px;
+  padding: 40px 7% 64px;
 }
 
 .profile-container {
@@ -831,15 +842,15 @@
 .identity-badge {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-height: 30px;
-  padding: 0 12px;
+  gap: 6px;
+  padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(16, 185, 129, 0.10);
-  color: var(--success);
-  font-size: 12px;
-  font-weight: 800;
+  background: rgba(37, 99, 235, 0.08);
+  color: var(--primary);
+  font-size: 11px;
+  font-weight: 700;
   margin-bottom: 12px;
+  width: fit-content;
 }
 
 .identity-meta h2 {
@@ -1111,8 +1122,9 @@ body.dark-theme .profile-side {
 
 /* Make authenticated badge neutral-blue instead of green */
 .identity-badge {
-  background: rgba(37, 99, 235, 0.08) !important;
+  background: rgba(37, 99, 235, 0.06) !important;
   color: var(--primary) !important;
+  border: 1px solid rgba(37, 99, 235, 0.1);
 }
 
 /* Simplify info/status tiles */
@@ -1182,35 +1194,18 @@ body.dark-theme .profile-side {
     <span>Something went wrong.</span>
   </div>
 
-  <nav class="nav">
-    <a href="home.html" class="brand" aria-label="EngiSphere Home">
-      <span class="brand-icon">
-        <i class="fas fa-compass-drafting"></i>
-      </span>
-      <span class="brand-text">ENGI<span>SPHERE</span></span>
+  <header style="padding: 24px 7% 0; display: flex; align-items: center; justify-content: space-between;">
+    <a href="home.html" class="btn btn-outline" style="border-radius: 12px; font-weight: 700;">
+      <i class="fas fa-arrow-left"></i>
+      Back to Home
     </a>
-
-    <div class="nav-center">
-      <a href="home.html" class="nav-link">Home</a>
-      <a href="#" onclick="requireAuth('index.html'); return false;" class="nav-link">Workspace</a>
-      <a href="about.html" class="nav-link">About</a>
-      <a href="contact.html" class="nav-link">Contact</a>
-    </div>
-
-    <div class="nav-right">
-      <div id="notificationCenter"></div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+    
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <button class="theme-toggle" id="themeToggle" title="Toggle theme" aria-label="Toggle theme">
         <i class="fas fa-moon"></i>
       </button>
-
-      <div id="authActions" class="auth-actions">
-        <a href="login.html" class="btn btn-primary">
-          <i class="fas fa-right-to-bracket"></i>
-          System Access
-        </a>
-      </div>
     </div>
-  </nav>
+  </header>
 
  <main class="profile-page">
   <div class="profile-container">
@@ -1222,12 +1217,6 @@ body.dark-theme .profile-side {
         </p>
       </div>
 
-   <div class="header-actions">
-  <a href="#" onclick="requireAuth('index.html'); return false;" class="btn btn-primary">
-    <i class="fas fa-table-columns"></i>
-    Workspace
-  </a>
-</div>
     </header>
 
     <section class="profile-board">
@@ -1237,8 +1226,8 @@ body.dark-theme .profile-side {
 
           <div class="identity-meta">
             <div class="identity-badge">
-              <i class="fas fa-shield-halved"></i>
-              Authenticated User
+              <i class="fas fa-shield-check" style="font-size: 10px;"></i>
+              Verified Account
             </div>
 
             <h2 id="uName">Loading profile...</h2>
@@ -1306,7 +1295,7 @@ body.dark-theme .profile-side {
 
   <div class="session-note">
     <i class="fas fa-circle-info"></i>
-    Password and appearance preferences are managed from the Settings page.
+    Account security and appearance preferences are managed from the Settings page.
   </div>
 </aside>
     </section>
@@ -1355,15 +1344,9 @@ body.dark-theme .profile-side {
         return;
       }
 
-      const themeBtn = document.getElementById("themeToggle");
-
-      applySavedTheme();
       renderAuthActions();
       loadProfile();
 
-      if (themeBtn) {
-        themeBtn.addEventListener("click", toggleTheme);
-      }
 
       if (window.EngiSphereNotifications) {
           window.EngiSphereNotifications.initNotificationCenter("notificationCenter");
@@ -1393,32 +1376,6 @@ body.dark-theme .profile-side {
       `;
     }
 
-    function applySavedTheme() {
-      const savedTheme = localStorage.getItem("theme") || "light";
-      const isDark = savedTheme === "dark";
-
-      document.body.classList.toggle("dark-theme", isDark);
-      updateThemeButton(isDark);
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle("dark-theme");
-
-      const isDark = document.body.classList.contains("dark-theme");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-
-      updateThemeButton(isDark);
-    }
-
-    function updateThemeButton(isDark) {
-      const themeBtn = document.getElementById("themeToggle");
-
-      if (!themeBtn) return;
-
-      themeBtn.innerHTML = isDark
-        ? '<i class="fas fa-sun"></i>'
-        : '<i class="fas fa-moon"></i>';
-    }
 
     function showToast(id, message = null) {
       const toast = document.getElementById(id);

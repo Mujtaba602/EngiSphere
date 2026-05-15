@@ -109,22 +109,34 @@ window.EngiSphereAudit = (function () {
 
         const html = logs.map(log => {
             const date = new Date(log.created_at);
-            const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            const timeStr = (() => {
+                try {
+                    const now = new Date();
+                    const diff = Math.floor((now - date) / 60000);
+                    if (diff < 1) return "Just now";
+                    if (diff < 60) return `${diff}m ago`;
+                    if (diff < 1440) return `${Math.floor(diff/60)}h ago`;
+                    return date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                } catch (_) { return "Recent"; }
+            })();
             const color = getSeverityColor(log.severity);
             const icon = getSeverityIcon(log.severity);
 
             return `
-                <div style="display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border);">
-                    <div style="flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: ${color}15; border: 1px solid ${color}30; display: flex; align-items: center; justify-content: center; color: ${color};">
-                        <i class="fas ${icon}" style="font-size: 12px;"></i>
+                <div class="activity-item">
+                    <div class="activity-icon" style="background: ${color}15; border: 1px solid ${color}30; color: ${color};">
+                        <i class="fas ${icon}" style="font-size: 13px;"></i>
                     </div>
                     <div style="flex: 1; min-width: 0;">
-                        <div style="font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 3px; line-height: 1.4;">
-                            ${escapeHtml(log.message)}
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 2px;">
+                            <div style="font-size: 13px; color: var(--text); font-weight: 700; line-height: 1.4;">
+                                ${escapeHtml(log.message)}
+                            </div>
+                            <span style="font-size: 10px; color: var(--muted); font-weight: 700; white-space: nowrap;">${timeStr}</span>
                         </div>
-                        <div style="font-size: 11px; color: var(--muted); display: flex; gap: 10px;">
-                            <span><i class="far fa-clock" style="margin-right:4px;"></i>${timeStr}</span>
-                            ${log.entity_type ? `<span style="text-transform: capitalize;">• ${escapeHtml(log.entity_type)}</span>` : ''}
+                        <div style="font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 8px;">
+                            ${log.entity_type ? `<span style="text-transform: capitalize; background: var(--panel-2); padding: 2px 8px; border-radius: 4px;">${escapeHtml(log.entity_type)}</span>` : ''}
+                            <span style="opacity: 0.7;">• Event ID: ${log.id.split('_').pop()}</span>
                         </div>
                     </div>
                 </div>

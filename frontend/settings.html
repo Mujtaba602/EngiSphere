@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="assets/js/theme.js"></script>
 
   <title>EngiSphere | Settings</title>
 
@@ -33,6 +34,16 @@
       --line: rgba(255, 255, 255, 0.10);
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
       --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
+    }
+
+    body.light-theme {
+      --ink: #0f172a;
+      --muted: #64748b;
+      --soft: #f8fafc;
+      --panel: #ffffff;
+      --line: #e2e8f0;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 16px 42px rgba(15, 23, 42, 0.06);
     }
 
     * {
@@ -244,7 +255,7 @@
     /* ===== SETTINGS PAGE ===== */
     .settings-page {
       min-height: 100vh;
-      padding: 136px 7% 70px;
+      padding: 40px 7% 70px;
     }
 
     .settings-container {
@@ -778,10 +789,10 @@
         align-items: stretch;
       }
     }
-    /* ===== REFINED SETTINGS LAYOUT ===== */
+/* ===== REFINED SETTINGS LAYOUT ===== */
 .settings-page {
   min-height: 100vh;
-  padding: 124px 7% 64px;
+  padding: 40px 7% 64px;
 }
 
 .settings-container {
@@ -1223,7 +1234,7 @@ body {
 
 /* Fix top spacing under fixed navbar */
 .settings-page {
-  padding-top: 140px !important;
+  padding-top: 60px !important;
 }
 
 /* Remove colorful decorative blob */
@@ -1345,44 +1356,17 @@ body.dark-theme .settings-card {
 </head>
 
 <body>
-  <nav class="nav">
-    <a href="home.html" class="brand" aria-label="EngiSphere Home">
-      <span class="brand-icon">
-        <i class="fas fa-compass-drafting"></i>
-      </span>
-      <span class="brand-text">ENGI<span>SPHERE</span></span>
+  <header style="padding: 24px 7% 0; display: flex; align-items: center; justify-content: space-between;">
+    <a href="home.html" class="btn btn-outline" style="border-radius: 12px; font-weight: 700;">
+      <i class="fas fa-arrow-left"></i>
+      Back to Home
     </a>
-
-    <div class="nav-center">
-      <a href="home.html" class="nav-link">Home</a>
-      <a href="#" onclick="requireAuth('index.html'); return false;" class="nav-link">Workspace</a>
-      <a href="about.html" class="nav-link">About</a>
-      <a href="contact.html" class="nav-link">Contact</a>
-    </div>
-
-    <div class="nav-right">
-      <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-        <i class="fas fa-moon"></i>
-      </button>
-
-      <div id="authActions" class="auth-actions">
-        <a href="login.html" class="btn btn-primary">
-          <i class="fas fa-right-to-bracket"></i>
-          System Access
-        </a>
-      </div>
-    </div>
-  </nav>
+  </header>
 
 <main class="settings-page">
   <div class="settings-container">
     <header class="settings-header">
       <div>
-        <div class="settings-badge">
-          <i class="fas fa-gear"></i>
-          Account Settings
-        </div>
-
         <h1>Manage your <span>EngiSphere</span> account.</h1>
 
         <p>
@@ -1394,11 +1378,6 @@ body.dark-theme .settings-card {
         <a href="profile.html" class="btn btn-outline">
           <i class="fas fa-user"></i>
           View Profile
-        </a>
-
-        <a href="#" onclick="requireAuth('index.html'); return false;" class="btn btn-primary">
-          <i class="fas fa-table-columns"></i>
-          Workspace
         </a>
       </div>
     </header>
@@ -1428,7 +1407,7 @@ body.dark-theme .settings-card {
 
             <div class="settings-info-tile">
               <span>Account Status</span>
-              <strong>Authenticated</strong>
+              <strong id="userStatus">Verified</strong>
             </div>
           </div>
         </article>
@@ -1470,7 +1449,7 @@ body.dark-theme .settings-card {
 
             <div>
               <h2>Update Password</h2>
-              <p>Use a strong password to keep your workspace secure.</p>
+              <p>Use a strong password to keep your account secure.</p>
             </div>
           </div>
 
@@ -1479,7 +1458,7 @@ body.dark-theme .settings-card {
     <label for="settingsOldPass">Current Password</label>
     <div class="settings-input-wrap">
       <i class="fas fa-key"></i>
-      <input type="password" id="settingsOldPass" placeholder="Enter current password" required>
+      <input type="password" id="settingsOldPass" placeholder="Enter current password" autocomplete="current-password" required>
     </div>
   </div>
 
@@ -1487,7 +1466,7 @@ body.dark-theme .settings-card {
     <label for="settingsNewPass">New Password</label>
     <div class="settings-input-wrap">
       <i class="fas fa-shield-halved"></i>
-      <input type="password" id="settingsNewPass" placeholder="At least 8 characters" required>
+      <input type="password" id="settingsNewPass" placeholder="At least 8 characters" autocomplete="new-password" required>
     </div>
   </div>
 
@@ -1495,8 +1474,9 @@ body.dark-theme .settings-card {
     <label for="settingsConfirmPass">Confirm New Password</label>
     <div class="settings-input-wrap">
       <i class="fas fa-check"></i>
-      <input type="password" id="settingsConfirmPass" placeholder="Repeat new password" required>
+      <input type="password" id="settingsConfirmPass" placeholder="Repeat new password" autocomplete="new-password" required>
     </div>
+    <span id="passwordMatchMsg" style="color: var(--danger); font-size: 11px; margin-top: 5px; display: none;">Passwords do not match</span>
   </div>
 
   <div class="password-note">
@@ -1504,7 +1484,7 @@ body.dark-theme .settings-card {
     Use at least 8 characters. Avoid simple or repeated passwords.
   </div>
 
-  <button class="btn btn-primary settings-submit-btn" id="settingsPasswordBtn" type="submit">
+  <button class="btn btn-primary settings-submit-btn" id="settingsPasswordBtn" type="submit" disabled>
     <i class="fas fa-floppy-disk"></i>
     Save New Password
   </button>
@@ -1635,13 +1615,6 @@ body.dark-theme .settings-card {
       }, 3200);
     }
 
-    function updateThemeIcon(isDark) {
-      if (!themeToggle) return;
-
-      themeToggle.innerHTML = isDark
-        ? '<i class="fas fa-sun"></i>'
-        : '<i class="fas fa-moon"></i>';
-    }
 
     function updateDarkSwitch(isDark) {
       if (!darkModeSwitch) return;
@@ -1653,22 +1626,17 @@ body.dark-theme .settings-card {
       }
     }
 
-    function applySavedTheme() {
-      const savedTheme = localStorage.getItem("theme") || "light";
-      const isDark = savedTheme === "dark";
+    // Listen for unified theme changes
+    window.addEventListener("engisphere-theme-changed", (e) => {
+        const isDark = document.body.classList.contains("dark-theme");
+        updateDarkSwitch(isDark);
+    });
 
-      body.classList.toggle("dark-theme", isDark);
-      updateThemeIcon(isDark);
-      updateDarkSwitch(isDark);
-    }
-
-    function toggleTheme() {
-      const isCurrentlyDark = body.classList.contains("dark-theme");
-      const nextTheme = isCurrentlyDark ? "light" : "dark";
-
-      localStorage.setItem("theme", nextTheme);
-      applySavedTheme();
-    }
+    // Initial switch state
+    document.addEventListener("DOMContentLoaded", () => {
+        const isDark = document.body.classList.contains("dark-theme");
+        updateDarkSwitch(isDark);
+    });
 
     function renderAuthActions() {
       if (!authActions) return;
@@ -1724,7 +1692,7 @@ body.dark-theme .settings-card {
         setTextByIds(["settingsEmail", "userEmail"], email);
         setTextByIds(["settingsFullName", "userNameRow"], fullName);
         setTextByIds(["settingsEmailBox", "userEmailRow"], email);
-        setTextByIds(["userStatus"], "Authenticated");
+        setTextByIds(["userStatus"], "Verified");
 
       } catch (error) {
         console.error("Failed to load user info:", error);
@@ -1742,7 +1710,7 @@ body.dark-theme .settings-card {
       setTextByIds(["settingsEmail", "userEmail"], fallbackEmail);
       setTextByIds(["settingsFullName", "userNameRow"], fallbackName);
       setTextByIds(["settingsEmailBox", "userEmailRow"], fallbackEmail);
-      setTextByIds(["userStatus"], "Authenticated");
+      setTextByIds(["userStatus"], "Verified");
     }
 
     window.updateSettingsPassword = async function (event) {
@@ -1832,25 +1800,49 @@ body.dark-theme .settings-card {
       }
     };
 
-    applySavedTheme();
     renderAuthActions();
     loadUserInfo();
 
     if (themeToggle) {
-      themeToggle.addEventListener("click", toggleTheme);
+      themeToggle.addEventListener("click", () => window.toggleTheme());
     }
 
     if (darkModeSwitch) {
-      darkModeSwitch.addEventListener("change", toggleTheme);
+      darkModeSwitch.addEventListener("change", () => window.toggleTheme());
       darkModeSwitch.addEventListener("click", function (event) {
         if (darkModeSwitch.tagName !== "INPUT") {
-          toggleTheme();
+          window.toggleTheme();
         }
       });
     }
 
     if (passwordForm) {
       passwordForm.addEventListener("submit", window.updateSettingsPassword);
+
+      // Real-time validation
+      const validate = () => {
+        const oldPass = document.getElementById("settingsOldPass").value;
+        const newPass = document.getElementById("settingsNewPass").value;
+        const confirmPass = document.getElementById("settingsConfirmPass").value;
+        const btn = document.getElementById("settingsPasswordBtn");
+        const msg = document.getElementById("passwordMatchMsg");
+
+        const isLongEnough = newPass.length >= 8;
+        const isMatching = newPass === confirmPass;
+        const hasOld = oldPass.length > 0;
+
+        if (newPass && confirmPass && !isMatching) {
+          msg.style.display = "block";
+        } else {
+          msg.style.display = "none";
+        }
+
+        btn.disabled = !(hasOld && isLongEnough && isMatching);
+      };
+
+      ["settingsOldPass", "settingsNewPass", "settingsConfirmPass"].forEach(id => {
+        document.getElementById(id).addEventListener("input", validate);
+      });
     }
   });
 </script>

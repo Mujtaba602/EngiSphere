@@ -9,20 +9,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/sidebar.js"></script>
 
   <style>
     :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --ink: #0f172a;
-      --muted: #64748b;
-      --soft: #f8fafc;
-      --panel: #ffffff;
-      --line: #e2e8f0;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --ink: #f8fafc;
+      --muted: #94a3b8;
+      --soft: #020617;
+      --panel: rgba(15, 23, 42, 0.76);
+      --line: rgba(255, 255, 255, 0.08);
       --success: #10b981;
       --danger: #ef4444;
-      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
-      --shadow-soft: 0 16px 42px rgba(15, 23, 42, 0.06);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+      --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
+      --sidebar: #0f172a;
+      --border: rgba(255, 255, 255, 0.08);
+      --bg: #020617;
+      --text: #f8fafc;
     }
 
     body.dark-theme {
@@ -33,6 +39,24 @@
       --line: rgba(255, 255, 255, 0.10);
       --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
       --shadow-soft: 0 16px 42px rgba(0, 0, 0, 0.25);
+    }
+
+    body.light-theme {
+      --ink: #0f172a;
+      --secondary: #475569;
+      --muted: #64748b;
+      --soft: #f8fafc;
+      --panel: #ffffff;
+      --line: #e2e8f0;
+      --shadow: 0 24px 70px rgba(15, 23, 42, 0.08);
+      --shadow-soft: 0 16px 42px rgba(15, 23, 42, 0.06);
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --sidebar: #ffffff;
+      --border: #e2e8f0;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --soft-blue: #eff6ff;
     }
 
     * {
@@ -48,10 +72,292 @@
     body {
       min-height: 100vh;
       font-family: "Plus Jakarta Sans", sans-serif;
-      background: var(--soft);
-      color: var(--ink);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
       overflow-x: hidden;
-      transition: background 0.25s ease, color 0.25s ease;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    .sidebar {
+        width: 260px;
+        background: var(--sidebar);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        padding: 28px 18px;
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s, background 0.3s;
+        z-index: 100;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+        flex-shrink: 0;
+    }
+
+    body.sidebar-collapsed .sidebar {
+        width: 78px;
+        padding: 28px 12px;
+    }
+
+    .sidebar-toggle {
+        position: fixed;
+        left: 280px;
+        top: 20px;
+        z-index: 200;
+        width: 36px;
+        height: 36px;
+        background: var(--sidebar);
+        border: 1px solid var(--border);
+        color: var(--primary);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar-toggle:hover {
+        background: var(--primary);
+        color: white;
+        transform: scale(1.05);
+    }
+
+    body.sidebar-collapsed .sidebar-toggle {
+        left: 92px;
+    }
+
+    .sidebar-toggle i {
+        transition: transform 0.3s ease;
+    }
+
+    body.sidebar-collapsed .sidebar-toggle i {
+        transform: rotate(180deg);
+    }
+
+    /* Collapsed Sidebar Item Logic */
+    body.sidebar-collapsed .logo-text,
+    body.sidebar-collapsed .nav-section,
+    body.sidebar-collapsed .nav-link span {
+        display: none;
+    }
+
+    body.sidebar-collapsed .nav-link {
+        justify-content: center;
+        padding: 12px 0;
+        width: 48px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    body.sidebar-collapsed .nav-link i {
+        font-size: 18px;
+        margin: 0;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 34px;
+        text-decoration: none;
+    }
+
+    .logo-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 18px;
+        display: grid;
+        place-items: center;
+        background: var(--primary);
+        color: #ffffff;
+        font-size: 16px;
+        flex: 0 0 auto;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+    }
+
+    .logo-text {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: -0.8px;
+        line-height: 1;
+        color: var(--text);
+    }
+
+    .logo-text span {
+        color: var(--primary);
+    }
+
+    body.light-theme .logo-text {
+        color: #0f172a;
+    }
+
+    /* Account Dropdown for Home */
+    .account-dropdown {
+        position: relative;
+    }
+    
+    .theme-toggle:hover {
+        background: var(--primary) !important;
+        color: white !important;
+        border-color: var(--primary) !important;
+    }
+
+    .account-btn {
+        border: 1px solid var(--border);
+        background: var(--sidebar);
+        color: var(--text);
+        height: 42px;
+        padding: 0 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        font-weight: 700;
+        font-size: 12px;
+        transition: 0.25s;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .account-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 48px;
+        background: var(--sidebar);
+        border: 1px solid var(--border);
+        min-width: 180px;
+        box-shadow: var(--shadow);
+        z-index: 1000;
+        border-radius: 14px;
+        overflow: hidden;
+        padding: 6px;
+    }
+
+    .dropdown-content.show {
+        display: block;
+        animation: accountFadeIn 0.2s ease-out;
+    }
+
+    @keyframes accountFadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        color: var(--secondary);
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 10px;
+        transition: 0.2s;
+    }
+
+    .dropdown-item:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+    }
+
+    .dropdown-item i {
+        width: 16px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .dropdown-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 6px 0;
+    }
+
+    .dropdown-item.danger {
+        color: var(--danger);
+    }
+
+    .dropdown-item.danger:hover {
+        background: rgba(239, 68, 68, 0.08);
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 22px;
+        font-weight: 800;
+        color: var(--primary);
+        margin-bottom: 34px;
+        letter-spacing: -1px;
+        text-shadow: 0 0 18px rgba(59, 130, 246, 0.22);
+    }
+
+    .nav-section {
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--muted);
+        text-transform: uppercase;
+        margin: 14px 0 6px 14px;
+        letter-spacing: 1px;
+    }
+
+    .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 12px 16px;
+        border-radius: 14px;
+        color: var(--secondary);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 13px;
+        transition: 0.25s;
+        margin-bottom: 4px;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--primary);
+        box-shadow: inset 4px 0 0 var(--primary);
+    }
+
+    .exit-link {
+        margin-top: auto;
+        color: var(--danger) !important;
+    }
+
+    .exit-link:hover {
+        background: rgba(239, 68, 68, 0.08);
+        box-shadow: inset 4px 0 0 var(--danger);
+        color: var(--danger) !important;
+    }
+
+    .main {
+        flex: 1;
+        min-height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+        background: var(--bg);
+        transition: background 0.3s, padding 0.4s ease;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    body.sidebar-collapsed .main {
+        padding-left: 20px; /* Safe padding for toggle button area if needed, but hero has its own padding */
     }
 
     a {
@@ -92,16 +398,22 @@
       transform: translateY(-1px);
     }
 
-   .btn-outline {
-  background: var(--panel);
-  border-color: rgba(37, 99, 235, 0.35);
-  color: var(--primary);
-  box-shadow: none;
-}
+    .btn-outline {
+      background: var(--panel);
+      border-color: rgba(37, 99, 235, 0.35);
+      color: var(--primary);
+      box-shadow: none;
+    }
 
     .btn-outline:hover {
-      background: rgba(37, 99, 235, 0.08);
+      background: var(--soft-blue);
+      border-color: var(--primary);
       transform: translateY(-1px);
+    }
+
+    body.light-theme .btn-outline {
+        border-color: rgba(37, 99, 235, 0.5);
+        background: #ffffff;
     }
 
     .btn-danger {
@@ -115,15 +427,22 @@
     }
 
     .hero {
-      min-height: calc(100vh - 78px);
-      padding: 118px 7% 74px;
+      flex: 1;
+      min-height: calc(100vh - 100px);
+      padding: 80px 7% 74px;
       display: grid;
       grid-template-columns: 1.05fr 0.95fr;
       align-items: center;
+      transition: padding 0.4s ease;
       gap: 70px;
       background:
-        radial-gradient(circle at 8% 18%, rgba(37, 99, 235, 0.08), transparent 28%),
-        linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        radial-gradient(circle at 8% 18%, rgba(37, 99, 235, 0.12), transparent 32%),
+        linear-gradient(180deg, var(--bg) 0%, rgba(15, 23, 42, 0.4) 100%);
+    }
+
+    body.sidebar-collapsed .hero {
+        padding-left: max(60px, 10%);
+        padding-right: max(60px, 10%);
     }
 
     body.dark-theme .hero {
@@ -132,13 +451,17 @@
         linear-gradient(180deg, #020617 0%, #0f172a 100%);
     }
 
+    body.light-theme .hero {
+      background: linear-gradient(135deg, #ffffff 0%, var(--soft-blue) 100%);
+    }
+
     .hero-content {
       max-width: 720px;
     }
 
     .hero-label {
       margin-bottom: 18px;
-      color: var(--muted);
+      color: var(--secondary);
       font-size: 14px;
       font-weight: 600;
       letter-spacing: 0.2px;
@@ -160,7 +483,7 @@
 
     .hero p {
       max-width: 580px;
-      color: var(--muted);
+      color: var(--secondary);
       font-size: 16.5px;
       line-height: 1.8;
       margin-bottom: 28px;
@@ -237,8 +560,17 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.15));
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.02), rgba(15, 23, 42, 0.12));
       pointer-events: none;
+    }
+
+    body.light-theme .clean-hero-image::after {
+      background: none;
+    }
+
+    body.light-theme .clean-hero-image {
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+      border-color: var(--line);
     }
 
     .stats {
@@ -271,7 +603,7 @@
     }
 
     .stat-card p {
-      color: var(--muted);
+      color: var(--secondary);
       font-size: 14px;
       font-weight: 700;
     }
@@ -308,7 +640,7 @@
     }
 
     .section-head p {
-      color: var(--muted);
+      color: var(--secondary);
       line-height: 1.8;
       font-size: 16px;
     }
@@ -360,7 +692,7 @@
     }
 
     .module-card p {
-      color: var(--muted);
+      color: var(--secondary);
       line-height: 1.7;
       font-size: 14px;
       margin-bottom: 22px;
@@ -438,6 +770,12 @@
       border-top: 1px solid rgba(255, 255, 255, 0.08);
     }
 
+    body.light-theme .site-footer {
+      background: #ffffff;
+      color: var(--secondary);
+      border-top: 1px solid var(--line);
+    }
+
     .footer-container {
       max-width: 1200px;
       margin: 0 auto;
@@ -459,6 +797,10 @@
       color: #ffffff;
     }
 
+    body.light-theme .site-footer .brand-text {
+      color: var(--ink);
+    }
+
     .site-footer .brand-text span {
       color: #60a5fa;
     }
@@ -470,12 +812,20 @@
       line-height: 1.85;
     }
 
+    body.light-theme .footer-description {
+      color: var(--secondary);
+    }
+
     .footer-column h4 {
       color: #ffffff;
       font-size: 15px;
       font-weight: 800;
       margin-bottom: 16px;
       letter-spacing: -0.2px;
+    }
+
+    body.light-theme .footer-column h4 {
+      color: var(--ink);
     }
 
     .footer-links,
@@ -496,6 +846,19 @@
       transition: 0.2s ease;
     }
 
+    body.light-theme .footer-link {
+      color: var(--secondary);
+    }
+
+    .footer-link:hover {
+      color: #ffffff;
+      transform: translateX(4px);
+    }
+
+    body.light-theme .footer-link:hover {
+      color: var(--primary);
+    }
+
     .footer-link i {
       width: 18px;
       color: #93c5fd;
@@ -503,9 +866,8 @@
       text-align: center;
     }
 
-    .footer-link:hover {
-      color: #ffffff;
-      transform: translateX(3px);
+    body.light-theme .footer-link i {
+      color: var(--primary);
     }
 
     .footer-bottom {
@@ -516,6 +878,13 @@
       justify-content: space-between;
       gap: 18px;
       flex-wrap: wrap;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    body.light-theme .footer-bottom {
+      border-top-color: var(--line);
+      color: var(--muted);
     }
 
     .footer-bottom p {
@@ -790,47 +1159,105 @@ body.dark-theme .nav {
   </style>
 </head>
 
-<body>
-<nav class="nav">
-  <a href="home.html" class="brand" aria-label="EngiSphere Home">
-    <span class="brand-icon">
-      <i class="fas fa-compass-drafting"></i>
-    </span>
-    <span class="brand-text">ENGI<span>SPHERE</span></span>
-  </a>
+    <aside class="sidebar">
+        <a href="home.html" class="logo">
+            <span class="logo-icon">
+                <i class="fas fa-compass-drafting"></i>
+            </span>
+            <span class="logo-text">ENGI<span>SPHERE</span></span>
+        </a>
 
-  <div class="nav-center">
-   <a href="home.html" class="nav-link active">Home</a>
-<a href="#" onclick="requireAuth('index.html'); return false;" class="nav-link">Workspace</a>
-<a href="about.html" class="nav-link">About</a>
-<a href="contact.html" class="nav-link">Contact</a>
-  </div>
+        <nav style="flex:1;">
+            <div class="nav-section">Core Systems</div>
 
-  <div class="nav-right">
-    <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
-      <i class="fas fa-moon"></i>
-    </button>
+            <a href="home.html" class="nav-link active">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
 
-    <div id="authActions" class="auth-actions">
-      <a href="login.html" class="btn btn-primary">
-        <i class="fas fa-right-to-bracket"></i>
-        System Access
-      </a>
-    </div>
-  </div>
-</nav>
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="solutions.html" class="nav-link">
+                <i class="fas fa-satellite"></i>
+                <span>Geospatial Radar</span>
+            </a>
+
+            <a href="ai_chat.html" class="nav-link">
+                <i class="fas fa-brain"></i>
+                <span>AI EngiBot</span>
+            </a>
+
+            <div class="nav-section">Management</div>
+
+            <a href="project_details.html" class="nav-link">
+                <i class="fas fa-folder-open"></i>
+                <span>Project Details</span>
+            </a>
+
+            <a href="team_access.html" class="nav-link">
+                <i class="fas fa-users-gear"></i>
+                <span>Team Access</span>
+            </a>
+
+            <a href="reports.html" class="nav-link">
+                <i class="fas fa-file-invoice"></i>
+                <span>Reports</span>
+            </a>
+        </nav>
+
+        <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i>
+            <span>Exit System</span>
+        </a>
+    </aside>
+
+    <main class="main">
+        <button id="sidebarToggle" class="sidebar-toggle" title="Toggle Sidebar">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div class="top-actions" style="position: fixed; right: 34px; top: 20px; z-index: 200; display: flex; gap: 12px; align-items: center;">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeToggleBtn" type="button" style="height: 42px; width: 42px; border-radius: 12px; border: 1px solid var(--border); background: var(--sidebar); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">
+                <i class="fas fa-moon"></i>
+            </button>
+
+            <div class="account-dropdown" style="position: relative; right: auto; top: auto;">
+                <button class="account-btn" onclick="toggleAccountMenu()" type="button" id="accountBtn">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="accountLabel">Account</span>
+                    <i class="fas fa-chevron-down" style="font-size: 10px; opacity: 0.6;"></i>
+                </button>
+                <div class="dropdown-content" id="accountMenu">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        My Profile
+                    </a>
+                    <a href="settings.html" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" onclick="logout(); return false;" class="dropdown-item danger">
+                        <i class="fas fa-power-off"></i>
+                        Exit System
+                    </a>
+                </div>
+            </div>
+        </div>
 
   <section class="hero">
     <div class="hero-content" data-aos="fade-right">
-      <div class="hero-label">Built for engineering project operations</div>
+      <div class="hero-label">Built for engineering project teams</div>
 
      <h1>
-  Manage engineering projects smarter with <span>AI.</span>
+  Plan, track, and manage engineering projects in one <span>workspace.</span>
 </h1>
 
 <p>
-  EngiSphere helps engineering teams manage projects, tasks, team members,
-  risk assessments, and AI-powered insights from one secure workspace.
+  EngiSphere helps engineering teams organize projects, assign tasks, manage team members, monitor risks, and make better decisions with AI-assisted insights.
 </p>
 
       <div class="hero-actions" id="heroBtns">
@@ -843,19 +1270,23 @@ body.dark-theme .nav {
     <i class="fas fa-right-to-bracket"></i>
     Login
   </a>
+  <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+    <i class="fab fa-linkedin"></i>
+    LinkedIn Page
+  </a>
 </div>
 
 
       <div class="hero-points">
-    <div><i class="fas fa-check"></i> Secure JWT-based access and protected project data</div>
-<div><i class="fas fa-check"></i> Projects, tasks, teams, risk analysis, and AI support</div>
-<div><i class="fas fa-check"></i> Built for professional engineering project workflows</div>
+    <div><i class="fas fa-check"></i> Secure login and protected project data</div>
+<div><i class="fas fa-check"></i> Centralized projects, tasks, teams, risk analysis, and AI support</div>
+<div><i class="fas fa-check"></i> Designed for professional engineering project workflows</div>
       </div>
     </div>
 
     <div class="hero-visual" data-aos="fade-left">
       <div class="clean-hero-image">
-        <img src="assets/construction-hero.jpg" alt="Engineering construction site">
+        <img src="assets/construction-hero.jpg" alt="Engineering project team at construction site">
       </div>
     </div>
   </section>
@@ -895,17 +1326,16 @@ body.dark-theme .nav {
   <section class="section modules" id="modules">
     <div class="section-head center" data-aos="fade-up">
       <div class="section-kicker">Platform Modules</div>
-      <h2>Core modules built for engineering project control.</h2>
+      <h2>Tools designed for engineering project control.</h2>
 <p>
-  EngiSphere combines project management, team coordination, task tracking,
-  automated risk assessment, and AI assistance in one integrated platform.
+  EngiSphere brings project tracking, team coordination, task management, risk assessment, and AI-assisted support into one organized workspace.
 </p>
     </div>
 <div class="module-grid">
   <div class="module-card" onclick="requireAuth('index.html')" data-aos="fade-up">
     <div class="module-icon"><i class="fas fa-folder-tree"></i></div>
     <h3>Project Management</h3>
-    <p>Create, update, track, and organize engineering projects with structured project data and clear status visibility.</p>
+    <p>Create, update, and track engineering projects with clear project data, progress status, and organized records.</p>
     <div class="module-link">Open Projects <i class="fas fa-arrow-right"></i></div>
   </div>
 
@@ -919,14 +1349,14 @@ body.dark-theme .nav {
   <div class="module-card" onclick="requireAuth('team_access.html')" data-aos="fade-up" data-aos-delay="200">
     <div class="module-icon"><i class="fas fa-users-gear"></i></div>
     <h3>Team & Tasks</h3>
-    <p>Manage team members, assign them to projects, create tasks, and monitor execution progress across your workflow.</p>
+    <p>Manage team members, assign tasks, connect users to projects, and monitor execution progress across the workflow.</p>
     <div class="module-link">Manage Team <i class="fas fa-arrow-right"></i></div>
   </div>
 
   <div class="module-card" onclick="requireAuth('ai_chat.html')" data-aos="fade-up" data-aos-delay="300">
     <div class="module-icon"><i class="fas fa-robot"></i></div>
     <h3>EngiBot AI Assistant</h3>
-    <p>Ask engineering questions, generate project insights, analyze risks, and receive intelligent planning support.</p>
+    <p>Ask project-related questions, generate summaries, analyze risks, and get AI-assisted planning support.</p>
     <div class="module-link">Open EngiBot <i class="fas fa-arrow-right"></i></div>
   </div>
 </div>
@@ -944,8 +1374,7 @@ body.dark-theme .nav {
           </a>
 
           <p class="footer-description">
-           An AI-powered engineering management platform for project tracking,
-team coordination, task management, risk assessment, and secure workflow control.
+           A project management platform designed for engineering teams to track progress, coordinate work, manage risks, and keep project data organized.
           </p>
         </div>
 
@@ -956,7 +1385,7 @@ team coordination, task management, risk assessment, and secure workflow control
            <a href="#" onclick="requireAuth('index.html')" class="footer-link">
   <i class="fas fa-table-columns"></i>Workspace
 </a>
-           <a href="about.html" class="footer-link"><i class="fas fa-circle-info"></i>About Us</a>
+            <a href="about.html" class="footer-link"><i class="fas fa-circle-info"></i>About Us</a>
             <a href="contact.html" class="footer-link"><i class="fas fa-paper-plane"></i>Contact</a>
           </div>
         </div>
@@ -972,6 +1401,11 @@ team coordination, task management, risk assessment, and secure workflow control
            <a href="https://github.com/Mujtaba602/EngiSphere" target="_blank" class="footer-link">
   <i class="fab fa-github"></i>
   GitHub Repository
+</a>
+
+           <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="footer-link">
+  <i class="fab fa-linkedin"></i>
+  LinkedIn Page
 </a>
           </div>
         </div>
@@ -1007,39 +1441,6 @@ team coordination, task management, risk assessment, and secure workflow control
 
     const authActions = document.getElementById("authActions");
     const heroBtns = document.getElementById("heroBtns");
-    const themeBtn = document.getElementById("themeToggle");
-    const body = document.body;
-
-    function applySavedTheme() {
-      const saved = localStorage.getItem("theme") || "light";
-      const isDark = saved === "dark";
-
-      body.classList.toggle("dark-theme", isDark);
-      updateThemeIcon(isDark);
-    }
-
-    function updateThemeIcon(isDark) {
-      if (!themeBtn) return;
-
-      themeBtn.innerHTML = isDark
-        ? '<i class="fas fa-sun"></i>'
-        : '<i class="fas fa-moon"></i>';
-    }
-
-    function toggleTheme() {
-      body.classList.toggle("dark-theme");
-
-      const isDark = body.classList.contains("dark-theme");
-
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-      updateThemeIcon(isDark);
-    }
-
-    if (themeBtn) {
-      themeBtn.addEventListener("click", toggleTheme);
-    }
-
-    applySavedTheme();
 
     function clearAuthData() {
       localStorage.removeItem("access_token");
@@ -1065,14 +1466,14 @@ team coordination, task management, risk assessment, and secure workflow control
     };
 
     function renderLoggedOutButtons() {
-      if (!authActions) return;
-
-      authActions.innerHTML = `
-        <a href="login.html" class="btn btn-primary">
-          <i class="fas fa-right-to-bracket"></i>
-          System Access
-        </a>
-      `;
+      if (authActions) {
+        authActions.innerHTML = `
+          <a href="login.html" class="btn btn-primary">
+            <i class="fas fa-right-to-bracket"></i>
+            System Access
+          </a>
+        `;
+      }
 
       if (heroBtns) {
         heroBtns.innerHTML = `
@@ -1085,31 +1486,33 @@ team coordination, task management, risk assessment, and secure workflow control
             <i class="fas fa-right-to-bracket"></i>
             Login
           </a>
+          <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+            <i class="fab fa-linkedin"></i>
+            LinkedIn Page
+          </a>
         `;
       }
     }
 
     function renderLoggedInButtons(user) {
-      if (!authActions) return;
+      if (authActions) {
+        authActions.innerHTML = `
+          <a href="profile.html" class="btn btn-outline">
+            <i class="fas fa-user"></i>
+            Profile
+          </a>
 
-      const displayName = user?.full_name || user?.email || localStorage.getItem("user_email") || "User";
+          <a href="settings.html" class="btn btn-outline">
+            <i class="fas fa-gear"></i>
+            Settings
+          </a>
 
-authActions.innerHTML = `
-  <a href="profile.html" class="btn btn-outline">
-    <i class="fas fa-user"></i>
-    Profile
-  </a>
-
-  <a href="settings.html" class="btn btn-outline">
-    <i class="fas fa-gear"></i>
-    Settings
-  </a>
-
-  <button type="button" class="btn btn-danger" onclick="logout()">
-    <i class="fas fa-power-off"></i>
-    Logout
-  </button>
-`;
+          <button type="button" class="btn btn-danger" onclick="logout()">
+            <i class="fas fa-power-off"></i>
+            Logout
+          </button>
+        `;
+      }
 
 
       if (heroBtns) {
@@ -1122,6 +1525,10 @@ authActions.innerHTML = `
           <a href="ai_chat.html" class="btn btn-outline">
             <i class="fas fa-robot"></i>
             Open EngiBot
+          </a>
+          <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+            <i class="fab fa-linkedin"></i>
+            LinkedIn Page
           </a>
         `;
       }
@@ -1266,10 +1673,27 @@ authActions.innerHTML = `
         modal.style.display = "none";
       }, 250);
     };
+    // logout logic already handled or present elsewhere
+
+
+    window.toggleAccountMenu = function() {
+        const menu = document.getElementById('accountMenu');
+        if (menu) menu.classList.toggle('show');
+    };
+
+    window.addEventListener('click', function(event) {
+        if (!event.target.closest('.account-dropdown')) {
+            const menu = document.getElementById('accountMenu');
+            if (menu && menu.classList.contains('show')) {
+                menu.classList.remove('show');
+            }
+        }
+    });
 
     loadUserInfo();
     loadProjectStats();
   });
 </script>
+    </main>
 </body>
 </html>

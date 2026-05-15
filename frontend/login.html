@@ -4,6 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="assets/js/theme.js"></script>
 
   <title>EngiSphere | Login</title>
 
@@ -15,13 +16,53 @@
     :root {
       --primary: #2563eb;
       --primary-dark: #1d4ed8;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 22px 60px rgba(15, 23, 42, 0.075);
+    }
+
+    body.dark-theme {
+      --ink: #ffffff;
+      --muted: #cbd5e1;
+      --soft: #020617;
+      --panel: #0f172a;
+      --line: rgba(255, 255, 255, 0.10);
+    }
+
+    body.light-theme {
       --ink: #0f172a;
       --muted: #64748b;
-      --line: #dbe2ea;
       --soft: #f8fafc;
-      --danger: #ef4444;
-      --success: #10b981;
-      --shadow: 0 22px 60px rgba(15, 23, 42, 0.075);
+      --panel: #ffffff;
+      --line: #e2e8f0;
+    }
+
+    body.light-theme .right,
+    body.light-theme .card {
+      background: #ffffff;
+      border-color: #e2e8f0;
+    }
+
+    body.light-theme .submit-btn {
+      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.1);
+    }
+
+    .theme-toggle {
+      background: rgba(15, 23, 42, 0.05);
+      border: 1px solid var(--line);
+      color: var(--ink);
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 14px;
+    }
+
+    body.dark-theme .theme-toggle {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.1);
     }
 
     * {
@@ -114,14 +155,14 @@
     .brand-icon {
       width: 42px;
       height: 42px;
-      border-radius: 14px;
+      border-radius: 18px;
       display: grid;
       place-items: center;
-      background: rgba(37, 99, 235, 0.96);
+      background: #2563eb;
       color: #ffffff;
       font-size: 18px;
       flex: 0 0 auto;
-      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28);
+      box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
     }
 
     .brand-text {
@@ -134,7 +175,7 @@
     }
 
     .brand-text span {
-      color: #93c5fd;
+      color: #3b82f6;
     }
 
     .hero {
@@ -204,22 +245,25 @@
     .card {
       width: 100%;
       max-width: 430px;
-      background: #ffffff;
-      border: 1px solid #e5eaf1;
+      background: #ffffff !important;
+      border: 1px solid #e5e7eb !important;
       border-radius: 26px;
       padding: 34px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
     }
 
     .card h2 {
       font-size: 34px;
       letter-spacing: -1.2px;
       margin-bottom: 10px;
-      color: var(--ink);
+      color: #0f172a !important;
+      display: block !important;
+      visibility: visible !important;
+      font-weight: 800;
     }
 
     .subtitle {
-      color: var(--muted);
+      color: #64748b !important;
       line-height: 1.7;
       font-size: 15px;
       margin-bottom: 26px;
@@ -255,25 +299,25 @@
     .input {
       width: 100%;
       height: 56px;
-      border: 1px solid var(--line);
+      border: 1px solid #dbe3ef !important;
       border-radius: 16px;
-      background: var(--soft);
+      background: #f8fafc !important;
       padding: 0 48px 0 46px;
       font-family: inherit;
       font-size: 14px;
-      color: var(--ink);
+      color: #0f172a !important;
       outline: none;
       transition: 0.2s ease;
     }
 
     .input:focus {
-      border-color: var(--primary);
-      background: #ffffff;
+      border-color: #2563eb;
+      background: #ffffff !important;
       box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
     }
 
     .input::placeholder {
-      color: #94a3b8;
+      color: #94a3b8 !important;
     }
 
     .toggle-pass {
@@ -291,7 +335,7 @@
     }
 
     .toggle-pass:hover {
-      color: var(--primary);
+      color: #2563eb;
       background: #eef2ff;
     }
 
@@ -300,8 +344,8 @@
       height: 56px;
       border: none;
       border-radius: 16px;
-      background: var(--primary);
-      color: #ffffff;
+      background: #2563eb !important;
+      color: #ffffff !important;
       font-family: inherit;
       font-size: 15px;
       font-weight: 800;
@@ -312,12 +356,13 @@
     }
 
     .submit-btn:hover {
-      background: var(--primary-dark);
+      background: #1d4ed8 !important;
       transform: translateY(-1px);
     }
 
     .submit-btn:disabled {
-      opacity: 0.72;
+      opacity: 0.5 !important;
+      background: #94a3b8 !important;
       cursor: not-allowed;
       transform: none;
     }
@@ -325,12 +370,12 @@
     .footer-text {
       margin-top: 22px;
       text-align: center;
-      color: var(--muted);
+      color: #64748b !important;
       font-size: 14px;
     }
 
     .footer-text a {
-      color: var(--primary);
+      color: #2563eb !important;
       font-weight: 800;
     }
 
@@ -474,6 +519,7 @@
     <span id="toastMessage">Done.</span>
   </div>
 
+
   <main class="page">
     <section class="left">
       <a href="home.html" class="brand" aria-label="EngiSphere Home">
@@ -538,7 +584,7 @@
             </div>
           </div>
 
-          <button type="submit" class="submit-btn" id="loginBtn">Access Workspace</button>
+          <button type="submit" class="submit-btn" id="loginBtn">Sign In</button>
         </form>
 
         <div class="footer-text">
@@ -554,7 +600,7 @@
   </main>
 
   <script>
-    const API_BASE_URL = "http://127.0.0.1:8000";
+    const API_BASE_URL = "http://127.0.0.1:8001";
     const HOME_PAGE = "home.html";
 
     const existingToken = localStorage.getItem("access_token");
@@ -677,7 +723,7 @@ return;
         // Only re-enable if we are NOT redirecting (i.e. an error occurred)
         if (!localStorage.getItem("access_token")) {
           btn.disabled = false;
-          btn.textContent = "Access Workspace";
+          btn.textContent = "Sign In";
         }
       }
     });

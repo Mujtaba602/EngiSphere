@@ -16,7 +16,107 @@ window.EngiSphereNotifications = (function () {
 
     const NOTIF_KEY  = "engisphere_notifications";
     const READ_KEY   = "engisphere_notification_read_at";
+    const VERSION_KEY = "engisphere_notifications_version";
+    const CURRENT_VERSION = "2";
     const MAX_STORED = 50;
+
+    // ── Demo Seeding (Phase 6E) ───────────────────────────────────────────
+    
+    function _seedDemoData() {
+        const stored = localStorage.getItem(NOTIF_KEY);
+        if (stored && JSON.parse(stored).length > 0) return;
+
+        const demoNotifs = [
+            {
+                id: "demo_1",
+                type: "high_risk_alert",
+                severity: "high",
+                projectId: 1,
+                projectTitle: "Dubai Smart Bridge",
+                title: "High risk project detected",
+                message: "Dubai Smart Bridge has a risk score of 51/100 and requires immediate management review.",
+                createdAt: new Date().toISOString(),
+                read: false,
+                target: "project-profile",
+                riskScore: 51
+            },
+            {
+                id: "demo_2",
+                type: "system",
+                severity: "warning",
+                projectId: 2,
+                projectTitle: "Riyadh Metro Expansion",
+                title: "Task structure missing",
+                message: "Riyadh Metro Expansion needs defined milestones to improve delivery visibility.",
+                createdAt: new Date(Date.now() - 3600000).toISOString(),
+                read: false,
+                target: "project-profile"
+            },
+            {
+                id: "demo_3",
+                type: "high_risk_alert",
+                severity: "high",
+                projectId: 3,
+                projectTitle: "Doha Energy Control Center",
+                title: "High risk project detected",
+                message: "Doha Energy Control Center has been flagged for analysis due to budget variance.",
+                createdAt: new Date(Date.now() - 7200000).toISOString(),
+                read: false,
+                target: "ai-radar",
+                riskScore: 50
+            },
+            {
+                id: "demo_4",
+                type: "ai",
+                severity: "success",
+                projectId: 4,
+                projectTitle: "Riyadh Business Innovation Tower",
+                title: "AI analysis completed",
+                message: "Operational feasibility for the Business Innovation Tower has been calculated.",
+                createdAt: new Date(Date.now() - 86400000).toISOString(),
+                read: true,
+                target: "ai-radar"
+            },
+            {
+                id: "demo_5",
+                type: "project",
+                severity: "info",
+                projectId: 1,
+                projectTitle: "Dubai Smart Bridge",
+                title: "Project details opened",
+                message: "User 'Manager' accessed the project profile for Dubai Smart Bridge.",
+                createdAt: new Date(Date.now() - 172800000).toISOString(),
+                read: true,
+                target: "project-profile"
+            }
+        ];
+        _save(demoNotifs);
+    }
+    _seedDemoData();
+
+    // ── Migration / Reset (Phase 4 Hard Fix) ───────────────────────────────
+    
+    (function _migrate() {
+        try {
+            const storedVersion = localStorage.getItem(VERSION_KEY);
+            if (storedVersion !== CURRENT_VERSION) {
+                // Clear old notification spam keys
+                const keysToClear = [
+                    "engisphere_notifications",
+                    "engisphere_dashboard_notifications",
+                    "engisphere_notification_cache",
+                    "engisphere_notifications_read_at"
+                ];
+                keysToClear.forEach(k => localStorage.removeItem(k));
+                
+                // We keep read_ids and cleared_ids for now as they are set-based
+                localStorage.setItem(VERSION_KEY, CURRENT_VERSION);
+                console.log(`Notification system migrated to v${CURRENT_VERSION}`);
+            }
+        } catch (e) {
+            console.error("Migration failed", e);
+        }
+    })();
 
     // ── Notification types ─────────────────────────────────────────────────
     const TYPES = [
@@ -43,6 +143,162 @@ window.EngiSphereNotifications = (function () {
         try {
             localStorage.setItem(NOTIF_KEY, JSON.stringify(notifications.slice(0, MAX_STORED)));
         } catch (_) { /* storage full */ }
+    }
+
+    // ── Persistence Helpers (Phase 4) ────────────────────────────────────────
+    
+    function _getReadIds() {
+        try {
+            const raw = localStorage.getItem("engisphere_notifications_read_ids");
+            return new Set(raw ? JSON.parse(raw) : []);
+        } catch (_) { return new Set(); }
+    }
+
+    function _saveReadIds(ids) {
+        localStorage.setItem("engisphere_notifications_read_ids", JSON.stringify(Array.from(ids)));
+    }
+
+    function _getClearedIds() {
+        try {
+            const raw = localStorage.getItem("engisphere_notifications_cleared_ids");
+            return new Set(raw ? JSON.parse(raw) : []);
+        } catch (_) { return new Set(); }
+    }
+
+    function _saveClearedIds(ids) {
+        localStorage.setItem("engisphere_notifications_cleared_ids", JSON.stringify(Array.from(ids)));
+    }
+
+    // ── Smart Notification Logic (Phase 4) ──────────────────────────────────
+    
+    /**
+     * buildSmartNotifications(projects)
+     * Generates a normalized, deduplicated list of intelligent notifications
+     * based on project state and existing alerts.
+     */
+    function buildSmartNotifications(projects = []) {
+        const smartNotifs = [];
+        const clearedIds = _getClearedIds();
+        const readIds = _getReadIds();
+        
+        // 1. Project-State Intelligence (Priority-based, max ONE per project)
+        projects.forEach(p => {
+            const merged = window.EngiSphereProgress ? window.EngiSphereProgress.mergeProjectProgress(p) : p;
+            const status = String(merged.status || "").toLowerCase();
+            const projectId = merged.id;
+            const projectName = merged.title || "Untitled Project";
+
+            // SKIP completed projects for automated risk/status alerts
+            if (status === "completed" || status === "done") return;
+
+            let analysis = null;
+            if (window.EngiSphereAIAnalysis) {
+                analysis = window.EngiSphereAIAnalysis.analyzeProject(merged);
+            }
+            const riskScore = analysis ? analysis.riskScore : 0;
+            const hasTasks = merged.tasks && merged.tasks.length > 0;
+
+            let projectNotif = null;
+
+            // Priority 1: High Risk
+            if (riskScore >= 50) {
+                projectNotif = {
+                    id: `smart_risk_high_${projectId}`,
+                    stableKey: `risk:${projectId}:high`,
+                    type: "high_risk_alert",
+                    severity: "high",
+                    projectId: projectId,
+                    title: "High risk project detected",
+                    message: `${projectName} has a risk score of ${riskScore}/100 and requires management review.`,
+                    createdAt: new Date().toISOString()
+                };
+            } 
+            // Priority 2: Missing Task Structure
+            else if ((status === "active" || status === "in progress") && !hasTasks) {
+                projectNotif = {
+                    id: `smart_task_missing_${projectId}`,
+                    stableKey: `task_missing:${projectId}`,
+                    type: "system",
+                    severity: "warning",
+                    projectId: projectId,
+                    title: "Task structure missing",
+                    message: `${projectName} needs defined milestones to improve delivery visibility.`,
+                    createdAt: new Date().toISOString()
+                };
+            }
+            // Priority 3: Pending Planning
+            else if (status === "pending") {
+                projectNotif = {
+                    id: `smart_status_pending_${projectId}`,
+                    stableKey: `status_pending:${projectId}`,
+                    type: "status_update",
+                    severity: "info",
+                    projectId: projectId,
+                    title: "Pending project awaiting planning",
+                    message: `${projectName} requires planning confirmation before execution.`,
+                    createdAt: new Date().toISOString()
+                };
+            }
+            // Priority 4: Moderate Risk
+            else if (riskScore >= 35) {
+                projectNotif = {
+                    id: `smart_risk_mod_${projectId}`,
+                    stableKey: `risk:${projectId}:mod`,
+                    type: "risk_update",
+                    severity: "warning",
+                    projectId: projectId,
+                    title: "Project risk monitoring",
+                    message: `${projectName} shows moderate risk. Monitor schedule and ownership.`,
+                    createdAt: new Date().toISOString()
+                };
+            }
+
+            if (projectNotif && !clearedIds.has(projectNotif.id)) {
+                smartNotifs.push({
+                    ...projectNotif,
+                    read: readIds.has(projectNotif.id)
+                });
+            }
+        });
+
+        // 2. Load existing rich notifications
+        const rich = _load();
+        
+        // 3. Merge & Deduplicate with Stable Keys
+        const combined = [...smartNotifs, ...rich];
+        const unique = [];
+        const seenKeys = new Map(); // key -> notification object
+
+        combined.forEach(n => {
+            // Generate stable key if not present
+            // For risk, we use a bucketed score or priority level
+            let key = n.stableKey;
+            if (!key) {
+                if (n.type === "high_risk_alert" || n.type === "risk_update") {
+                    // Risk Bucket: round to nearest 5 for some stability but allowing updates
+                    const scoreMatch = n.message.match(/(\d+)\/100/);
+                    const score = scoreMatch ? scoreMatch[1] : "0";
+                    key = `risk:${n.projectId || n.title}:${score}`;
+                } else {
+                    key = n.projectId ? `${n.type}:${n.projectId}` : n.id;
+                }
+            }
+
+            if (!clearedIds.has(n.id)) {
+                const existing = seenKeys.get(key);
+                // Keep the newest one by timestamp
+                if (!existing || new Date(n.createdAt) > new Date(existing.createdAt)) {
+                    seenKeys.set(key, {
+                        ...n,
+                        read: n.read || readIds.has(n.id)
+                    });
+                }
+            }
+        });
+
+        const result = Array.from(seenKeys.values());
+        result.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return result;
     }
 
     // ── Public CRUD API ────────────────────────────────────────────────────
@@ -73,32 +329,52 @@ window.EngiSphereNotifications = (function () {
     }
 
     function getNotifications() {
-        return _load();
+        return _getMergedNotifications();
     }
 
     function getUnreadNotifications() {
-        return _load().filter(n => !n.read);
+        return _getMergedNotifications().filter(n => !n.read);
     }
 
     function markNotificationAsRead(id) {
+        const readIds = _getReadIds();
+        readIds.add(id);
+        _saveReadIds(readIds);
+        
         const notifications = _load().map(n => n.id === id ? { ...n, read: true } : n);
         _save(notifications);
         refreshNotifications();
     }
 
     function markAllNotificationsAsRead() {
+        // We use the current smart notifications as the baseline
+        const projects = window.EngiSphereProjects || [];
+        const currentNotifs = buildSmartNotifications(projects);
+        
+        const readIds = _getReadIds();
+        currentNotifs.forEach(n => readIds.add(n.id));
+        _saveReadIds(readIds);
+
         const notifications = _load().map(n => ({ ...n, read: true }));
         _save(notifications);
-        // Also bump the legacy timestamp for audit-based items
+        
         localStorage.setItem(READ_KEY, Date.now().toString());
         refreshNotifications();
     }
 
     function clearNotifications() {
+        const projects = window.EngiSphereProjects || [];
+        const currentNotifs = buildSmartNotifications(projects);
+        
+        const clearedIds = _getClearedIds();
+        currentNotifs.forEach(n => clearedIds.add(n.id));
+        _saveClearedIds(clearedIds);
+
         _save([]);
         localStorage.removeItem(READ_KEY);
         refreshNotifications();
     }
+
 
     // ── Convenience trigger functions ──────────────────────────────────────
 
@@ -237,27 +513,9 @@ window.EngiSphereNotifications = (function () {
     // Merges rich notifications + important audit log events, deduped by id.
 
     function _getMergedNotifications(limit) {
-        const rich  = _load();
-        const audit = _getImportantAuditLogs().map(_auditLogToNotif);
-        const readAt = Number(localStorage.getItem(READ_KEY) || 0);
-
-        // Mark audit items as read if timestamp is older than readAt
-        const markedAudit = audit.map(n => ({
-            ...n,
-            read: new Date(n.createdAt).getTime() <= readAt
-        }));
-
-        // Merge, deduplicate by id, sort newest first
-        const combined = [...rich, ...markedAudit];
-        const seen = new Set();
-        const unique = combined.filter(n => {
-            if (seen.has(n.id)) return false;
-            seen.add(n.id);
-            return true;
-        });
-
-        unique.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        return limit ? unique.slice(0, limit) : unique;
+        const projects = window.EngiSphereProjects || [];
+        const smart = buildSmartNotifications(projects);
+        return limit ? smart.slice(0, limit) : smart;
     }
 
     function _getUnreadCount() {
@@ -299,46 +557,60 @@ window.EngiSphereNotifications = (function () {
             }
             .notif-dropdown {
                 position: absolute; top: 100%; right: 0; margin-top: 10px; width: 340px;
-                background: var(--panel, #1e293b); border: 1px solid var(--border, rgba(255,255,255,0.1));
-                border-radius: 12px; box-shadow: var(--shadow, 0 10px 25px rgba(0,0,0,0.5));
+                background: #ffffff; border: 1px solid #e2e8f0;
+                border-radius: 16px; box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
                 z-index: 1000; display: none; flex-direction: column; overflow: hidden;
-                backdrop-filter: blur(10px);
+            }
+            body.dark-theme .notif-dropdown {
+                background: var(--sidebar, #0f172a); border: 1px solid rgba(255,255,255,0.1);
+                box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             }
             .notif-dropdown.show { display: flex; }
             .notif-header {
-                padding: 12px 16px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.1));
+                padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
                 display: flex; align-items: center; justify-content: space-between; gap: 8px;
             }
-            .notif-header h4 { margin: 0; font-size: 14px; color: var(--text, #fff); flex: 1; }
-            .notif-header-actions { display: flex; gap: 8px; align-items: center; }
+            body.dark-theme .notif-header { border-bottom: 1px solid rgba(255,255,255,0.08); }
+            .notif-header h4 { margin: 0; font-size: 14px; font-weight: 800; color: #0f172a; flex: 1; }
+            body.dark-theme .notif-header h4 { color: #fff; }
+            .notif-header-actions { display: flex; gap: 10px; align-items: center; }
             .notif-action-btn {
-                background: transparent; border: none; color: var(--primary, #3b82f6);
-                font-size: 11px; cursor: pointer; font-weight: 600; white-space: nowrap;
+                background: transparent; border: none; color: var(--primary);
+                font-size: 11px; cursor: pointer; font-weight: 700; white-space: nowrap;
             }
             .notif-action-btn:hover { text-decoration: underline; }
-            .notif-action-btn.danger { color: var(--danger, #ef4444); }
-            .notif-body { max-height: 360px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
+            .notif-body { max-height: 380px; overflow-y: auto; padding: 0; margin: 0; list-style: none; }
             .notif-item {
-                padding: 12px 16px; border-bottom: 1px solid var(--border, rgba(255,255,255,0.05));
-                display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: background 0.2s;
+                padding: 14px 18px; border-bottom: 1px solid #f1f5f9;
+                display: flex; gap: 12px; align-items: flex-start; cursor: pointer; transition: 0.2s;
             }
+            body.dark-theme .notif-item { border-bottom: 1px solid rgba(255,255,255,0.05); }
             .notif-item:last-child { border-bottom: none; }
-            .notif-item:hover { background: rgba(255,255,255,0.04) !important; }
-            .notif-item.unread { background: rgba(59,130,246,0.05); }
+            .notif-item:hover { background: #f8fafc; }
+            body.dark-theme .notif-item:hover { background: rgba(255,255,255,0.04); }
+            .notif-item.unread { background: rgba(37, 99, 235, 0.03); }
             .notif-icon {
-                width: 30px; height: 30px; border-radius: 50%; display: flex;
+                width: 34px; height: 34px; border-radius: 10px; display: flex;
                 align-items: center; justify-content: center; flex-shrink: 0;
             }
             .notif-content { flex: 1; min-width: 0; }
-            .notif-title { font-size: 12px; font-weight: 700; color: var(--text, #fff); margin-bottom: 2px; }
-            .notif-msg { font-size: 12px; color: var(--muted, #94a3b8); line-height: 1.4; margin-bottom: 4px; }
-            .notif-time { font-size: 10px; color: var(--muted, #94a3b8); }
+            .notif-title { font-size: 12px; font-weight: 800; color: #0f172a; margin-bottom: 3px; }
+            body.dark-theme .notif-title { color: #fff; }
+            .notif-msg { font-size: 12px; color: #64748b; line-height: 1.5; margin-bottom: 4px; }
+            body.dark-theme .notif-msg { color: #94a3b8; }
+            .notif-time { font-size: 10px; color: #94a3b8; font-weight: 600; }
             .notif-unread-dot {
                 display: inline-block; width: 6px; height: 6px; border-radius: 50%;
-                background: var(--primary, #3b82f6); margin-left: 6px; flex-shrink: 0;
+                background: #3b82f6; margin-left: 6px;
             }
-            .notif-arrow { color: var(--muted); align-self: center; margin-left: 4px; flex-shrink: 0; }
-            .notif-empty { padding: 24px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+            .notif-footer {
+                padding: 12px; text-align: center; border-top: 1px solid #f1f5f9;
+            }
+            body.dark-theme .notif-footer { border-top: 1px solid rgba(255,255,255,0.08); }
+            .notif-view-all {
+                font-size: 12px; font-weight: 800; color: var(--primary); text-decoration: none;
+            }
+            .notif-empty { padding: 40px 20px; text-align: center; color: #64748b; font-size: 13px; font-weight: 600; }
         `;
         document.head.appendChild(style);
     }
@@ -374,28 +646,7 @@ window.EngiSphereNotifications = (function () {
     }
 
     function _notifUrl(notif) {
-        const id = notif.projectId;
-        switch (notif.type) {
-            case "progress_update":
-            case "status_update":
-            case "risk_update":
-            case "high_risk_alert":
-                return id ? `project_details.html?projectId=${id}` : "project_details.html";
-            case "pdf_export":
-            case "pdf_export_clicked":
-                return "reports.html";
-            case "team_assignment":
-            case "team_member_invited":
-                return "team_access.html";
-            case "unauthorized_access":
-                return null;
-            case "ai_radar_opened":
-            case "ai_radar_project_loaded":
-            case "ai_analysis_completed":
-                return id ? `solutions.html?projectId=${id}` : "solutions.html";
-            default:
-                return null;
-        }
+        return `notifications.html?id=${notif.id}`;
     }
 
     function _renderHTML(container) {
@@ -415,10 +666,13 @@ window.EngiSphereNotifications = (function () {
                         <h4>Notifications</h4>
                         <div class="notif-header-actions">
                             <button class="notif-action-btn" id="notifReadAllBtn" type="button">Mark all read</button>
-                            <button class="notif-action-btn danger" id="notifClearBtn" type="button">Clear</button>
+                            <button class="notif-action-btn" id="notifClearBtn" type="button" style="color:#ef4444">Clear</button>
                         </div>
                     </div>
                     <ul class="notif-body" id="notifList"></ul>
+                    <div class="notif-footer">
+                        <a href="notifications.html" class="notif-view-all">View all notifications</a>
+                    </div>
                 </div>
             </div>
         `;
@@ -560,6 +814,9 @@ window.EngiSphereNotifications = (function () {
                 _populateList();
             }
         }
+        
+        // Broadcast update to other dashboard components
+        window.dispatchEvent(new CustomEvent('engisphereNotificationsUpdated'));
     }
 
     // ── Public API ─────────────────────────────────────────────────────────
@@ -585,6 +842,7 @@ window.EngiSphereNotifications = (function () {
         initNotificationCenter,
         refreshNotifications,
         renderNotifications,
+        relativeTime: _relativeTime,
 
         // Exposed for testing
         TYPES
