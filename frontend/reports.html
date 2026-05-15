@@ -55,7 +55,7 @@
 
         /* Sidebar */
         .sidebar { width: var(--sidebar-width); background: var(--sidebar); border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; padding: 28px 18px; transition: var(--transition); z-index: 1000; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; }
-        body.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
+        .sidebar.collapsed, body.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
         .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; text-decoration: none; }
         .logo-icon { width: 38px; height: 38px; border-radius: 18px; display: grid; place-items: center; background: var(--primary); color: #ffffff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); font-size: 16px; }
         .logo-text { font-size: 20px; font-weight: 800; color: var(--text-main); letter-spacing: -0.8px; }
@@ -67,11 +67,11 @@
         .nav-link.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
         .nav-link.active i { color: white !important; }
 
-        body.sidebar-collapsed .nav-link { justify-content: center; padding: 12px 0; width: 48px; margin-left: auto; margin-right: auto; }
-        body.sidebar-collapsed .nav-link i { font-size: 18px; margin: 0; }
+        body.sidebar-collapsed .nav-link, .sidebar.collapsed .nav-link { justify-content: center; padding: 12px 0; width: 48px; margin-left: auto; margin-right: auto; }
+        body.sidebar-collapsed .nav-link i, .sidebar.collapsed .nav-link i { font-size: 18px; margin: 0; }
 
         .main { flex: 1; margin-left: var(--sidebar-width); padding: 40px 50px; transition: var(--transition); width: calc(100% - var(--sidebar-width)); }
-        body.sidebar-collapsed .main { margin-left: var(--sidebar-collapsed-width); width: calc(100% - var(--sidebar-collapsed-width)); }
+        body.sidebar-collapsed .main, .main.sidebar-collapsed { margin-left: var(--sidebar-collapsed-width); width: calc(100% - var(--sidebar-collapsed-width)); }
 
         .header { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-start; }
         .header h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
@@ -120,9 +120,9 @@
 
         .sidebar-toggle { position: fixed; left: calc(var(--sidebar-width) - 18px); top: 24px; z-index: 1100; width: 36px; height: 36px; background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); outline: none; }
         .sidebar-toggle:hover { background: var(--primary); color: white; transform: scale(1.1); }
-        body.sidebar-collapsed .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
+        body.sidebar-collapsed .sidebar-toggle, .sidebar.collapsed + .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
         .sidebar-toggle i { transition: transform 0.3s ease; }
-        body.sidebar-collapsed .sidebar-toggle i { transform: rotate(180deg); }
+        body.sidebar-collapsed .sidebar-toggle i, .sidebar.collapsed + .sidebar-toggle i { transform: rotate(180deg); }
 
         .exit-link { margin-top: auto; color: var(--danger) !important; }
         .exit-link:hover { background: rgba(239, 68, 68, 0.08); box-shadow: inset 4px 0 0 var(--danger); color: var(--danger) !important; }
@@ -150,7 +150,7 @@
         <a href="login.html" class="nav-link exit-link"><i class="fas fa-power-off"></i><span>Exit System</span></a>
     </aside>
 
-    <button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-chevron-left"></i></button>
+    <button id="sidebarToggle" class="sidebar-toggle" data-sidebar-toggle><i class="fas fa-chevron-left"></i></button>
 
     <main class="main">
         <div class="header">
@@ -290,20 +290,25 @@
             });
         }
 
-        function initSidebarToggle() {
+        function initSidebarCollapse() {
             const sidebar = document.querySelector(".sidebar");
-            const toggle = document.getElementById('sidebarToggle') || document.querySelector('.sidebar-toggle');
-            if (sidebar && toggle && toggle.dataset.bound !== "true") {
-                toggle.dataset.bound = "true";
-                toggle.addEventListener('click', () => {
-                    document.body.classList.toggle('sidebar-collapsed');
-                });
-            }
+            const mainContent = document.querySelector(".main");
+            const toggle = document.querySelector("[data-sidebar-toggle]");
+
+            if (!sidebar || !toggle || toggle.dataset.bound === "true") return;
+
+            toggle.dataset.bound = "true";
+            toggle.addEventListener("click", function (e) {
+                e.preventDefault();
+                sidebar.classList.toggle("collapsed");
+                document.body.classList.toggle("sidebar-collapsed");
+                if (mainContent) mainContent.classList.toggle("sidebar-collapsed");
+            });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             initThemeToggle();
-            initSidebarToggle();
+            initSidebarCollapse();
 
             // Project context logic
             const PROJECT_DATASET = {
