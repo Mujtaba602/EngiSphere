@@ -192,10 +192,6 @@
                 <button class="theme-toggle" id="themeToggleBtn" title="Toggle Dark/Light Mode">
                     <i class="fas fa-moon"></i>
                 </button>
-                <a href="index.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
-                <a href="team_access.html" id="headerTeamBtn" class="btn btn-outline"><i class="fas fa-users-gear"></i> Team Access</a>
-                <a href="reports.html" id="headerReportsBtn" class="btn btn-outline"><i class="fas fa-file-invoice"></i> Reports</a>
-                <button class="btn btn-primary" onclick="document.getElementById('ai-insights-section').scrollIntoView({behavior: 'smooth'})"><i class="fas fa-satellite"></i> AI Insights</button>
             </div>
         </div>
 
@@ -203,34 +199,34 @@
             <!-- 2. KPI Cards -->
             <div class="stats-grid">
                 <div class="stat-card">
-                    <div class="stat-label">Progress</div>
-                    <div class="stat-value">92%</div>
+                    <div class="stat-label">Project Status</div>
+                    <div class="stat-value" id="kpiStatus">Active</div>
+                    <div class="stat-badge" id="kpiStatusBadge">Current</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Risk Level</div>
+                    <div class="stat-value" id="kpiRisk">Low</div>
+                    <div class="stat-badge" id="kpiRiskBadge">Stable</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Overall Progress</div>
+                    <div class="stat-value" id="kpiProgress">92%</div>
                     <div class="stat-badge badge-green">On Track</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Budget Usage</div>
-                    <div class="stat-value">68%</div>
+                    <div class="stat-value" id="kpiBudget">68%</div>
                     <div class="stat-badge badge-green">Efficient</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Schedule Health</div>
-                    <div class="stat-value">On Track</div>
+                    <div class="stat-value" id="kpiSchedule">On Track</div>
                     <div class="stat-badge badge-green">Healthy</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Risk Score</div>
-                    <div class="stat-value">18/100</div>
-                    <div class="stat-badge badge-green">Low Risk</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Open Risks</div>
-                    <div class="stat-value">2</div>
-                    <div class="stat-badge badge-green">Stable</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Last AI Scan</div>
-                    <div class="stat-value">Verified</div>
-                    <div class="stat-badge badge-green">Clean</div>
+                    <div class="stat-label">Open Issues</div>
+                    <div class="stat-value" id="kpiIssues">3</div>
+                    <div class="stat-badge badge-green">Managed</div>
                 </div>
             </div>
 
@@ -311,40 +307,18 @@
                 </div>
             </div>
 
-            <!-- 7. Project Progress Tracking -->
+            <!-- 7. Delivery Milestones -->
             <div class="card">
-                <div class="section-title"><i class="fas fa-chart-line"></i> Project Progress Tracking</div>
-                <div class="grid-2">
-                    <div>
-                        <div class="progress-container">
-                            <div class="progress-header"><span>Overall Progress</span><span>92%</span></div>
-                            <div class="progress-bar"><div class="progress-fill" style="width: 92%;"></div></div>
-                        </div>
-                        <div class="progress-container">
-                            <div class="progress-header"><span>Budget Usage</span><span>68%</span></div>
-                            <div class="progress-bar"><div class="progress-fill success" style="width: 68%;"></div></div>
-                        </div>
-                        <div style="margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #d1fae5; color: #065f46; border-radius: 99px; font-size: 12px; font-weight: 800;">
-                            <i class="fas fa-check-circle"></i> Schedule Health: On Track
-                        </div>
-                    </div>
-                    <div>
-                        <div class="meta-label">Milestone Status</div>
-                        <div style="display: grid; gap: 10px; margin-top: 12px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
-                                <span>Design Validation</span><span class="badge badge-completed">Completed</span>
-                            </div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
-                                <span>Sensor Integration</span><span class="badge badge-active">In Progress</span>
-                            </div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
-                                <span>Structural Safety Review</span><span class="badge badge-pending">Scheduled</span>
-                            </div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
-                                <span>Final Handover</span><span class="badge badge-pending" style="background: #f1f5f9; color: #64748b;">Pending</span>
-                            </div>
-                        </div>
-                    </div>
+                <div class="section-title"><i class="fas fa-list-check"></i> Delivery Milestones</div>
+                <div class="table-responsive">
+                    <table class="clean-table" id="milestoneTable">
+                        <thead>
+                            <tr><th>Milestone Name</th><th>Status</th><th>Priority</th><th>Progress</th></tr>
+                        </thead>
+                        <tbody id="milestoneList">
+                            <!-- Dynamic Milestones -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -397,32 +371,31 @@
             </div>
 
             <div class="grid-2">
-                <!-- 10. Geospatial Risk Summary -->
+                <!-- 10. Risk & Action Plan -->
                 <div class="card">
-                    <div class="section-title"><i class="fas fa-earth-americas"></i> Geospatial Risk Summary</div>
-                    <div class="project-meta-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
-                        <div class="meta-item"><div class="meta-label">Location</div><div class="meta-value">Dubai, UAE</div></div>
-                        <div class="meta-item"><div class="meta-label">Geospatial Risk</div><div class="meta-value" style="color: var(--success);">Low</div></div>
-                        <div class="meta-item"><div class="meta-label">Weather Exposure</div><div class="meta-value">Minimal</div></div>
-                        <div class="meta-item"><div class="meta-label">Traffic Dependency</div><div class="meta-value">Moderate</div></div>
-                        <div class="meta-item"><div class="meta-label">Infrastructure</div><div class="meta-value">Controlled</div></div>
+                    <div class="section-title"><i class="fas fa-shield-halved"></i> Risk & Action Plan</div>
+                    <div class="project-meta-grid" style="grid-template-columns: 1fr; gap: 12px;">
+                        <div class="meta-item">
+                            <div class="meta-label">Main Risk</div>
+                            <div class="meta-value" id="riskPlanTitle">Structural sensor delivery delay</div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="meta-item"><div class="meta-label">Impact</div><div class="meta-value" id="riskPlanImpact">Minor schedule impact</div></div>
+                            <div class="meta-item"><div class="meta-label">Owner</div><div class="meta-value" id="riskPlanOwner">Ahmed M.</div></div>
+                        </div>
                     </div>
-                    <div style="margin-top: 16px; padding: 12px; background: var(--bg-soft); border-radius: 12px;">
-                        <div class="meta-label">Recommended Action</div>
-                        <p style="font-size: 13px; font-weight: 700; margin-top: 4px;">Continue monitoring nearby infrastructure and traffic conditions.</p>
+                    <div style="margin-top: 16px; padding: 16px; background: var(--bg-soft); border-radius: 16px; border-left: 4px solid var(--primary);">
+                        <div class="meta-label" style="color: var(--primary);">Recommended Mitigation</div>
+                        <p style="font-size: 13px; font-weight: 600; margin-top: 4px; line-height: 1.5;" id="riskPlanMitigation">Continue weekly monitoring, maintain structural sensor checks, and review supplier status every 7 days.</p>
+                        <div style="margin-top: 8px; font-size: 11px; font-weight: 700; color: var(--text-muted);">DUE DATE: <span id="riskPlanDue">2026-06-15</span></div>
                     </div>
                 </div>
 
-                <!-- 11. Extended Activity Log -->
+                <!-- 11. Recent Activity -->
                 <div class="card">
-                    <div class="section-title"><i class="fas fa-clock-rotate-left"></i> Extended Activity Log</div>
-                    <div class="timeline">
-                        <div class="timeline-item">Project data reviewed</div>
-                        <div class="timeline-item">Risk score recalculated</div>
-                        <div class="timeline-item">AI recommendation generated</div>
-                        <div class="timeline-item">Sensor layer checked</div>
-                        <div class="timeline-item">Report preview prepared</div>
-                        <div class="timeline-item">Geospatial dependency reviewed</div>
+                    <div class="section-title"><i class="fas fa-clock-rotate-left"></i> Recent Activity</div>
+                    <div class="timeline" id="activityTimeline">
+                        <!-- Dynamic Activity -->
                     </div>
                 </div>
             </div>
@@ -481,13 +454,43 @@
             setupThemeToggle();
             setupSidebarToggle();
 
-            // Minimal routing fix
             const PROJECT_DATASET = {
-                "PRJ-0001": { title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure", progress: 92, riskScore: 18, openRisks: 2, status: "Active", schedule: "On Track" },
-                "PRJ-0002": { title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure", progress: 64, riskScore: 54, openRisks: 6, status: "Active", schedule: "Delayed" },
-                "PRJ-0003": { title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel", progress: 41, riskScore: 76, openRisks: 9, status: "At Risk", schedule: "Critical" },
-                "PRJ-0004": { title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District", progress: 78, riskScore: 31, openRisks: 3, status: "Active", schedule: "On Track" },
-                "PRJ-0005": { title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure", progress: 57, riskScore: 49, openRisks: 5, status: "Active", schedule: "Watch" }
+                "PRJ-0001": { 
+                    title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure", progress: 92, riskScore: 18, openRisks: 2, status: "Active", schedule: "On Track", budgetUsage: 68, riskLevel: "Low", openIssues: 3,
+                    milestones: [
+                        { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
+                        { name: "Procurement", status: "Completed", priority: "Medium", progress: 100 },
+                        { name: "Structural Review", status: "Completed", priority: "High", progress: 100 },
+                        { name: "Site Execution", status: "In Progress", priority: "High", progress: 85 },
+                        { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
+                    ],
+                    riskPlan: { risk: "Structural sensor delivery delay", impact: "Minor schedule impact", mitigation: "Parallel track testing and redundant supplier validation.", owner: "Ahmed M.", dueDate: "2026-06-15" },
+                    activities: ["Risk score updated by system", "Monthly progress report generated", "Team access permissions reviewed", "Site execution milestone updated"]
+                },
+                "PRJ-0002": { 
+                    title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure", progress: 64, riskScore: 54, openRisks: 6, status: "Active", schedule: "Delayed", budgetUsage: 72, riskLevel: "Medium", openIssues: 12,
+                    milestones: [
+                        { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
+                        { name: "Procurement", status: "In Progress", priority: "High", progress: 45 },
+                        { name: "Structural Review", status: "Pending", priority: "Medium", progress: 0 },
+                        { name: "Site Execution", status: "Pending", priority: "High", progress: 0 },
+                        { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
+                    ],
+                    riskPlan: { risk: "Supply chain bottleneck", impact: "High schedule pressure", mitigation: "Alternative vendor sourcing and priority customs clearance.", owner: "Khalid R.", dueDate: "2026-07-20" },
+                    activities: ["Supply chain risk flagged", "Procurement update logged", "Team access reviewed", "Budget forecast generated"]
+                },
+                "PRJ-0003": { 
+                    title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel", progress: 41, riskScore: 76, openRisks: 9, status: "At Risk", schedule: "Critical", budgetUsage: 85, riskLevel: "High", openIssues: 24,
+                    milestones: [
+                        { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
+                        { name: "Procurement", status: "Delayed", priority: "High", progress: 30 },
+                        { name: "Structural Review", status: "Pending", priority: "High", progress: 0 },
+                        { name: "Site Execution", status: "Pending", priority: "High", progress: 0 },
+                        { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
+                    ],
+                    riskPlan: { risk: "Tunnel boring machine downtime", impact: "Critical path delay", mitigation: "Deploy 24/7 specialist maintenance shift and spare part pre-stocking.", owner: "Sara J.", dueDate: "2026-05-30" },
+                    activities: ["Critical risk alert triggered", "Maintenance report generated", "Executive review scheduled", "Milestone 'Procurement' marked as Delayed"]
+                }
             };
 
             let selectedProjectId = new URLSearchParams(window.location.search).get("project") 
@@ -500,67 +503,62 @@
 
             localStorage.setItem("engisphere-selected-project-id", selectedProjectId);
 
-            if (selectedProjectId !== "PRJ-0001") {
-                const project = PROJECT_DATASET[selectedProjectId];
-                document.title = project.title + " Intelligence | EngiSphere";
-                
-                const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-                let node;
-                while (node = walk.nextNode()) {
-                    if (node.nodeValue.includes("PRJ-0001")) node.nodeValue = node.nodeValue.replace(/PRJ-0001/g, selectedProjectId);
-                    if (node.nodeValue.includes("Dubai Smart Bridge")) node.nodeValue = node.nodeValue.replace(/Dubai Smart Bridge/g, project.title);
-                    if (node.nodeValue.includes("Dubai, UAE")) node.nodeValue = node.nodeValue.replace(/Dubai, UAE/g, project.location);
-                    if (node.nodeValue.includes("Smart Bridge Infrastructure")) node.nodeValue = node.nodeValue.replace(/Smart Bridge Infrastructure/g, project.type);
-                }
+            const project = PROJECT_DATASET[selectedProjectId];
+            document.title = project.title + " Intelligence | EngiSphere";
+            
+            // Header
+            document.querySelector('.header-left h1').innerText = project.title;
+            document.querySelector('.header-left p').innerText = `Comprehensive management of ${project.title} operations`;
 
-                // Update specific KPI DOM elements
-                document.querySelectorAll('.stat-card').forEach(card => {
-                    const label = card.querySelector('.stat-label')?.innerText.trim();
-                    const val = card.querySelector('.stat-value');
-                    const badge = card.querySelector('.stat-badge');
-                    
-                    if (label === 'Progress' && val) val.innerText = project.progress + '%';
-                    if (label === 'Risk Score' && val) {
-                        val.innerText = project.riskScore + '/100';
-                        if (badge) {
-                            badge.innerText = project.riskScore >= 70 ? 'High Risk' : project.riskScore >= 50 ? 'Medium Risk' : 'Low Risk';
-                            if (project.riskScore >= 70) badge.style.cssText = 'background: #fee2e2; color: #991b1b;';
-                            else if (project.riskScore >= 50) badge.style.cssText = 'background: #fef3c7; color: #92400e;';
-                        }
-                    }
-                    if (label === 'Open Risks' && val) val.innerText = project.openRisks;
-                    if (label === 'Schedule Health' && val) {
-                        val.innerText = project.schedule;
-                        if (badge) {
-                            badge.innerText = project.schedule === 'Critical' ? 'Danger' : project.schedule === 'Delayed' ? 'Warning' : 'Healthy';
-                            if (project.schedule === 'Critical') badge.style.cssText = 'background: #fee2e2; color: #991b1b;';
-                            else if (project.schedule !== 'On Track') badge.style.cssText = 'background: #fef3c7; color: #92400e;';
-                        }
-                    }
-                });
+            // KPIs
+            document.getElementById('kpiStatus').innerText = project.status;
+            document.getElementById('kpiRisk').innerText = project.riskLevel;
+            document.getElementById('kpiProgress').innerText = project.progress + '%';
+            document.getElementById('kpiBudget').innerText = project.budgetUsage + '%';
+            document.getElementById('kpiSchedule').innerText = project.schedule;
+            document.getElementById('kpiIssues').innerText = project.openIssues;
 
-                document.querySelectorAll('.meta-item').forEach(item => {
-                    const label = item.querySelector('.meta-label')?.innerText.trim();
-                    const val = item.querySelector('.meta-value');
-                    if (!val) return;
-                    
-                    if (label === 'Status') {
-                        val.innerHTML = `<span class="badge" style="padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; ${project.status === 'At Risk' ? 'background: #fee2e2; color: #991b1b;' : 'background: #dbeafe; color: #1e40af;'}">${project.status}</span>`;
-                    }
-                    if (label === 'Risk Score') val.innerText = project.riskScore + '/100';
-                    if (label === 'Operational Progress') val.innerText = project.progress + '%';
-                    if (label === 'Open Risks') val.innerText = project.openRisks;
-                });
+            // Badges colors
+            const riskBadge = document.getElementById('kpiRiskBadge');
+            riskBadge.innerText = project.riskLevel === 'High' ? 'Critical' : project.riskLevel === 'Medium' ? 'Warning' : 'Stable';
+            riskBadge.className = 'stat-badge ' + (project.riskLevel === 'High' ? 'badge-danger' : project.riskLevel === 'Medium' ? 'badge-warning' : 'badge-green');
+            if (project.riskLevel === 'High') riskBadge.style.cssText = 'background:#fee2e2;color:#991b1b;';
+            else if (project.riskLevel === 'Medium') riskBadge.style.cssText = 'background:#fef3c7;color:#92400e;';
+            else riskBadge.style.cssText = 'background:#d1fae5;color:#065f46;';
 
-                document.querySelectorAll('.progress-container').forEach(container => {
-                    const header = container.querySelector('.progress-header')?.innerText || '';
-                    if (header.includes('Overall Progress')) {
-                        const spans = container.querySelectorAll('span');
-                        if (spans.length > 1) spans[1].innerText = project.progress + '%';
-                        const fill = container.querySelector('.progress-fill');
-                        if (fill) fill.style.width = project.progress + '%';
-                    }
-                });
+            // Milestones
+            const milestoneList = document.getElementById('milestoneList');
+            milestoneList.innerHTML = project.milestones.map(m => `
+                <tr>
+                    <td>${m.name}</td>
+                    <td><span class="badge" style="padding:4px 8px;border-radius:6px;font-size:11px;font-weight:700;background:${m.status === 'Completed' ? '#d1fae5;color:#065f46;' : m.status === 'Delayed' ? '#fee2e2;color:#991b1b;' : '#dbeafe;color:#1e40af;'}">${m.status}</span></td>
+                    <td>${m.priority}</td>
+                    <td>
+                        <div class="progress-bar" style="height:6px;width:100px;background:var(--bg-soft);">
+                            <div class="progress-fill" style="width:${m.progress}%;height:100%;background:var(--primary);border-radius:3px;"></div>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Risk Plan
+            document.getElementById('riskPlanTitle').innerText = project.riskPlan.risk;
+            document.getElementById('riskPlanImpact').innerText = project.riskPlan.impact;
+            document.getElementById('riskPlanOwner').innerText = project.riskPlan.owner;
+            document.getElementById('riskPlanMitigation').innerText = project.riskPlan.mitigation;
+            document.getElementById('riskPlanDue').innerText = project.riskPlan.dueDate;
+
+            // Timeline
+            document.getElementById('activityTimeline').innerHTML = project.activities.map(a => `
+                <div class="timeline-item">${a}</div>
+            `).join('');
+
+            // Walk text nodes for PRJ IDs and minor replacements
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            while (node = walk.nextNode()) {
+                if (node.nodeValue.includes("PRJ-0001")) node.nodeValue = node.nodeValue.replace(/PRJ-0001/g, selectedProjectId);
+                if (node.nodeValue.includes("Dubai Smart Bridge")) node.nodeValue = node.nodeValue.replace(/Dubai Smart Bridge/g, project.title);
             }
 
             // Update project-aware links
@@ -578,12 +576,6 @@
                     a.href = `project_details.html?project=${selectedProjectId}`;
                 }
             });
-
-            // Specific header buttons update
-            const headerTeam = document.getElementById('headerTeamBtn');
-            const headerReports = document.getElementById('headerReportsBtn');
-            if (headerTeam) headerTeam.href = `team_access.html?project=${selectedProjectId}`;
-            if (headerReports) headerReports.href = `reports.html?project=${selectedProjectId}`;
         });
     </script>
 </body>
