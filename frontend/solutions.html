@@ -694,7 +694,7 @@
 
     <script>
         const API_BASE_URL = "http://127.0.0.1:8001";
-        let map, markers = [], projects = [], selectedProject = null;
+        let map, markers = [], markersByProjectId = {}, projects = [], selectedProject = null;
 
         document.addEventListener("DOMContentLoaded", () => {
             initMap();
@@ -750,7 +750,7 @@
             const container = document.getElementById("radarList");
             if (!list.length) { container.innerHTML = '<div class="empty-state">No projects found.</div>'; return; }
             container.innerHTML = list.map(p => `
-                <div class="project-card ${selectedProject?.id === p.id ? 'active' : ''}" onclick="selectProject(${p.id})">
+                <div class="project-card ${selectedProject?.id === p.id ? 'active' : ''}" onclick="selectProject('${p.id}')">
                     <div class="project-card-title">${p.title || p.name}</div>
                     <div class="project-card-sub"><span class="status-badge status-${p.status.toLowerCase().replace(/ /g, '')}">${p.status}</span> <span>${p.location || 'Dubai'}</span></div>
                 </div>
@@ -760,6 +760,7 @@
         function addMarkers(list) {
             markers.forEach(m => map.removeLayer(m));
             markers = [];
+            markersByProjectId = {};
             
             // Jitter coordinates to avoid stacking
             const locationCount = {};
@@ -779,20 +780,30 @@
                     }
 
                     const m = L.marker([lat, lng]).addTo(map);
+                    m.bindPopup(`<strong>${p.title || p.name}</strong><br>${p.location || 'Dubai'}`);
                     m.on("click", () => selectProject(p.id));
                     markers.push(m);
+                    markersByProjectId[p.id] = m;
                 }
             });
         }
 
         function selectProject(id) {
-            selectedProject = projects.find(p => p.id === id);
+            selectedProject = projects.find(p => String(p.id) === String(id));
+            if (!selectedProject) return;
+
             renderProjects(projects);
             document.getElementById("aiSelectedProject").innerHTML = `
                 <div style="font-weight:700; color:var(--text-main); margin-bottom:4px;">${selectedProject.title || selectedProject.name}</div>
                 <div style="font-size:12px; color:var(--text-muted);">${selectedProject.location || 'Dubai'}</div>
             `;
-            if (selectedProject.latitude) map.flyTo([selectedProject.latitude, selectedProject.longitude], 14);
+            
+            if (selectedProject.latitude && selectedProject.longitude) {
+                map.flyTo([selectedProject.latitude, selectedProject.longitude], 13, { duration: 0.8 });
+                const marker = markersByProjectId[id];
+                if (marker) marker.openPopup();
+            }
+            
             document.getElementById("aiSolutionOutput").classList.add("hidden");
         }
 
