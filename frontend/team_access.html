@@ -228,14 +228,78 @@
     </main>
 
     <script>
-        const themeBtn = document.getElementById('themeToggleBtn');
-        themeBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark-theme');
-            localStorage.setItem('engisphere-theme', isDark ? 'dark' : 'light');
-            themeBtn.querySelector('i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme setup
+            const themeBtn = document.getElementById('themeToggleBtn');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const isDark = document.documentElement.classList.toggle('dark-theme');
+                    localStorage.setItem('engisphere-theme', isDark ? 'dark' : 'light');
+                    const icon = themeBtn.querySelector('i');
+                    if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                });
+                const currentTheme = localStorage.getItem('engisphere-theme') || 'dark';
+                const icon = themeBtn.querySelector('i');
+                if (icon) icon.className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            // Minimal sidebar toggle if not handled by sidebar.js
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle && !sidebarToggle.hasAttribute('data-bound')) {
+                sidebarToggle.setAttribute('data-bound', 'true');
+                sidebarToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('sidebar-collapsed');
+                    const i = sidebarToggle.querySelector('i');
+                    if (i) {
+                        i.classList.toggle('fa-chevron-left');
+                        i.classList.toggle('fa-chevron-right');
+                    }
+                });
+            }
+
+            // Project context logic
+            const PROJECT_DATASET = {
+                "PRJ-0001": { title: "Dubai Smart Bridge" },
+                "PRJ-0002": { title: "Riyadh Metro Expansion" },
+                "PRJ-0003": { title: "Doha Coastal Tunnel" },
+                "PRJ-0004": { title: "Abu Dhabi Smart District" },
+                "PRJ-0005": { title: "Jeddah Flood Defense" }
+            };
+
+            let selectedProjectId = new URLSearchParams(window.location.search).get("project") 
+                || localStorage.getItem("engisphere-selected-project-id") 
+                || "PRJ-0001";
+
+            if (!PROJECT_DATASET[selectedProjectId]) {
+                selectedProjectId = "PRJ-0001";
+            }
+
+            localStorage.setItem("engisphere-selected-project-id", selectedProjectId);
+
+            const project = PROJECT_DATASET[selectedProjectId];
+            document.title = `Team Access | ${project.title} | EngiSphere`;
+
+            // Update Header
+            const h1 = document.querySelector('.header h1');
+            if (h1) h1.innerText = `Team Access – ${project.title}`;
+            
+            const pHeader = document.querySelector('.header p');
+            if (pHeader) pHeader.innerText = `Manage team permissions and access for ${selectedProjectId}.`;
+
+            // Sync links
+            document.querySelectorAll('a').forEach(a => {
+                if (a.href.includes('project_details.html')) {
+                    a.href = `project_details.html?project=${selectedProjectId}`;
+                }
+                if (a.href.includes('reports.html')) {
+                    a.href = `reports.html?project=${selectedProjectId}`;
+                }
+                if (a.href.includes('ai-radar.html')) {
+                    // Prevent linking to ai-radar.html as per requirements
+                    a.style.display = 'none';
+                }
+            });
         });
-        const currentTheme = localStorage.getItem('engisphere-theme') || 'dark';
-        themeBtn.querySelector('i').className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     </script>
 </body>
 </html>
