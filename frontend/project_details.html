@@ -498,21 +498,44 @@
     </main>
 
     <script>
-        function setupThemeToggle() {
-            const themeBtn = document.getElementById('themeToggleBtn');
-            if (!themeBtn) return;
+        const THEME_KEY = "theme";
 
-            const updateIcon = (isDark) => {
-                themeBtn.querySelector('i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
-            };
+        function getThemeToggleButton() {
+            return (
+                document.getElementById("themeToggle") ||
+                document.getElementById("themeToggleBtn") ||
+                document.querySelector("[data-theme-toggle]") ||
+                document.querySelector(".theme-toggle")
+            );
+        }
 
-            const isDark = document.documentElement.classList.contains('dark-theme');
-            updateIcon(isDark);
+        function applyTheme(theme) {
+            const isDark = theme === "dark";
+            document.body.classList.toggle("dark-theme", isDark);
+            document.documentElement.classList.toggle("dark-theme", isDark);
+            document.body.classList.toggle("dark", isDark);
+            document.documentElement.classList.toggle("dark", isDark);
+            localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
+            const themeToggle = getThemeToggleButton();
+            if (themeToggle) {
+                themeToggle.innerHTML = isDark ? "☀️" : "🌙";
+                themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
+                themeToggle.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
+            }
+        }
 
-            themeBtn.addEventListener('click', () => {
-                const nowDark = document.documentElement.classList.toggle('dark-theme');
-                localStorage.setItem('engisphere-theme', nowDark ? 'dark' : 'light');
-                updateIcon(nowDark);
+        function initThemeToggle() {
+            const savedTheme = localStorage.getItem(THEME_KEY) || "light";
+            applyTheme(savedTheme === "dark" ? "dark" : "light");
+            const themeToggle = getThemeToggleButton();
+            if (!themeToggle || themeToggle.dataset.bound === "true") return;
+            themeToggle.dataset.bound = "true";
+            themeToggle.addEventListener("click", function () {
+                const isDark = document.body.classList.contains("dark-theme") || 
+                              document.documentElement.classList.contains("dark-theme") || 
+                              document.body.classList.contains("dark") || 
+                              document.documentElement.classList.contains("dark");
+                applyTheme(isDark ? "light" : "dark");
             });
         }
 
@@ -528,7 +551,7 @@
         let currentFilter = 'All';
 
         document.addEventListener('DOMContentLoaded', () => {
-            setupThemeToggle();
+            initThemeToggle();
             setupSidebarToggle();
 
             const PROJECT_DATASET = {
