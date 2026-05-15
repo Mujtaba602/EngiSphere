@@ -292,16 +292,14 @@
         .timeline-item { position: relative; margin-bottom: 20px; font-size: 13px; font-weight: 600; }
         .timeline-item::before { content: ""; position: absolute; left: -27px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--card-bg); }
 
-        /* Decision Panel */
-        .decision-panel { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; }
-        .decision-panel .section-title { color: white; }
-        .decision-panel .section-title i { color: white; }
-        .decision-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
-        .decision-main h2 { font-size: 24px; font-weight: 800; margin: 8px 0; }
-        .decision-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .meta-box { padding: 16px; background: rgba(255, 255, 255, 0.1); border-radius: 16px; }
-        .meta-box label { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.8; }
-        .meta-box span { display: block; font-size: 16px; font-weight: 700; margin-top: 4px; }
+        /* Decision Section */
+        .decision-panel { border: 1px solid var(--primary-soft); background: var(--card-bg); }
+        .decision-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 32px; align-items: center; }
+        .decision-main h2 { font-size: 22px; font-weight: 800; color: var(--primary); margin: 4px 0; }
+        .decision-meta { display: flex; gap: 16px; justify-content: flex-end; }
+        .meta-box { padding: 12px 20px; background: var(--bg-soft); border-radius: 14px; border: 1px solid var(--border-soft); min-width: 140px; }
+        .meta-box label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; }
+        .meta-box span { display: block; font-size: 15px; font-weight: 700; color: var(--text-main); }
 
         .theme-toggle { width: 44px; height: 44px; border-radius: 14px; background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 18px; }
         .theme-toggle:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
@@ -627,14 +625,14 @@
 
             </div>
 
-            <!-- 12. Executive Decision Panel -->
+            <!-- 12. Executive Decision -->
             <div class="card decision-panel">
-                <div class="section-title"><i class="fas fa-gavel"></i> Executive Decision Panel</div>
+                <div class="section-title"><i class="fas fa-gavel"></i> Executive Decision</div>
                 <div class="decision-grid">
                     <div class="decision-main">
-                        <p style="opacity: 0.9; font-size: 14px;">Recommended Strategic Direction:</p>
+                        <p style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Recommended Strategic Direction</p>
                         <h2 id="decisionDirection">Continue as planned</h2>
-                        <p style="margin-top: 12px; font-size: 14px; line-height: 1.5; opacity: 0.9;"><strong style="margin-right: 4px;">Reason:</strong> <span id="decisionReason">Low risk, stable procurement, and controlled critical path schedule.</span></p>
+                        <p style="margin-top: 8px; font-size: 13px; line-height: 1.5; color: var(--text-main);"><strong style="margin-right: 4px; color: var(--text-muted);">Reason:</strong> <span id="decisionReason">Low risk, stable procurement, and controlled critical path schedule.</span></p>
                     </div>
                     <div class="decision-meta">
                         <div class="meta-box"><label>Next Review</label><span id="decisionReview">7 days</span></div>
