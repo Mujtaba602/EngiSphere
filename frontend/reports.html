@@ -53,18 +53,22 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Plus Jakarta Sans", sans-serif; background: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; transition: var(--transition); }
 
+        /* Sidebar */
         .sidebar { width: var(--sidebar-width); background: var(--sidebar); border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; padding: 28px 18px; transition: var(--transition); z-index: 1000; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; }
         body.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
         .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; text-decoration: none; }
-        .logo-icon { width: 38px; height: 38px; border-radius: 18px; display: grid; place-items: center; background: var(--primary); color: #ffffff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); }
+        .logo-icon { width: 38px; height: 38px; border-radius: 18px; display: grid; place-items: center; background: var(--primary); color: #ffffff; box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25); font-size: 16px; }
         .logo-text { font-size: 20px; font-weight: 800; color: var(--text-main); letter-spacing: -0.8px; }
         .logo-text span { color: var(--primary); }
         body.sidebar-collapsed .logo-text, body.sidebar-collapsed .nav-section, body.sidebar-collapsed .nav-link span { display: none; }
         .nav-section { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 14px 0 6px 14px; letter-spacing: 1px; }
         .nav-link { display: flex; align-items: center; gap: 14px; padding: 12px 16px; border-radius: 14px; color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 13px; transition: var(--transition); margin-bottom: 4px; }
         .nav-link:hover { background: var(--primary-soft); color: var(--primary); }
-        .nav-link.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white !important; }
+        .nav-link.active { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
         .nav-link.active i { color: white !important; }
+
+        body.sidebar-collapsed .nav-link { justify-content: center; padding: 12px 0; width: 48px; margin-left: auto; margin-right: auto; }
+        body.sidebar-collapsed .nav-link i { font-size: 18px; margin: 0; }
 
         .main { flex: 1; margin-left: var(--sidebar-width); padding: 40px 50px; transition: var(--transition); width: calc(100% - var(--sidebar-width)); }
         body.sidebar-collapsed .main { margin-left: var(--sidebar-collapsed-width); width: calc(100% - var(--sidebar-collapsed-width)); }
@@ -114,8 +118,14 @@
         .btn-outline { background: var(--card-bg); color: var(--text-main); }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
 
-        .sidebar-toggle { position: fixed; left: calc(var(--sidebar-width) - 18px); top: 24px; z-index: 1100; width: 36px; height: 36px; background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+        .sidebar-toggle { position: fixed; left: calc(var(--sidebar-width) - 18px); top: 24px; z-index: 1100; width: 36px; height: 36px; background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); outline: none; }
+        .sidebar-toggle:hover { background: var(--primary); color: white; transform: scale(1.1); }
         body.sidebar-collapsed .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
+        .sidebar-toggle i { transition: transform 0.3s ease; }
+        body.sidebar-collapsed .sidebar-toggle i { transform: rotate(180deg); }
+
+        .exit-link { margin-top: auto; color: var(--danger) !important; }
+        .exit-link:hover { background: rgba(239, 68, 68, 0.08); box-shadow: inset 4px 0 0 var(--danger); color: var(--danger) !important; }
         .theme-toggle { background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--text-main); padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
     </style>
 </head>
@@ -130,13 +140,14 @@
             <div class="nav-section">Core Systems</div>
             <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span>Home</span></a>
             <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
+            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i><span>Geospatial Radar</span></a>
             <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i><span>AI EngiBot</span></a>
             <div class="nav-section">Management</div>
             <a href="project_details.html" class="nav-link"><i class="fas fa-folder-open"></i><span>Project Details</span></a>
             <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span>Team Access</span></a>
             <a href="reports.html" class="nav-link active"><i class="fas fa-file-invoice"></i><span>Reports</span></a>
         </nav>
-        <a href="login.html" class="nav-link" style="color:var(--danger); margin-top: auto;"><i class="fas fa-power-off"></i><span>Exit System</span></a>
+        <a href="login.html" class="nav-link exit-link"><i class="fas fa-power-off"></i><span>Exit System</span></a>
     </aside>
 
     <button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-chevron-left"></i></button>
@@ -279,22 +290,20 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initThemeToggle();
-
-            // Minimal sidebar toggle if not handled by sidebar.js
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            if (sidebarToggle && !sidebarToggle.hasAttribute('data-bound')) {
-                sidebarToggle.setAttribute('data-bound', 'true');
-                sidebarToggle.addEventListener('click', () => {
+        function initSidebarToggle() {
+            const sidebar = document.querySelector(".sidebar");
+            const toggle = document.getElementById('sidebarToggle') || document.querySelector('.sidebar-toggle');
+            if (sidebar && toggle && toggle.dataset.bound !== "true") {
+                toggle.dataset.bound = "true";
+                toggle.addEventListener('click', () => {
                     document.body.classList.toggle('sidebar-collapsed');
-                    const i = sidebarToggle.querySelector('i');
-                    if (i) {
-                        i.classList.toggle('fa-chevron-left');
-                        i.classList.toggle('fa-chevron-right');
-                    }
                 });
             }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initThemeToggle();
+            initSidebarToggle();
 
             // Project context logic
             const PROJECT_DATASET = {
