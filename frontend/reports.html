@@ -247,14 +247,106 @@
     </main>
 
     <script>
-        const themeBtn = document.getElementById('themeToggleBtn');
-        themeBtn.addEventListener('click', () => {
-            const isDark = document.documentElement.classList.toggle('dark-theme');
-            localStorage.setItem('engisphere-theme', isDark ? 'dark' : 'light');
-            themeBtn.querySelector('i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme setup
+            const themeBtn = document.getElementById('themeToggleBtn');
+            if (themeBtn) {
+                themeBtn.addEventListener('click', () => {
+                    const isDark = document.documentElement.classList.toggle('dark-theme');
+                    localStorage.setItem('engisphere-theme', isDark ? 'dark' : 'light');
+                    const icon = themeBtn.querySelector('i');
+                    if (icon) icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                });
+                const currentTheme = localStorage.getItem('engisphere-theme') || 'dark';
+                const icon = themeBtn.querySelector('i');
+                if (icon) icon.className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            // Minimal sidebar toggle if not handled by sidebar.js
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            if (sidebarToggle && !sidebarToggle.hasAttribute('data-bound')) {
+                sidebarToggle.setAttribute('data-bound', 'true');
+                sidebarToggle.addEventListener('click', () => {
+                    document.body.classList.toggle('sidebar-collapsed');
+                    const i = sidebarToggle.querySelector('i');
+                    if (i) {
+                        i.classList.toggle('fa-chevron-left');
+                        i.classList.toggle('fa-chevron-right');
+                    }
+                });
+            }
+
+            // Project context logic
+            const PROJECT_DATASET = {
+                "PRJ-0001": { title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure", progress: 92, riskScore: 18, openRisks: 2, status: "Active", schedule: "On Track" },
+                "PRJ-0002": { title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure", progress: 64, riskScore: 54, openRisks: 6, status: "Active", schedule: "Delayed" },
+                "PRJ-0003": { title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel", progress: 41, riskScore: 76, openRisks: 9, status: "At Risk", schedule: "Critical" },
+                "PRJ-0004": { title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District", progress: 78, riskScore: 31, openRisks: 3, status: "Active", schedule: "On Track" },
+                "PRJ-0005": { title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure", progress: 57, riskScore: 49, openRisks: 5, status: "Active", schedule: "Watch" }
+            };
+
+            let selectedProjectId = new URLSearchParams(window.location.search).get("project") 
+                || localStorage.getItem("engisphere-selected-project-id") 
+                || "PRJ-0001";
+
+            if (!PROJECT_DATASET[selectedProjectId]) {
+                selectedProjectId = "PRJ-0001";
+            }
+
+            localStorage.setItem("engisphere-selected-project-id", selectedProjectId);
+
+            const project = PROJECT_DATASET[selectedProjectId];
+            document.title = `Reports | ${project.title} | EngiSphere`;
+
+            // Update Header
+            const h1 = document.querySelector('.header h1');
+            if (h1) h1.innerText = `Reports - ${project.title}`;
+            
+            const pHeader = document.querySelector('.header p');
+            if (pHeader) pHeader.innerText = `Generate and review engineering intelligence reports for ${project.id || selectedProjectId}.`;
+
+            // Update Report Preview Header and Meta
+            const previewH2 = document.querySelector('.preview-header h2');
+            if (previewH2) previewH2.innerText = `Executive Project Intelligence Report: ${project.title}`;
+
+            const metaItems = document.querySelectorAll('.preview-meta .meta-item');
+            metaItems.forEach(item => {
+                if (item.innerText.includes('Project')) {
+                    item.innerHTML = `<strong>Project Context</strong>${project.title} (${selectedProjectId})`;
+                }
+                if (item.innerText.includes('Risk Level')) {
+                    const level = project.riskScore >= 70 ? 'High Risk' : project.riskScore >= 50 ? 'Medium Risk' : 'Low Risk';
+                    item.innerHTML = `<strong>Risk Level</strong>${level} (Score: ${project.riskScore})`;
+                }
+            });
+
+            // Update KPI
+            document.querySelectorAll('.stat-card').forEach(card => {
+                const label = card.querySelector('.stat-label')?.innerText;
+                if (label === 'Open Risks') {
+                    card.querySelector('.stat-value').innerText = project.openRisks;
+                }
+            });
+
+            // Replace generic texts
+            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            while (node = walk.nextNode()) {
+                if (node.nodeValue.includes("EngiSphere Demo")) {
+                    node.nodeValue = node.nodeValue.replace(/EngiSphere Demo/g, project.title);
+                }
+            }
+
+            // Sync links
+            document.querySelectorAll('a').forEach(a => {
+                if (a.href.includes('project_details.html')) {
+                    a.href = `project_details.html?project=${selectedProjectId}`;
+                }
+                if (a.href.includes('team_access.html')) {
+                    a.href = `team_access.html?project=${selectedProjectId}`;
+                }
+            });
         });
-        const currentTheme = localStorage.getItem('engisphere-theme') || 'dark';
-        themeBtn.querySelector('i').className = currentTheme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
     </script>
 </body>
 </html>
