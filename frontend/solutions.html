@@ -30,6 +30,7 @@
             --shadow-premium: 0 12px 30px rgba(15, 23, 42, 0.06);
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             --sidebar-width: 260px;
+            --sidebar-collapsed-width: 88px;
         }
 
         body.dark-theme {
@@ -155,6 +156,33 @@
             background: rgba(239, 68, 68, 0.08);
             color: var(--danger) !important;
         }
+
+        /* Sidebar Collapsed State */
+        .sidebar.collapsed { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
+        .sidebar.collapsed .logo-text,
+        .sidebar.collapsed .nav-section,
+        .sidebar.collapsed .nav-text,
+        .sidebar.collapsed .exit-text {
+            display: none !important;
+        }
+        .sidebar.collapsed .logo { justify-content: center; }
+        .sidebar.collapsed .nav-link { 
+            width: 56px; height: 56px; padding: 0; justify-content: center; margin-left: auto; margin-right: auto; border-radius: 18px;
+        }
+        .sidebar.collapsed .nav-link i { font-size: 18px; margin: 0; }
+
+        .sidebar-toggle { 
+            position: fixed; left: calc(var(--sidebar-width) - 18px); top: 24px; z-index: 2100; width: 36px; height: 36px; 
+            background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--primary); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); 
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); outline: none; 
+        }
+        .sidebar-toggle:hover { background: var(--primary); color: white; transform: scale(1.1); }
+        body.sidebar-collapsed .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
+        .sidebar-toggle i { transition: transform 0.3s ease; }
+        body.sidebar-collapsed .sidebar-toggle i { transform: rotate(180deg); }
+
+        body.sidebar-collapsed .main-radar { margin-left: 0; }
 
         /* Main Map Viewport */
         .main-radar {
@@ -609,22 +637,24 @@
 
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
-            <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
-            <a href="solutions.html" class="nav-link active"><i class="fas fa-satellite"></i><span>Geospatial Radar</span></a>
-            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i><span>AI EngiBot</span></a>
+            <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span class="nav-text">Home</span></a>
+            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span class="nav-text">Dashboard</span></a>
+            <a href="solutions.html" class="nav-link active"><i class="fas fa-satellite"></i><span class="nav-text">Geospatial Radar</span></a>
+            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i><span class="nav-text">AI EngiBot</span></a>
 
             <div class="nav-section">Management</div>
-            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-open"></i><span>Project Details</span></a>
-            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span>Team Access</span></a>
-            <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i><span>Reports</span></a>
+            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-open"></i><span class="nav-text">Project Details</span></a>
+            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span class="nav-text">Team Access</span></a>
+            <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i><span class="nav-text">Reports</span></a>
         </nav>
 
         <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
             <i class="fas fa-power-off"></i>
-            <span>Exit System</span>
+            <span class="exit-text">Exit System</span>
         </a>
     </aside>
+
+    <button id="sidebarToggle" class="sidebar-toggle" data-sidebar-toggle><i class="fas fa-chevron-left"></i></button>
 
     <main class="main-radar">
         <div id="map"></div>
@@ -974,6 +1004,47 @@
             renderProjects(filtered);
             addMarkers(filtered);
         }
+
+        const SIDEBAR_KEY = "sidebarCollapsed";
+
+        function setSidebarCollapsed(isCollapsed) {
+            const sidebar = document.querySelector(".sidebar");
+            const mainContent = document.querySelector(".main-radar");
+            if (!sidebar) return;
+
+            sidebar.classList.toggle("collapsed", isCollapsed);
+            document.body.classList.toggle("sidebar-collapsed", isCollapsed);
+            
+            localStorage.setItem(SIDEBAR_KEY, isCollapsed ? "true" : "false");
+
+            const toggle = document.querySelector("[data-sidebar-toggle]");
+            if (toggle) {
+                toggle.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
+                toggle.setAttribute("title", isCollapsed ? "Expand sidebar" : "Collapse sidebar");
+            }
+        }
+
+        function initSidebarCollapse() {
+            const sidebar = document.querySelector(".sidebar");
+            const toggle = document.querySelector("[data-sidebar-toggle]");
+            if (!sidebar) return;
+
+            const savedCollapsed = localStorage.getItem(SIDEBAR_KEY) === "true";
+            setSidebarCollapsed(savedCollapsed);
+
+            if (!toggle || toggle.dataset.bound === "true") return;
+            toggle.dataset.bound = "true";
+            toggle.addEventListener("click", function (e) {
+                e.preventDefault();
+                const currentlyCollapsed = sidebar.classList.contains("collapsed");
+                setSidebarCollapsed(!currentlyCollapsed);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initSidebarCollapse();
+            // ... other initializations if needed
+        });
     </script>
 </body>
 </html>
