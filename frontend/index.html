@@ -2122,8 +2122,8 @@
                         Open EngiBot
                     </a>
 
-                    <a class="hero-action" href="ai-radar.html">
-                        View Project Map
+                    <a class="hero-action" href="solutions.html">
+                        View Geospatial Radar
                     </a>
                 </div>
             </div>
@@ -4247,7 +4247,7 @@
 
                         <td style="width: 1%; white-space: nowrap;">
                             <div class="table-btns">
-                                <a href="project_details.html?id=${projectId}" class="table-btn primary">
+                                <a href="project_details.html?project=${projectId}" class="table-btn primary">
                                     View
                                 </a>
 
@@ -4255,9 +4255,6 @@
                                     Edit
                                 </button>
                                 
-                                <a href="solutions.html?id=${projectId}" class="table-btn radar">
-                                    <i class="fas fa-brain" style="margin-right:6px;"></i> AI Radar
-                                </a>
 
                                 <button class="table-btn danger" type="button" onclick="deleteProject('${projectId}')">
                                     Delete
@@ -4876,9 +4873,6 @@
                                 <button class="table-btn" type="button" onclick="alert('Demo mode: editing project data is available as a frontend preview.')">
                                     Edit
                                 </button>
-                                <a href="ai-radar.html?project=${p.id}" class="table-btn radar">
-                                    <i class="fas fa-satellite" style="margin-right:6px;"></i> AI Radar
-                                </a>
                             </div>
                         </td>
                     </tr>
