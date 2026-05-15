@@ -535,7 +535,14 @@
             });
         }
 
-            });
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = value;
+        }
+
+        function renderHTML(id, html) {
+            const el = document.getElementById(id);
+            if (el) el.innerHTML = html;
         }
 
         const projectTeamData = {
@@ -665,28 +672,30 @@
         function updateTeamPage(projectId) {
             const data = projectTeamData[projectId] || projectTeamData["PRJ-0001"];
             
-            // 1. Header
+            // 1. Header & Document Title
             document.title = `Team Access | ${data.name} | EngiSphere`;
-            document.getElementById('headerTitle').innerText = `Team Access – ${data.name}`;
-            document.getElementById('headerSub').innerText = `Manage access, roles, and permission coverage for ${data.id}.`;
+            setText('headerTitle', `Team Access – ${data.name}`);
+            setText('headerSub', `Manage access, roles, and permission coverage for ${data.id}.`);
 
             // 2. KPIs
-            document.getElementById('kpiTotal').innerText = data.totalMembers;
-            document.getElementById('kpiActive').innerText = data.activeUsers;
-            document.getElementById('kpiPending').innerText = data.pendingInvites;
+            setText('kpiTotal', data.totalMembers);
+            setText('kpiActive', data.activeUsers);
+            setText('kpiPending', data.pendingInvites);
+            
             const healthVal = document.getElementById('kpiHealth');
-            healthVal.innerText = data.accessHealth;
-            healthVal.style.color = data.accessHealth === 'Controlled' ? 'var(--success)' : data.accessHealth === 'Review Needed' ? 'var(--warning)' : 'var(--danger)';
+            if (healthVal) {
+                healthVal.textContent = data.accessHealth;
+                healthVal.style.color = data.accessHealth === 'Controlled' ? 'var(--success)' : data.accessHealth === 'Review Needed' ? 'var(--warning)' : 'var(--danger)';
+            }
 
             // 3. Access Overview
-            document.getElementById('overviewModel').innerText = data.accessModel;
-            document.getElementById('overviewExternal').innerText = data.externalUsers;
-            document.getElementById('overviewLimited').innerText = data.limitedUsers;
-            document.getElementById('overviewReview').innerText = data.lastReview;
+            setText('overviewModel', data.accessModel);
+            setText('overviewExternal', data.externalUsers);
+            setText('overviewLimited', data.limitedUsers);
+            setText('overviewReview', data.lastReview);
 
             // 4. Team Table
-            const tbody = document.getElementById('teamMemberList');
-            tbody.innerHTML = data.members.map(m => `
+            const membersHTML = data.members.map(m => `
                 <tr>
                     <td>
                         <div class="member-info">
@@ -704,10 +713,10 @@
                     <td>${m.last}</td>
                 </tr>
             `).join('');
+            renderHTML('teamMemberList', membersHTML);
 
             // 5. Permission Matrix
-            const matrixBody = document.getElementById('permissionMatrixList');
-            matrixBody.innerHTML = data.matrix.map(row => `
+            const matrixHTML = data.matrix.map(row => `
                 <tr>
                     <td style="font-weight: 800;">${row[0]}</td>
                     ${row.slice(1).map(cell => `
@@ -715,14 +724,13 @@
                     `).join('')}
                 </tr>
             `).join('');
+            renderHTML('permissionMatrixList', matrixHTML);
 
             // 6. Access Governance
-            const govList = document.getElementById('governanceNotesList');
-            govList.innerHTML = data.gov.map(note => `
-                <div class="gov-card"><p>${note}</p></div>
-            `).join('');
+            const govHTML = data.gov.map(note => `<div class="gov-card"><p>${note}</p></div>`).join('');
+            renderHTML('governanceNotesList', govHTML);
 
-            // 7. Sidebar Links
+            // 7. Context Persistence
             document.querySelectorAll('.sidebar .nav-link').forEach(link => {
                 const href = link.getAttribute('href');
                 if (href && (href.includes('project_details.html') || href.includes('reports.html') || href.includes('team_access.html'))) {
@@ -731,7 +739,8 @@
                 }
             });
 
-            document.getElementById('projectSwitcher').value = data.id;
+            const switcher = document.getElementById('projectSwitcher');
+            if (switcher) switcher.value = data.id;
             localStorage.setItem("engisphere-selected-project-id", data.id);
         }
 
