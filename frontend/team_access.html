@@ -262,7 +262,39 @@
 
         .exit-link { margin-top: auto; color: var(--danger) !important; }
         .exit-link:hover { background: rgba(239, 68, 68, 0.08); box-shadow: inset 4px 0 0 var(--danger); color: var(--danger) !important; }
+        
+        .header-actions { display: flex; align-items: center; gap: 12px; }
         .theme-toggle { background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--text-main); padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
+        
+        .project-switcher {
+            background: var(--card-bg);
+            border: 1px solid var(--border-soft);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+            transition: var(--transition);
+        }
+        .project-switcher:hover { border-color: var(--primary); }
+
+        .btn-secondary {
+            background: var(--bg-soft);
+            color: var(--primary);
+            border: 1px solid var(--primary-soft);
+            padding: 10px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-secondary:hover { background: var(--primary-soft); transform: translateY(-1px); }
     </style>
 </head>
 <body>
@@ -327,20 +359,32 @@
     <main class="main">
         <div class="header">
             <div>
-                <h1>Team Access</h1>
-                <p>Role-based access overview for engineering project collaboration.</p>
+                <h1 id="headerTitle">Team Access</h1>
+                <p id="headerSub">Role-based access overview for engineering project collaboration.</p>
             </div>
-            <button class="theme-toggle" id="themeToggleBtn">
-                <i class="fas fa-moon"></i>
-                <span>Theme</span>
-            </button>
+            <div class="header-actions">
+                <a href="#" id="backToProject" class="btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Project Details
+                </a>
+                <select id="projectSwitcher" class="project-switcher">
+                    <option value="PRJ-0001">PRJ-0001 - Dubai Smart Bridge</option>
+                    <option value="PRJ-0002">PRJ-0002 - Riyadh Metro Expansion</option>
+                    <option value="PRJ-0003">PRJ-0003 - Doha Coastal Tunnel</option>
+                    <option value="PRJ-0004">PRJ-0004 - Abu Dhabi Smart District</option>
+                    <option value="PRJ-0005">PRJ-0005 - Jeddah Flood Defense</option>
+                </select>
+                <button class="theme-toggle" id="themeToggleBtn">
+                    <i class="fas fa-moon"></i>
+                    <span>Theme</span>
+                </button>
+            </div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-value">4</div></div>
-            <div class="stat-card"><div class="stat-label">Active Users</div><div class="stat-value">3</div></div>
-            <div class="stat-card"><div class="stat-label">Pending Invites</div><div class="stat-value">1</div></div>
-            <div class="stat-card"><div class="stat-label">Access Model</div><div class="stat-value">Role-Based</div></div>
+            <div class="stat-card"><div class="stat-label">Total Members</div><div class="stat-value" id="kpiTotal">0</div></div>
+            <div class="stat-card"><div class="stat-label">Active Users</div><div class="stat-value" id="kpiActive">0</div></div>
+            <div class="stat-card"><div class="stat-label">Pending Invites</div><div class="stat-value" id="kpiPending">0</div></div>
+            <div class="stat-card"><div class="stat-label">Access Model</div><div class="stat-value" id="kpiModel">Role-Based</div></div>
         </div>
 
         <div class="content-section">
@@ -361,35 +405,8 @@
                             <th>Last Activity</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td><div class="member-info"><div class="avatar">SA</div><div><strong>System Admin</strong><br><small style="color:var(--text-muted)">admin@engisphere.com</small></div></div></td>
-                            <td><span class="role-badge">System Owner</span></td>
-                            <td>Full Access</td>
-                            <td><div class="status-badge"><div class="dot dot-active"></div> Active</div></td>
-                            <td>Today</td>
-                        </tr>
-                        <tr>
-                            <td><div class="member-info"><div class="avatar">CE</div><div><strong>Civil Engineer</strong><br><small style="color:var(--text-muted)">civil@engisphere.com</small></div></div></td>
-                            <td><span class="role-badge">Engineering Reviewer</span></td>
-                            <td>Project + Reports</td>
-                            <td><div class="status-badge"><div class="dot dot-active"></div> Active</td>
-                            <td>Today</td>
-                        </tr>
-                        <tr>
-                            <td><div class="member-info"><div class="avatar">PM</div><div><strong>Project Manager</strong><br><small style="color:var(--text-muted)">pm@engisphere.com</small></div></div></td>
-                            <td><span class="role-badge">Delivery Control</span></td>
-                            <td>Dashboard + EngiBot</td>
-                            <td><div class="status-badge"><div class="dot dot-active"></div> Active</td>
-                            <td>Yesterday</td>
-                        </tr>
-                        <tr>
-                            <td><div class="member-info"><div class="avatar" style="background:var(--warning-soft); color:var(--warning)">EC</div><div><strong>External Consultant</strong><br><small style="color:var(--text-muted)">consultant@partner.com</small></div></div></td>
-                            <td><span class="role-badge">Technical Consultant</span></td>
-                            <td>Reports Only</td>
-                            <td><div class="status-badge"><div class="dot dot-pending"></div> Limited</td>
-                            <td>This Week</td>
-                        </tr>
+                    <tbody id="teamMemberList">
+                        <!-- Dynamic Content -->
                     </tbody>
                 </table>
             </div>
@@ -459,46 +476,153 @@
             });
         }
 
+            });
+        }
+
+        const projectTeamData = {
+            "PRJ-0001": {
+                id: "PRJ-0001",
+                name: "Dubai Smart Bridge",
+                totalMembers: 4,
+                activeUsers: 3,
+                pendingInvites: 1,
+                accessModel: "Role-Based",
+                members: [
+                    { initials: "SA", name: "System Admin", email: "admin@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
+                    { initials: "SE", name: "Structural Engineer", email: "structural@engisphere.com", role: "Structural Review", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
+                    { initials: "IS", name: "IoT Specialist", email: "iot@engisphere.com", role: "Sensor Monitoring", access: "Dashboard + EngiBot", status: "Active", type: "active", last: "Yesterday" },
+                    { initials: "EC", name: "External Consultant", email: "consultant@partner.com", role: "Technical Consultant", access: "Reports Only", status: "Limited", type: "pending", last: "This Week" }
+                ]
+            },
+            "PRJ-0002": {
+                id: "PRJ-0002",
+                name: "Riyadh Metro Expansion",
+                totalMembers: 5,
+                activeUsers: 4,
+                pendingInvites: 1,
+                accessModel: "Unified Hub",
+                members: [
+                    { initials: "PD", name: "Program Director", email: "director@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
+                    { initials: "RE", name: "Rail Systems Engineer", email: "rail@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
+                    { initials: "PL", name: "Procurement Lead", email: "procurement@engisphere.com", role: "Delivery Control", access: "Dashboard + Reports", status: "Active", type: "active", last: "Yesterday" },
+                    { initials: "SA", name: "Safety Auditor", email: "safety@partner.com", role: "Compliance Auditor", access: "Reports Only", status: "Limited", type: "active", last: "This Week" },
+                    { initials: "CL", name: "Contractor Lead", email: "contractor@partner.com", role: "Site Coordination", access: "Project View", status: "Pending", type: "pending", last: "Pending Invite" }
+                ]
+            },
+            "PRJ-0003": {
+                id: "PRJ-0003",
+                name: "Doha Coastal Tunnel",
+                totalMembers: 5,
+                activeUsers: 4,
+                pendingInvites: 1,
+                accessModel: "Multi-Org",
+                members: [
+                    { initials: "TL", name: "Tunnel Project Lead", email: "tunnel.lead@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
+                    { initials: "GE", name: "Geotechnical Engineer", email: "geo@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
+                    { initials: "MA", name: "Marine Risk Analyst", email: "marine@engisphere.com", role: "Risk Analyst", access: "Dashboard + EngiBot", status: "Active", type: "active", last: "Yesterday" },
+                    { initials: "QI", name: "QA Inspector", email: "qa@partner.com", role: "Quality Review", access: "Reports Only", status: "Limited", type: "active", last: "This Week" },
+                    { initials: "EP", name: "Emergency Planning Consultant", email: "emergency@partner.com", role: "Risk Consultant", access: "Project View", status: "Pending", type: "pending", last: "Pending Invite" }
+                ]
+            },
+            "PRJ-0004": {
+                id: "PRJ-0004",
+                name: "Abu Dhabi Smart District",
+                totalMembers: 4,
+                activeUsers: 3,
+                pendingInvites: 1,
+                accessModel: "Role-Based",
+                members: [
+                    { initials: "SA", name: "System Admin", email: "admin@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
+                    { initials: "CE", name: "Civil Engineer", email: "civil@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
+                    { initials: "PM", name: "Project Manager", email: "pm@engisphere.com", role: "Delivery Control", access: "Dashboard + EngiBot", status: "Active", type: "active", last: "Yesterday" },
+                    { initials: "EC", name: "External Consultant", email: "consultant@partner.com", role: "Technical Consultant", access: "Reports Only", status: "Limited", type: "pending", last: "This Week" }
+                ]
+            },
+            "PRJ-0005": {
+                id: "PRJ-0005",
+                name: "Jeddah Flood Defense",
+                totalMembers: 5,
+                activeUsers: 4,
+                pendingInvites: 1,
+                accessModel: "Hybrid Access",
+                members: [
+                    { initials: "FM", name: "Flood Program Manager", email: "flood.pm@engisphere.com", role: "System Owner", access: "Full Access", status: "Active", type: "active", last: "Today" },
+                    { initials: "HE", name: "Hydrology Engineer", email: "hydro@engisphere.com", role: "Engineering Reviewer", access: "Project + Reports", status: "Active", type: "active", last: "Today" },
+                    { initials: "GA", name: "GIS Analyst", email: "gis@engisphere.com", role: "Geospatial Review", access: "Dashboard + Radar", status: "Active", type: "active", last: "Yesterday" },
+                    { initials: "ML", name: "Municipal Liaison", email: "municipal@partner.com", role: "Government Liaison", access: "Reports Only", status: "Limited", type: "active", last: "This Week" },
+                    { initials: "SS", name: "Site Supervisor", email: "site@partner.com", role: "Field Operations", access: "Project View", status: "Pending", type: "pending", last: "Pending Invite" }
+                ]
+            }
+        };
+
+        function updateTeamPage(projectId) {
+            const data = projectTeamData[projectId] || projectTeamData["PRJ-0001"];
+            
+            // Update Title & Header
+            document.title = `Team Access | ${data.name} | EngiSphere`;
+            document.getElementById('headerTitle').innerText = `Team Access – ${data.name}`;
+            document.getElementById('headerSub').innerText = `Manage team permissions and access for ${data.id}.`;
+
+            // Update KPIs
+            document.getElementById('kpiTotal').innerText = data.totalMembers;
+            document.getElementById('kpiActive').innerText = data.activeUsers;
+            document.getElementById('kpiPending').innerText = data.pendingInvites;
+            document.getElementById('kpiModel').innerText = data.accessModel;
+
+            // Update Back Button
+            document.getElementById('backToProject').href = `project_details.html?project=${data.id}`;
+
+            // Update Table
+            const tbody = document.getElementById('teamMemberList');
+            tbody.innerHTML = data.members.map(m => `
+                <tr>
+                    <td>
+                        <div class="member-info">
+                            <div class="avatar" style="${m.type === 'pending' ? 'background:var(--warning-soft); color:var(--warning)' : ''}">${m.initials}</div>
+                            <div>
+                                <strong>${m.name}</strong><br>
+                                <small style="color:var(--text-muted)">${m.email}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><span class="role-badge">${m.role}</span></td>
+                    <td>${m.access}</td>
+                    <td>
+                        <div class="status-badge">
+                            <div class="dot ${m.type === 'active' ? 'dot-active' : 'dot-pending'}"></div> ${m.status}
+                        </div>
+                    </td>
+                    <td>${m.last}</td>
+                </tr>
+            `).join('');
+
+            // Update Switcher Value
+            document.getElementById('projectSwitcher').value = data.id;
+
+            // Update Sidebar Links
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && (href.includes('project_details.html') || href.includes('reports.html') || href.includes('team_access.html'))) {
+                    const base = href.split('?')[0];
+                    link.setAttribute('href', `${base}?project=${data.id}`);
+                }
+            });
+
+            // Save to localStorage
+            localStorage.setItem("engisphere-selected-project-id", data.id);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             initThemeToggle();
 
-            // Project context logic
-            const PROJECT_DATASET = {
-                "PRJ-0001": { title: "Dubai Smart Bridge" },
-                "PRJ-0002": { title: "Riyadh Metro Expansion" },
-                "PRJ-0003": { title: "Doha Coastal Tunnel" },
-                "PRJ-0004": { title: "Abu Dhabi Smart District" },
-                "PRJ-0005": { title: "Jeddah Flood Defense" }
-            };
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get("project") || localStorage.getItem("engisphere-selected-project-id") || "PRJ-0001";
 
-            let selectedProjectId = new URLSearchParams(window.location.search).get("project") 
-                || localStorage.getItem("engisphere-selected-project-id") 
-                || "PRJ-0001";
+            updateTeamPage(projectId);
 
-            if (!PROJECT_DATASET[selectedProjectId]) {
-                selectedProjectId = "PRJ-0001";
-            }
-
-            localStorage.setItem("engisphere-selected-project-id", selectedProjectId);
-
-            const project = PROJECT_DATASET[selectedProjectId];
-            document.title = `Team Access | ${project.title} | EngiSphere`;
-
-            // Update Header
-            const h1 = document.querySelector('.header h1');
-            if (h1) h1.innerText = `Team Access – ${project.title}`;
-            
-            const pHeader = document.querySelector('.header p');
-            if (pHeader) pHeader.innerText = `Manage team permissions and access for ${selectedProjectId}.`;
-
-            // Sync links
-            document.querySelectorAll('a').forEach(a => {
-                if (a.href.includes('project_details.html')) {
-                    a.href = `project_details.html?project=${selectedProjectId}`;
-                }
-                if (a.href.includes('reports.html')) {
-                    a.href = `reports.html?project=${selectedProjectId}`;
-                }
+            document.getElementById('projectSwitcher').addEventListener('change', (e) => {
+                const newId = e.target.value;
+                window.location.href = `team_access.html?project=${newId}`;
             });
         });
     </script>
