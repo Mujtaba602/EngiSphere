@@ -118,8 +118,7 @@
         /* Collapsed Sidebar Item Logic */
         body.sidebar-collapsed .logo-text,
         body.sidebar-collapsed .nav-section,
-        body.sidebar-collapsed .nav-link .nav-text,
-        body.sidebar-collapsed .exit-text {
+        body.sidebar-collapsed .nav-link span {
             display: none;
         }
 
@@ -135,9 +134,89 @@
             font-size: 18px;
             margin: 0;
         }
-        
-        body.sidebar-collapsed .logo {
-            justify-content: center;
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 34px;
+            text-decoration: none;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 18px;
+            display: grid;
+            place-items: center;
+            background: var(--primary);
+            color: #ffffff;
+            font-size: 16px;
+            flex: 0 0 auto;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+        }
+
+        .logo-text {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.8px;
+            line-height: 1;
+            color: var(--text-main);
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        .nav-section {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin: 14px 0 6px 14px;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 14px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: var(--transition);
+            margin-bottom: 4px;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-soft);
+            color: var(--primary);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .nav-link.active i {
+            color: white !important;
+        }
+
+        .exit-link {
+            margin-top: auto;
+            color: var(--danger) !important;
+        }
+
+        .exit-link:hover {
+            background: rgba(239, 68, 68, 0.08);
+            box-shadow: inset 4px 0 0 var(--danger);
+            color: var(--danger) !important;
         }
 
         .main { flex: 1; margin-left: var(--sidebar-width); padding: 40px 50px; transition: var(--transition); min-width: 0; }
@@ -274,21 +353,57 @@
 
     <aside class="sidebar">
         <a href="home.html" class="logo">
-            <span class="logo-icon"><i class="fas fa-compass-drafting"></i></span>
+            <span class="logo-icon">
+                <i class="fas fa-compass-drafting"></i>
+            </span>
             <span class="logo-text">ENGI<span>SPHERE</span></span>
         </a>
+
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
-            <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span class="nav-text">Home</span></a>
-            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span class="nav-text">Dashboard</span></a>
-            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i><span class="nav-text">Geospatial Radar</span></a>
-            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i><span class="nav-text">AI EngiBot</span></a>
+
+            <a href="home.html" class="nav-link">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+
+            <a href="index.html" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="solutions.html" class="nav-link">
+                <i class="fas fa-satellite"></i>
+                <span>Geospatial Radar</span>
+            </a>
+
+            <a href="ai_chat.html" class="nav-link">
+                <i class="fas fa-brain"></i>
+                <span>AI EngiBot</span>
+            </a>
+
             <div class="nav-section">Management</div>
-            <a href="project_details.html" class="nav-link active"><i class="fas fa-folder-open"></i><span class="nav-text">Project Details</span></a>
-            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span class="nav-text">Team Access</span></a>
-            <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i><span class="nav-text">Reports</span></a>
+
+            <a href="project_details.html" class="nav-link active">
+                <i class="fas fa-folder-open"></i>
+                <span>Project Details</span>
+            </a>
+
+            <a href="team_access.html" class="nav-link">
+                <i class="fas fa-users-gear"></i>
+                <span>Team Access</span>
+            </a>
+
+            <a href="reports.html" class="nav-link">
+                <i class="fas fa-file-invoice"></i>
+                <span>Reports</span>
+            </a>
         </nav>
-        <a href="login.html" class="nav-link exit-link"><i class="fas fa-power-off"></i><span class="nav-text">Exit System</span></a>
+
+        <a href="login.html" class="nav-link exit-link">
+            <i class="fas fa-power-off"></i>
+            <span>Exit System</span>
+        </a>
     </aside>
 
     <button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-chevron-left"></i></button>
