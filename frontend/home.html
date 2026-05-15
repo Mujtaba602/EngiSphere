@@ -1242,16 +1242,16 @@ body.dark-theme .nav {
 </p>
 
       <div class="hero-actions" id="heroBtns">
-  <a href="register.html" class="btn btn-primary">
+  <a href="register.html" class="btn btn-primary" id="heroGetStartedBtn">
     <i class="fas fa-user-plus"></i>
     Get Started
   </a>
 
-  <a href="login.html" class="btn btn-outline">
+  <a href="login.html" class="btn btn-outline" id="heroLoginBtn">
     <i class="fas fa-right-to-bracket"></i>
     Login
   </a>
-  <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+  <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="btn btn-outline" id="heroLinkedInBtn">
     <i class="fab fa-linkedin"></i>
     LinkedIn Page
   </a>
@@ -1422,10 +1422,22 @@ body.dark-theme .nav {
     function getAuthToken() {
       const keys = ["access_token", "token", "authToken", "engisphere-token", "engisphere_user", "currentUser"];
       for (const key of keys) {
-        const val = localStorage.getItem(key);
+        let val = localStorage.getItem(key);
+        if (val) return val;
+        val = sessionStorage.getItem(key);
         if (val) return val;
       }
       return null;
+    }
+
+    function isUserAuthenticated() {
+      if (getAuthToken()) return true;
+      // Check for visible logout/exit indicators in sidebar
+      const exitLink = document.querySelector('.exit-link');
+      if (exitLink && window.getComputedStyle(exitLink).display !== 'none') {
+          return true;
+      }
+      return false;
     }
 
     const token = getAuthToken();
@@ -1435,7 +1447,10 @@ body.dark-theme .nav {
 
     function clearAuthData() {
       const keys = ["access_token", "token", "authToken", "token_type", "user_email", "engisphere-token", "engisphere_user", "currentUser"];
-      keys.forEach(k => localStorage.removeItem(k));
+      keys.forEach(k => {
+          localStorage.removeItem(k);
+          sessionStorage.removeItem(k);
+      });
     }
 
     window.logout = function () {
@@ -1464,23 +1479,10 @@ body.dark-theme .nav {
         `;
       }
 
-      if (heroBtns) {
-        heroBtns.innerHTML = `
-          <a href="register.html" class="btn btn-primary">
-            <i class="fas fa-user-plus"></i>
-            Get Started
-          </a>
-
-          <a href="login.html" class="btn btn-outline">
-            <i class="fas fa-right-to-bracket"></i>
-            Login
-          </a>
-          <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-            <i class="fab fa-linkedin"></i>
-            LinkedIn Page
-          </a>
-        `;
-      }
+      const loginBtn = document.getElementById("heroLoginBtn");
+      const getStartedBtn = document.getElementById("heroGetStartedBtn");
+      if (loginBtn) loginBtn.style.display = "inline-flex";
+      if (getStartedBtn) getStartedBtn.href = "register.html";
     }
 
     function renderLoggedInButtons(user) {
@@ -1511,29 +1513,23 @@ body.dark-theme .nav {
         `;
       }
 
-
-      if (heroBtns) {
-        heroBtns.innerHTML = `
-          <a href="index.html" class="btn btn-primary">
-            <i class="fas fa-table-columns"></i>
-         Open Workspace
-          </a>
-
-          <a href="ai_chat.html" class="btn btn-outline">
-            <i class="fas fa-robot"></i>
-            Open EngiBot
-          </a>
-          <a href="https://www.linkedin.com/company/engisphere-project" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
-            <i class="fab fa-linkedin"></i>
-            LinkedIn Page
-          </a>
-        `;
+      const loginBtn = document.getElementById("heroLoginBtn");
+      const getStartedBtn = document.getElementById("heroGetStartedBtn");
+      if (loginBtn) loginBtn.style.display = "none";
+      if (getStartedBtn) {
+          getStartedBtn.href = "index.html";
+          getStartedBtn.innerHTML = '<i class="fas fa-table-columns"></i> Get Started';
       }
     }
 
     async function loadUserInfo() {
-      if (!token) {
+      if (!isUserAuthenticated()) {
         renderLoggedOutButtons();
+        return;
+      }
+
+      if (!token) {
+        renderLoggedInButtons({ full_name: "User" });
         return;
       }
 
