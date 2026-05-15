@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details | EngiSphere</title>
+    <title>Dubai Smart Bridge Intelligence | EngiSphere</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -53,6 +53,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Plus Jakarta Sans", sans-serif; background: var(--bg-main); color: var(--text-main); display: flex; min-height: 100vh; overflow-x: hidden; transition: var(--transition); }
 
+        /* Sidebar */
         .sidebar { width: var(--sidebar-width); background: var(--sidebar); border-right: 1px solid var(--border-soft); display: flex; flex-direction: column; padding: 28px 18px; transition: var(--transition); z-index: 1000; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; }
         body.sidebar-collapsed .sidebar { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
         .logo { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; text-decoration: none; }
@@ -70,81 +71,92 @@
         body.sidebar-collapsed .main { margin-left: var(--sidebar-collapsed-width); width: calc(100% - var(--sidebar-collapsed-width)); }
 
         .header { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-start; }
-        .header-left h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
-        .header-meta { display: flex; gap: 16px; align-items: center; margin-top: 8px; }
-        .project-id { font-size: 13px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; background: var(--bg-soft); padding: 4px 10px; border-radius: 6px; }
-        .location-text { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .header-left h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 4px; }
+        .header-left p { color: var(--text-muted); font-size: 14px; }
 
-        .btn { padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: var(--transition); border: 1px solid var(--border-soft); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .header-actions { display: flex; gap: 12px; align-items: center; }
+        .btn { padding: 10px 20px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: var(--transition); border: 1px solid var(--border-soft); display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
         .btn-primary { background: var(--primary); color: white; border: none; }
         .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2); }
         .btn-outline { background: var(--card-bg); color: var(--text-main); }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        /* KPI Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 32px; }
         .stat-card { background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 20px; padding: 20px; box-shadow: var(--shadow-premium); }
-        .stat-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .stat-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .stat-value { font-size: 20px; font-weight: 800; color: var(--text-main); }
-        .progress-mini { height: 6px; background: var(--bg-soft); border-radius: 3px; margin-top: 10px; overflow: hidden; }
-        .progress-mini-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+        .stat-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-top: 8px; }
+        .badge-green { background: #d1fae5; color: #065f46; }
 
-        .content-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
-        .content-section { background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 24px; padding: 28px; box-shadow: var(--shadow-premium); margin-bottom: 24px; }
-        .section-title { font-size: 16px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--text-main); }
-        .section-title i { color: var(--primary); font-size: 14px; }
+        /* Layout */
+        .content-container { max-width: 1200px; margin: 0 auto; }
+        .card { background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 24px; padding: 32px; box-shadow: var(--shadow-premium); margin-bottom: 24px; }
+        .section-title { font-size: 18px; font-weight: 800; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: var(--text-main); }
+        .section-title i { color: var(--primary); }
 
-        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border-soft); font-size: 14px; }
-        .info-row:last-child { border-bottom: none; }
-        .info-label { color: var(--text-muted); font-weight: 600; }
-        .info-value { font-weight: 700; color: var(--text-main); }
+        /* Overview */
+        .project-meta-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .meta-item { padding: 16px; background: var(--bg-soft); border-radius: 16px; }
+        .meta-label { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+        .meta-value { font-size: 15px; font-weight: 700; color: var(--text-main); }
 
-        .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-        .badge-active { background: #d1fae5; color: #065f46; }
-        .badge-pending { background: #fef3c7; color: #92400e; }
-        .badge-completed { background: #dbeafe; color: #1e40af; }
-        .badge-low { background: #d1fae5; color: #065f46; }
-        .badge-medium { background: #fef3c7; color: #92400e; }
-        .badge-high { background: #fee2e2; color: #991b1b; }
+        .executive-summary { border-top: 1px solid var(--border-soft); padding-top: 20px; margin-top: 20px; }
+        .executive-summary h4 { font-size: 14px; font-weight: 800; margin-bottom: 8px; }
+        .executive-summary p { font-size: 15px; line-height: 1.6; color: var(--text-main); }
 
-        .risk-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; }
-        .risk-card { padding: 20px; border-radius: 18px; background: var(--bg-soft); border: 1px solid var(--border-soft); }
-        .risk-card h4 { font-size: 13px; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; color: var(--text-muted); }
-        .risk-card p { font-size: 13px; color: var(--text-main); line-height: 1.5; font-weight: 600; }
+        /* AI Radar Ready Card */
+        .radar-card { background: linear-gradient(135deg, var(--primary-soft), #fff); border: 1px solid var(--primary-soft); display: flex; align-items: center; justify-content: space-between; }
+        .dark-theme .radar-card { background: linear-gradient(135deg, #1e1b4b, #0f172a); }
+        .radar-text h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+        .radar-text p { font-size: 13px; color: var(--text-muted); max-width: 600px; }
 
-        .timeline { position: relative; padding-left: 24px; }
-        .timeline::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: var(--border-soft); }
-        .timeline-item { position: relative; margin-bottom: 20px; }
-        .timeline-dot { position: absolute; left: -21px; top: 4px; width: 10px; height: 10px; border-radius: 50%; background: var(--primary); border: 2px solid var(--card-bg); }
-        .timeline-content h5 { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
-        .timeline-content span { font-size: 11px; color: var(--text-muted); }
+        /* Two column grid */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
 
-        .action-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-        .action-btn { padding: 12px; border-radius: 12px; background: var(--bg-soft); border: 1px solid var(--border-soft); text-align: center; text-decoration: none; color: var(--text-main); font-weight: 700; font-size: 12px; transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 8px; }
-        .action-btn:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
-        .action-btn i { font-size: 18px; }
+        /* Progress Bars */
+        .progress-container { margin-bottom: 16px; }
+        .progress-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+        .progress-bar { height: 10px; background: var(--bg-soft); border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 5px; transition: width 1s ease; }
+        .progress-fill.success { background: var(--success); }
 
+        /* Tables */
+        .table-responsive { overflow-x: auto; }
+        .clean-table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+        .clean-table th { text-align: left; font-size: 11px; text-transform: uppercase; color: var(--text-muted); padding: 12px; border-bottom: 1px solid var(--border-soft); }
+        .clean-table td { padding: 12px; border-bottom: 1px solid var(--border-soft); font-size: 13px; font-weight: 600; }
+
+        /* Report Cards */
+        .report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; }
+        .report-card { padding: 20px; border-radius: 20px; border: 1px solid var(--border-soft); background: var(--card-bg); transition: var(--transition); }
+        .report-card:hover { border-color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow-premium); }
+        .report-card h5 { font-size: 14px; font-weight: 800; margin-bottom: 12px; }
+        .btn-mini { padding: 5px 12px; font-size: 10px; }
+
+        /* Activity Log */
+        .timeline { position: relative; padding-left: 20px; border-left: 2px solid var(--border-soft); margin-left: 10px; }
+        .timeline-item { position: relative; margin-bottom: 20px; font-size: 13px; font-weight: 600; }
+        .timeline-item::before { content: ""; position: absolute; left: -27px; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); border: 2px solid var(--card-bg); }
+
+        /* Decision Panel */
+        .decision-panel { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: white; border: none; }
+        .decision-panel .section-title { color: white; }
+        .decision-panel .section-title i { color: white; }
+        .decision-grid { display: grid; grid-template-columns: 1.5fr 1fr; gap: 24px; }
+        .decision-main h2 { font-size: 24px; font-weight: 800; margin: 8px 0; }
+        .decision-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .meta-box { padding: 16px; background: rgba(255, 255, 255, 0.1); border-radius: 16px; }
+        .meta-box label { font-size: 10px; font-weight: 800; text-transform: uppercase; opacity: 0.8; }
+        .meta-box span { display: block; font-size: 16px; font-weight: 700; margin-top: 4px; }
+
+        .theme-toggle { width: 44px; height: 44px; border-radius: 14px; background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); font-size: 18px; }
+        .theme-toggle:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
+
+        /* Sidebar Toggle */
         .sidebar-toggle { position: fixed; left: calc(var(--sidebar-width) - 18px); top: 24px; z-index: 1100; width: 36px; height: 36px; background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
         body.sidebar-collapsed .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
-
-        .theme-toggle {
-            width: 44px;
-            height: 44px;
-            border-radius: 14px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-soft);
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 18px;
-        }
-        .theme-toggle:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-2px);
-        }
     </style>
 </head>
 <body>
@@ -170,258 +182,279 @@
 
     <button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-chevron-left"></i></button>
 
-    <main class="main" id="mainRoot">
-        <!-- Content will be injected by JS -->
-        <div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
-            <i class="fas fa-spinner fa-spin" style="font-size: 32px; color: var(--primary);"></i>
+    <main class="main">
+        <div class="header">
+            <div class="header-left">
+                <h1>Dubai Smart Bridge</h1>
+                <p>Comprehensive operational overview and risk analysis</p>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggleBtn" title="Toggle Dark/Light Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="index.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+                <a href="solutions.html" class="btn btn-primary"><i class="fas fa-satellite"></i> Run AI Radar</a>
+            </div>
+        </div>
+
+        <div class="content-container">
+            <!-- 2. KPI Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Progress</div>
+                    <div class="stat-value">92%</div>
+                    <div class="stat-badge badge-green">On Track</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Budget Usage</div>
+                    <div class="stat-value">68%</div>
+                    <div class="stat-badge badge-green">Efficient</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Schedule Health</div>
+                    <div class="stat-value">On Track</div>
+                    <div class="stat-badge badge-green">Healthy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Risk Score</div>
+                    <div class="stat-value">18/100</div>
+                    <div class="stat-badge badge-green">Low Risk</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Open Risks</div>
+                    <div class="stat-value">2</div>
+                    <div class="stat-badge badge-green">Stable</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Last AI Scan</div>
+                    <div class="stat-value">Verified</div>
+                    <div class="stat-badge badge-green">Clean</div>
+                </div>
+            </div>
+
+            <!-- 3. Main Project Overview Card -->
+            <div class="card">
+                <div class="section-title"><i class="fas fa-info-circle"></i> Project Profile</div>
+                <div class="project-meta-grid">
+                    <div class="meta-item"><div class="meta-label">Project ID</div><div class="meta-value">PRJ-0001</div></div>
+                    <div class="meta-item"><div class="meta-label">Project Name</div><div class="meta-value">Dubai Smart Bridge</div></div>
+                    <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value"><span class="badge badge-active">Active</span></div></div>
+                    <div class="meta-item"><div class="meta-label">Location</div><div class="meta-value">Dubai, UAE</div></div>
+                    <div class="meta-item"><div class="meta-label">Project Type</div><div class="meta-value">Smart Bridge Infrastructure</div></div>
+                    <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value">18/100</div></div>
+                    <div class="meta-item"><div class="meta-label">Operational Progress</div><div class="meta-value">92%</div></div>
+                </div>
+                <div class="executive-summary">
+                    <h4>Executive Summary</h4>
+                    <p>Smart bridge infrastructure project focused on traffic optimization, IoT monitoring, and structural safety.</p>
+                </div>
+            </div>
+
+            <!-- 4. AI Risk Radar Ready Card -->
+            <div class="card radar-card">
+                <div class="radar-text">
+                    <h3>AI Risk Radar Ready</h3>
+                    <p>Generate a deep-dive analysis of project health, cost realism, schedule stability, geospatial exposure, and structural monitoring performance.</p>
+                </div>
+                <a href="solutions.html" class="btn btn-primary">Analyze Now</a>
+            </div>
+
+            <div class="grid-2">
+                <!-- 5. Risk Scoring Engine -->
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-shield-halved"></i> Risk Scoring Engine</div>
+                    <div class="project-meta-grid" style="grid-template-columns: 1fr 1fr;">
+                        <div class="meta-item"><div class="meta-label">Risk Score</div><div class="meta-value" style="color: var(--success);">18/100</div></div>
+                        <div class="meta-item"><div class="meta-label">Risk Level</div><div class="meta-value">Low Risk</div></div>
+                        <div class="meta-item"><div class="meta-label">Confidence</div><div class="meta-value">94%</div></div>
+                        <div class="meta-item"><div class="meta-label">Open Risks</div><div class="meta-value">2</div></div>
+                    </div>
+                    <div style="margin-top: 16px;">
+                        <div class="meta-label">Main Risk Drivers</div>
+                        <ul style="list-style: none; padding: 0; margin-top: 8px;">
+                            <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Schedule exposure remains low</li>
+                            <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Procurement is stable</li>
+                            <li style="font-size: 13px; font-weight: 600; margin-bottom: 6px;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Critical path is controlled</li>
+                            <li style="font-size: 13px; font-weight: 600;"><i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i> Sensor monitoring is active</li>
+                        </ul>
+                    </div>
+                    <div style="margin-top: 20px; padding: 16px; background: var(--bg-soft); border-radius: 16px; border-left: 4px solid var(--primary);">
+                        <div class="meta-label" style="color: var(--primary);">Recommended Mitigation</div>
+                        <p style="font-size: 13px; font-weight: 600; margin-top: 4px; line-height: 1.5;">Continue weekly monitoring, maintain structural sensor checks, and review supplier status every 7 days.</p>
+                    </div>
+                </div>
+
+                <!-- 6. AI Project Analysis -->
+                <div class="card" style="border: 1px solid var(--primary-soft);">
+                    <div class="section-title"><i class="fas fa-robot"></i> AI Project Analysis</div>
+                    <div style="padding: 20px; background: var(--bg-soft); border-radius: 20px; margin-bottom: 20px;">
+                        <p style="font-size: 14px; font-weight: 600; font-style: italic; line-height: 1.6;">
+                            "EngiSphere AI indicates that Dubai Smart Bridge is currently stable with low delivery exposure. The project is progressing above the portfolio baseline, with controlled procurement, active IoT monitoring, and limited open risks. The recommended approach is to maintain routine monitoring and continue weekly risk review meetings."
+                        </p>
+                    </div>
+                    <div style="display: grid; gap: 12px;">
+                        <div style="padding: 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 12px;">
+                            <div class="meta-label" style="color: var(--danger);">Key Risks</div>
+                            <p style="font-size: 12px; font-weight: 700;">Potential minor delay in structural sensor component delivery.</p>
+                        </div>
+                        <div style="padding: 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 12px;">
+                            <div class="meta-label" style="color: var(--success);">Recommended Actions</div>
+                            <p style="font-size: 12px; font-weight: 700;">Confirm supplier delivery schedules 14 days in advance and maintain weekly review meetings.</p>
+                        </div>
+                        <div style="padding: 12px; background: #fff; border: 1px solid var(--border-soft); border-radius: 12px;">
+                            <div class="meta-label" style="color: var(--primary);">Executive Note</div>
+                            <p style="font-size: 12px; font-weight: 700;">Operational health is strong and the project can continue as planned.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 7. Project Progress Tracking -->
+            <div class="card">
+                <div class="section-title"><i class="fas fa-chart-line"></i> Project Progress Tracking</div>
+                <div class="grid-2">
+                    <div>
+                        <div class="progress-container">
+                            <div class="progress-header"><span>Overall Progress</span><span>92%</span></div>
+                            <div class="progress-bar"><div class="progress-fill" style="width: 92%;"></div></div>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-header"><span>Budget Usage</span><span>68%</span></div>
+                            <div class="progress-bar"><div class="progress-fill success" style="width: 68%;"></div></div>
+                        </div>
+                        <div style="margin-top: 16px; display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #d1fae5; color: #065f46; border-radius: 99px; font-size: 12px; font-weight: 800;">
+                            <i class="fas fa-check-circle"></i> Schedule Health: On Track
+                        </div>
+                    </div>
+                    <div>
+                        <div class="meta-label">Milestone Status</div>
+                        <div style="display: grid; gap: 10px; margin-top: 12px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
+                                <span>Design Validation</span><span class="badge badge-completed">Completed</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
+                                <span>Sensor Integration</span><span class="badge badge-active">In Progress</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
+                                <span>Structural Safety Review</span><span class="badge badge-pending">Scheduled</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 13px; font-weight: 700;">
+                                <span>Final Handover</span><span class="badge badge-pending" style="background: #f1f5f9; color: #64748b;">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- 8. Assigned Team Members -->
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-users"></i> Assigned Team Members</div>
+                    <div class="table-responsive">
+                        <table class="clean-table">
+                            <thead>
+                                <tr><th>Member</th><th>Role</th><th>Access</th><th>Status</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>Project Admin</td><td>System Owner</td><td>Full Access</td><td><span class="badge badge-active">Active</span></td></tr>
+                                <tr><td>Civil Engineer</td><td>Structural Review</td><td>Engineering</td><td><span class="badge badge-active">Active</span></td></tr>
+                                <tr><td>Project Manager</td><td>Delivery Control</td><td>Management</td><td><span class="badge badge-active">Active</span></td></tr>
+                                <tr><td>GIS Analyst</td><td>Geospatial</td><td>Radar Access</td><td><span class="badge badge-active">Active</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 9. Related Reports -->
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-file-invoice"></i> Related Reports</div>
+                    <div class="report-grid">
+                        <div class="report-card">
+                            <h5>Executive Summary</h5>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="badge badge-completed">Ready</span>
+                                <button class="btn btn-outline btn-mini">Preview</button>
+                            </div>
+                        </div>
+                        <div class="report-card">
+                            <h5>Risk Scoring Report</h5>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="badge badge-completed">Ready</span>
+                                <button class="btn btn-outline btn-mini">Preview</button>
+                            </div>
+                        </div>
+                        <div class="report-card">
+                            <h5>Geospatial Snapshot</h5>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="badge badge-completed">Ready</span>
+                                <button class="btn btn-outline btn-mini">Preview</button>
+                            </div>
+                        </div>
+                        <div class="report-card">
+                            <h5>Progress Tracking</h5>
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <span class="badge badge-completed">Ready</span>
+                                <button class="btn btn-outline btn-mini">Preview</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <!-- 10. Geospatial Risk Summary -->
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-earth-americas"></i> Geospatial Risk Summary</div>
+                    <div class="project-meta-grid" style="grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="meta-item"><div class="meta-label">Location</div><div class="meta-value">Dubai, UAE</div></div>
+                        <div class="meta-item"><div class="meta-label">Geospatial Risk</div><div class="meta-value" style="color: var(--success);">Low</div></div>
+                        <div class="meta-item"><div class="meta-label">Weather Exposure</div><div class="meta-value">Minimal</div></div>
+                        <div class="meta-item"><div class="meta-label">Traffic Dependency</div><div class="meta-value">Moderate</div></div>
+                        <div class="meta-item"><div class="meta-label">Infrastructure</div><div class="meta-value">Controlled</div></div>
+                    </div>
+                    <div style="margin-top: 16px; padding: 12px; background: var(--bg-soft); border-radius: 12px;">
+                        <div class="meta-label">Recommended Action</div>
+                        <p style="font-size: 13px; font-weight: 700; margin-top: 4px;">Continue monitoring nearby infrastructure and traffic conditions.</p>
+                    </div>
+                </div>
+
+                <!-- 11. Extended Activity Log -->
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-clock-rotate-left"></i> Extended Activity Log</div>
+                    <div class="timeline">
+                        <div class="timeline-item">Project data reviewed</div>
+                        <div class="timeline-item">Risk score recalculated</div>
+                        <div class="timeline-item">AI recommendation generated</div>
+                        <div class="timeline-item">Sensor layer checked</div>
+                        <div class="timeline-item">Report preview prepared</div>
+                        <div class="timeline-item">Geospatial dependency reviewed</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 12. Executive Decision Panel -->
+            <div class="card decision-panel">
+                <div class="section-title"><i class="fas fa-gavel"></i> Executive Decision Panel</div>
+                <div class="decision-grid">
+                    <div class="decision-main">
+                        <p style="opacity: 0.9; font-size: 14px;">Recommended Strategic Direction:</p>
+                        <h2>Continue as planned</h2>
+                        <p style="margin-top: 12px; font-size: 14px; line-height: 1.5; opacity: 0.9;"><strong>Reason:</strong> Low risk, stable procurement, and controlled critical path schedule.</p>
+                    </div>
+                    <div class="decision-meta">
+                        <div class="meta-box"><label>Next Review</label><span>7 days</span></div>
+                        <div class="meta-box"><label>Escalation Required</label><span>No</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--border-soft); text-align: center; opacity: 0.6;">
+            <p style="font-size: 12px; font-weight: 600;">EngiSphere Platform Context: Integrated Engineering Intelligence Suite v1.0</p>
         </div>
     </main>
 
     <script>
-        const ENGI_PROJECTS = [
-            {
-                id: "PRJ-0001",
-                title: "Dubai Smart Bridge",
-                location: "Dubai, UAE",
-                status: "Active",
-                type: "Infrastructure",
-                progress: 92,
-                riskLevel: "Low",
-                budgetUsage: 68,
-                scheduleHealth: "On Track",
-                openRisks: 2,
-                procurementStatus: "Stable",
-                criticalPathStatus: "Controlled",
-                manager: "Project Admin",
-                contractor: "Gulf Engineering Group",
-                description: "Smart bridge infrastructure project focused on traffic optimization, IoT monitoring, and structural safety.",
-                recommendedAction: "Continue monitoring structural sensors and maintain weekly risk review.",
-                lastUpdated: "Today"
-            },
-            {
-                id: "PRJ-0002",
-                title: "Riyadh Metro Expansion",
-                location: "Riyadh, Saudi Arabia",
-                status: "In Progress",
-                type: "Transportation",
-                progress: 67,
-                riskLevel: "Medium",
-                budgetUsage: 74,
-                scheduleHealth: "Watch",
-                openRisks: 5,
-                procurementStatus: "Delayed MEP components",
-                criticalPathStatus: "Under Review",
-                manager: "Project Manager",
-                contractor: "Urban Rail Systems",
-                description: "Metro expansion project with multi-disciplinary dependencies across civil, MEP, and signaling packages.",
-                recommendedAction: "Review procurement blockers and update dependency ownership within 72 hours.",
-                lastUpdated: "Today"
-            },
-            {
-                id: "PRJ-0003",
-                title: "Doha Energy Control Center",
-                location: "Doha, Qatar",
-                status: "Pending",
-                type: "Energy",
-                progress: 35,
-                riskLevel: "High",
-                budgetUsage: 42,
-                scheduleHealth: "At Risk",
-                openRisks: 7,
-                procurementStatus: "Pending approvals",
-                criticalPathStatus: "Not Confirmed",
-                manager: "Energy Systems Lead",
-                contractor: "Doha Grid Technologies",
-                description: "Energy control center project requiring planning confirmation, systems coordination, and equipment procurement alignment.",
-                recommendedAction: "Confirm execution plan before starting and escalate pending approvals.",
-                lastUpdated: "Today"
-            },
-            {
-                id: "PRJ-0004",
-                title: "Cairo Residential District",
-                location: "Cairo, Egypt",
-                status: "Completed",
-                type: "Residential",
-                progress: 100,
-                riskLevel: "Low",
-                budgetUsage: 96,
-                scheduleHealth: "Completed",
-                openRisks: 0,
-                procurementStatus: "Closed",
-                criticalPathStatus: "Closed",
-                manager: "Civil Works Lead",
-                contractor: "Nile Construction Partners",
-                description: "Completed residential district project with civil works, utilities, and handover documentation finalized.",
-                recommendedAction: "Archive final reports and retain lessons learned.",
-                lastUpdated: "Yesterday"
-            },
-            {
-                id: "PRJ-0005",
-                title: "Riyadh Business Innovation Tower",
-                location: "Riyadh, Saudi Arabia",
-                status: "Pending",
-                type: "Commercial",
-                progress: 45,
-                riskLevel: "Medium",
-                budgetUsage: 55,
-                scheduleHealth: "Review Needed",
-                openRisks: 4,
-                procurementStatus: "Scope not finalized",
-                criticalPathStatus: "Needs Review",
-                manager: "Commercial Projects Lead",
-                contractor: "Riyadh BuildTech",
-                description: "High-rise commercial tower project pending scope alignment and delivery baseline confirmation.",
-                recommendedAction: "Review timeline and resource allocation.",
-                lastUpdated: "2 days ago"
-            }
-        ];
-
-        function init() {
-            const params = new URLSearchParams(window.location.search);
-            const projectId = params.get('id') || params.get('projectId');
-            
-            let project = ENGI_PROJECTS.find(p => p.id === projectId);
-            if (!project) project = ENGI_PROJECTS[0]; // Default to Dubai Smart Bridge
-
-            renderPage(project);
-        }
-
-        function renderPage(p) {
-            const root = document.getElementById('mainRoot');
-            
-            const statusBadge = `badge-${p.status.toLowerCase().replace(' ', '-')}`;
-            const riskBadge = `badge-${p.riskLevel.toLowerCase()}`;
-
-            root.innerHTML = `
-                <div class="header">
-                <div class="header-left">
-                    <h1>${p.title}</h1>
-                    <div class="header-meta">
-                        <span class="project-id">${p.id}</span>
-                        <span class="location-text"><i class="fas fa-location-dot"></i> ${p.location}</span>
-                        <span class="badge ${statusBadge}">${p.status}</span>
-                        <span class="badge ${riskBadge}">${p.riskLevel} Risk</span>
-                    </div>
-                </div>
-                <div class="header-right">
-                    <button class="theme-toggle" id="themeToggleBtn" title="Toggle Dark/Light Mode">
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
-                </div>
-
-                <!-- Metric Cards -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-label">Progress</div>
-                        <div class="stat-value">${p.progress}%</div>
-                        <div class="progress-mini">
-                            <div class="progress-mini-fill" style="width: ${p.progress}%"></div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Budget Usage</div>
-                        <div class="stat-value">${p.budgetUsage}%</div>
-                        <div class="progress-mini">
-                            <div class="progress-mini-fill" style="width: ${p.budgetUsage}%; background: var(--warning)"></div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Schedule Health</div>
-                        <div class="stat-value">${p.scheduleHealth}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Open Risks</div>
-                        <div class="stat-value">${p.openRisks}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Procurement</div>
-                        <div class="stat-value" style="font-size: 14px;">${p.procurementStatus}</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Critical Path</div>
-                        <div class="stat-value" style="font-size: 14px;">${p.criticalPathStatus}</div>
-                    </div>
-                </div>
-
-                <div class="content-grid">
-                    <div class="left-col">
-                        <div class="content-section">
-                            <div class="section-title"><i class="fas fa-info-circle"></i> Project Overview</div>
-                            <p style="font-size: 15px; line-height: 1.6; color: var(--text-main);">${p.description}</p>
-                        </div>
-
-                        <div class="content-section">
-                            <div class="section-title"><i class="fas fa-shield-halved"></i> Risk & Controls</div>
-                            <div class="risk-grid">
-                                <div class="risk-card">
-                                    <h4>Delivery Risk</h4>
-                                    <p>${p.riskLevel === 'High' ? 'Critical exposure detected in schedule baseline.' : 'Schedule exposure remains within acceptable variance.'}</p>
-                                </div>
-                                <div class="risk-card">
-                                    <h4>Procurement Risk</h4>
-                                    <p>${p.procurementStatus === 'Stable' ? 'Supply chain remains stable with no current blockers.' : 'Material lead times are impacting critical modules.'}</p>
-                                </div>
-                                <div class="risk-card">
-                                    <h4>Critical Path Risk</h4>
-                                    <p>${p.criticalPathStatus === 'Controlled' ? 'Logic integrity is maintained across all packages.' : 'Logic changes required to stabilize delivery dates.'}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="right-col">
-                        <div class="content-section">
-                            <div class="section-title"><i class="fas fa-bolt"></i> Delivery Intelligence</div>
-                            <div class="info-row"><span class="info-label">Status</span><span class="info-value">${p.status}</span></div>
-                            <div class="info-row"><span class="info-label">Last Updated</span><span class="info-value">${p.lastUpdated}</span></div>
-                            <div class="info-row"><span class="info-label">Manager</span><span class="info-value">${p.manager}</span></div>
-                            <div class="info-row"><span class="info-label">Contractor</span><span class="info-value">${p.contractor}</span></div>
-                            
-                            <div style="margin-top: 20px; padding: 16px; background: var(--primary-soft); border-radius: 14px; border-left: 4px solid var(--primary);">
-                                <div style="font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--primary); margin-bottom: 6px;">AI Recommendation</div>
-                                <div style="font-size: 13px; font-weight: 700; line-height: 1.5;">${p.recommendedAction}</div>
-                            </div>
-                        </div>
-
-                        <div class="content-section">
-                            <div class="section-title"><i class="fas fa-history"></i> Recent Activity</div>
-                            <div class="timeline">
-                                <div class="timeline-item">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-content"><h5>Project data reviewed</h5><span>${p.lastUpdated}</span></div>
-                                </div>
-                                <div class="timeline-item">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-content"><h5>Risk profile updated</h5><span>${p.lastUpdated}</span></div>
-                                </div>
-                                <div class="timeline-item">
-                                    <div class="timeline-dot"></div>
-                                    <div class="timeline-content"><h5>AI recommendation generated</h5><span>${p.lastUpdated}</span></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="content-section">
-                            <div class="section-title"><i class="fas fa-play"></i> Related Actions</div>
-                            <div class="action-grid">
-                                <a href="reports.html?id=${p.id}" class="action-btn"><i class="fas fa-file-invoice"></i><span>Reports</span></a>
-                                <a href="ai_chat.html" class="action-btn" onclick="localStorage.setItem('engibot_prompt', 'Analyze risks for ${p.title}')"><i class="fas fa-brain"></i><span>Ask EngiBot</span></a>
-                                <a href="solutions.html?id=${p.id}" class="action-btn"><i class="fas fa-satellite"></i><span>AI Radar</span></a>
-                                <a href="index.html" class="action-btn"><i class="fas fa-arrow-left"></i><span>Dashboard</span></a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div style="margin-top: 40px; padding: 20px; border-top: 1px solid var(--border-soft); text-align: center; opacity: 0.6;">
-                    <p style="font-size: 12px; font-weight: 600;">EngiSphere Platform Context: Integrated Engineering Intelligence Suite v1.0</p>
-                </div>
-            `;
-
-            setupThemeToggle();
-        }
-
         function setupThemeToggle() {
             const themeBtn = document.getElementById('themeToggleBtn');
             if (!themeBtn) return;
@@ -440,7 +473,19 @@
             });
         }
 
-        document.addEventListener('DOMContentLoaded', init);
+        function setupSidebarToggle() {
+            const toggle = document.getElementById('sidebarToggle');
+            toggle.addEventListener('click', () => {
+                document.body.classList.toggle('sidebar-collapsed');
+                toggle.querySelector('i').classList.toggle('fa-chevron-left');
+                toggle.querySelector('i').classList.toggle('fa-chevron-right');
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupThemeToggle();
+            setupSidebarToggle();
+        });
     </script>
 </body>
 </html>
