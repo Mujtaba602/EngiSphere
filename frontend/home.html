@@ -1224,27 +1224,8 @@ body.dark-theme .nav {
                 <i class="fas fa-moon"></i>
             </button>
 
-            <div class="account-dropdown" style="position: relative; right: auto; top: auto;">
-                <button class="account-btn" onclick="toggleAccountMenu()" type="button" id="accountBtn">
-                    <i class="fas fa-user-circle"></i>
-                    <span id="accountLabel">Account</span>
-                    <i class="fas fa-chevron-down" style="font-size: 10px; opacity: 0.6;"></i>
-                </button>
-                <div class="dropdown-content" id="accountMenu">
-                    <a href="profile.html" class="dropdown-item">
-                        <i class="fas fa-user"></i>
-                        My Profile
-                    </a>
-                    <a href="settings.html" class="dropdown-item">
-                        <i class="fas fa-cog"></i>
-                        Settings
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" onclick="logout(); return false;" class="dropdown-item danger">
-                        <i class="fas fa-power-off"></i>
-                        Exit System
-                    </a>
-                </div>
+            <div id="authActions">
+                <!-- Account dropdown or Login button will be injected here -->
             </div>
         </div>
 
@@ -1437,16 +1418,24 @@ body.dark-theme .nav {
     }
 
     const API_BASE_URL = "http://127.0.0.1:8000";
-    const token = localStorage.getItem("access_token");
+    
+    function getAuthToken() {
+      const keys = ["access_token", "token", "authToken", "engisphere-token", "engisphere_user", "currentUser"];
+      for (const key of keys) {
+        const val = localStorage.getItem(key);
+        if (val) return val;
+      }
+      return null;
+    }
+
+    const token = getAuthToken();
 
     const authActions = document.getElementById("authActions");
     const heroBtns = document.getElementById("heroBtns");
 
     function clearAuthData() {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("token");
-      localStorage.removeItem("token_type");
-      localStorage.removeItem("user_email");
+      const keys = ["access_token", "token", "authToken", "token_type", "user_email", "engisphere-token", "engisphere_user", "currentUser"];
+      keys.forEach(k => localStorage.removeItem(k));
     }
 
     window.logout = function () {
@@ -1455,7 +1444,7 @@ body.dark-theme .nav {
     };
 
     window.requireAuth = function (page) {
-      const currentToken = localStorage.getItem("access_token");
+      const currentToken = getAuthToken();
 
       if (!currentToken) {
         window.location.assign(new URL("login.html", window.location.href).href);
@@ -1497,20 +1486,28 @@ body.dark-theme .nav {
     function renderLoggedInButtons(user) {
       if (authActions) {
         authActions.innerHTML = `
-          <a href="profile.html" class="btn btn-outline">
-            <i class="fas fa-user"></i>
-            Profile
-          </a>
-
-          <a href="settings.html" class="btn btn-outline">
-            <i class="fas fa-gear"></i>
-            Settings
-          </a>
-
-          <button type="button" class="btn btn-danger" onclick="logout()">
-            <i class="fas fa-power-off"></i>
-            Logout
-          </button>
+          <div class="account-dropdown">
+                <button class="account-btn" onclick="toggleAccountMenu()" type="button" id="accountBtn">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="accountLabel">${user.full_name || user.email || 'Account'}</span>
+                    <i class="fas fa-chevron-down" style="font-size: 10px; opacity: 0.6;"></i>
+                </button>
+                <div class="dropdown-content" id="accountMenu">
+                    <a href="profile.html" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        My Profile
+                    </a>
+                    <a href="settings.html" class="dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" onclick="logout(); return false;" class="dropdown-item danger">
+                        <i class="fas fa-power-off"></i>
+                        Exit System
+                    </a>
+                </div>
+            </div>
         `;
       }
 
