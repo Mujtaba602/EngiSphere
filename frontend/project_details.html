@@ -421,6 +421,76 @@
             color: var(--primary);
             transform: translateX(-4px);
         }
+
+        .structured-summary {
+            margin-top: 0.75rem;
+            color: var(--text-primary, #0f172a);
+        }
+
+        .summary-intro {
+            margin: 0 0 1.25rem;
+            color: var(--text-secondary, #475569);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .summary-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 14px;
+            background: rgba(248, 250, 252, 0.75);
+        }
+
+        .summary-section h4 {
+            margin: 0 0 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: #1e40af;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .summary-row {
+            padding: 0.75rem;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.9);
+        }
+
+        .summary-row-full {
+            grid-column: 1 / -1;
+        }
+
+        .summary-label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-size: 0.68rem;
+            font-weight: 800;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .summary-value {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.45;
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -684,6 +754,374 @@
     <script>
         const THEME_KEY = "theme";
 
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function formatLabel(label) {
+            return String(label || '')
+                .replace(/_/g, ' ')
+                .replace(/([a-z])([A-Z])/g, '$1 $2')
+                .toLowerCase()
+                .replace(/\b\w/g, function (c) { return c.toUpperCase(); });
+        }
+
+        function formatValue(label, value) {
+            const key = String(label || '').toLowerCase();
+            const raw = String(value ?? '').trim();
+
+            if (key.includes('budget')) {
+                const numeric = Number(raw.replace(/[^\d.]/g, ''));
+                if (!Number.isNaN(numeric) && numeric > 0) {
+                    return numeric.toLocaleString('en-US');
+                }
+            }
+
+            return raw || 'N/A';
+        }
+
+        function parseStructuredProjectSummary(text) {
+            const source = String(text || '').trim();
+
+            if (!source) {
+                return {
+                    intro: '',
+                    sections: []
+                };
+            }
+
+            const markers = [
+                'Basic Details',
+                'Engineering Requirements',
+                'AI FEASIBILITY ANALYSIS'
+            ];
+
+            const hasStructuredMarkers = markers.some(function (marker) {
+                return source.includes('-- ' + marker + ' --');
+            });
+
+            if (!hasStructuredMarkers) {
+                return {
+                    intro: source,
+                    sections: []
+                };
+            }
+
+            const parts = source.split(/--\s*(Basic Details|Engineering Requirements|AI FEASIBILITY ANALYSIS)\s*--/i);
+
+            const intro = (parts[0] || '').trim();
+            const sections = [];
+
+            for (let i = 1; i < parts.length; i += 2) {
+                const title = parts[i];
+                const body = parts[i + 1] || '';
+
+                const rows = body
+                    .split(/\n+/)
+                    .map(function (line) { return line.trim(); })
+                    .filter(Boolean)
+                    .map(function (line) {
+                        const separatorIndex = line.indexOf(':');
+
+                        if (separatorIndex === -1) {
+                            return {
+                                label: '',
+                                value: line
+                            };
+                        }
+
+                        return {
+                            label: line.slice(0, separatorIndex).trim(),
+                            value: line.slice(separatorIndex + 1).trim()
+                        };
+                    });
+
+                sections.push({
+                    title: title,
+                    rows: rows
+                });
+            }
+
+            return {
+                intro: intro,
+                sections: sections
+            };
+        }
+
+        function renderStructuredProjectSummary(text) {
+            const parsed = parseStructuredProjectSummary(text);
+
+            if (!parsed.intro && parsed.sections.length === 0) {
+                return '<p id="profileSummary">No summary provided.</p>';
+            }
+
+            let html = '<div id="profileSummary" class="structured-summary">';
+
+            if (parsed.intro) {
+                html += '<p class="summary-intro">' + escapeHtml(parsed.intro) + '</p>';
+            }
+
+            parsed.sections.forEach(function (section) {
+                html += '<div class="summary-section">';
+                html += '<h4>' + escapeHtml(formatLabel(section.title)) + '</h4>';
+                html += '<div class="summary-grid">';
+
+                section.rows.forEach(function (row) {
+                    if (!row.label) {
+                        html += '<div class="summary-row summary-row-full">';
+                        html += '<span>' + escapeHtml(row.value) + '</span>';
+                        html += '</div>';
+                        return;
+                    }
+
+                    html += '<div class="summary-row">';
+                    html += '<span class="summary-label">' + escapeHtml(formatLabel(row.label)) + '</span>';
+                    html += '<span class="summary-value">' + escapeHtml(formatValue(row.label, row.value)) + '</span>';
+                    html += '</div>';
+                });
+
+                html += '</div>';
+                html += '</div>';
+            });
+
+            html += '</div>';
+
+            return html;
+        }
+
+        // Global functions for robust URL parsing and local projects loading
+        function getProjectIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return String(params.get('id') || params.get('projectId') || params.get('project') || '').trim();
+        }
+
+        function getProjectModeFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('mode') || 'view';
+        }
+
+        function safeParseJSON(value, fallback = null) {
+            try {
+                return value ? JSON.parse(value) : fallback;
+            } catch (error) {
+                console.warn('Invalid JSON:', error);
+                return fallback;
+            }
+        }
+
+        function collectLocalStorageProjects() {
+            const keys = [
+                'engisphere_projects',
+                'projects',
+                'dashboard_projects',
+                'engisphere_project_portfolio',
+                'projectSetupState'
+            ];
+
+            const collected = [];
+
+            keys.forEach(key => {
+                const parsed = safeParseJSON(localStorage.getItem(key), null);
+                if (!parsed) return;
+
+                if (Array.isArray(parsed)) {
+                    collected.push(...parsed);
+                } else if (Array.isArray(parsed.projects)) {
+                    collected.push(...parsed.projects);
+                } else if (Array.isArray(parsed.items)) {
+                    collected.push(...parsed.items);
+                } else if (parsed.id || parsed.projectId || parsed.title || parsed.projectTitle || parsed.name) {
+                    collected.push(parsed);
+                }
+            });
+
+            return collected;
+        }
+
+        function normalizeProjectId(project) {
+            return String(
+                project?.id ||
+                project?.projectId ||
+                project?.code ||
+                project?.ref ||
+                project?.projectCode ||
+                ''
+            ).trim();
+        }
+
+        function findProjectByExactId(projectId, projects) {
+            const target = String(projectId || '').trim();
+            if (!target) return null;
+
+            return projects.find(project => normalizeProjectId(project) === target) || null;
+        }
+
+        function getProjectTitle(project) {
+            return project.title || project.projectTitle || project.name || project.projectName || 'Untitled Project';
+        }
+
+        function getProjectLocation(project) {
+            return project.location || project.projectLocation || project.city || 'Not specified';
+        }
+
+        function getProjectStatus(project) {
+            return project.status || project.projectStatus || 'Pending';
+        }
+
+        function getProjectType(project) {
+            return project.type || project.projectType || 'General';
+        }
+
+        function normalizeProject(project) {
+            const id = normalizeProjectId(project) || String(Date.now());
+
+            return {
+                ...project,
+                id,
+                projectId: id,
+                code: project.code || project.ref || project.projectCode || `PRJ-${id}`,
+                title: project.title || project.projectTitle || project.name || project.projectName || 'Untitled Project',
+                name: project.name || project.title || project.projectTitle || project.projectName || 'Untitled Project',
+                location: project.location || project.projectLocation || project.city || 'Not specified',
+                type: project.type || project.projectType || 'General',
+                status: project.status || project.projectStatus || 'Pending',
+                progress: project.progress !== undefined ? Number(project.progress) : (project.completion !== undefined ? Number(project.completion) : 0),
+                riskScore: project.riskScore !== undefined ? Number(project.riskScore) : (project.risk_score !== undefined ? Number(project.risk_score) : 65),
+                riskLevel: project.riskLevel || (project.risk_score > 70 ? 'High' : project.risk_score > 40 ? 'Medium' : 'Low')
+            };
+        }
+
+        function mergeProjectsById(staticProjects = [], localProjects = []) {
+            const map = new Map();
+
+            [...staticProjects, ...localProjects].forEach(project => {
+                const normalized = normalizeProject(project);
+                const id = normalizeProjectId(normalized);
+                if (!id) return;
+                map.set(id, normalized);
+            });
+
+            return Array.from(map.values());
+        }
+
+        function normalizeStoredProject(storedProject) {
+            const normalized = normalizeProject(storedProject);
+            
+            // Default aiAnalysis
+            const aiAnalysis = normalized.aiAnalysis || {
+                text: `EngiSphere AI indicates that ${normalized.title} is currently in its ${normalized.status} stage. The risk score is evaluated at ${normalized.riskScore}/100. Key engineering strategies are setup for ${normalized.strategy || 'Design-Build'}.`,
+                keyRisks: normalized.description || "Project initiated with baseline engineering requirements.",
+                actions: "Perform initial site assessment and confirm utility coordination parameters.",
+                note: "Baseline feasibility analysis active."
+            };
+
+            // Default riskEngine
+            const riskEngine = normalized.riskEngine || {
+                confidence: "85%",
+                drivers: [
+                    `Initial baseline score: ${normalized.riskScore}`,
+                    `Location: ${normalized.location}`,
+                    `Budget: ${normalized.budget || 'TBD'}`
+                ]
+            };
+
+            // Default milestones
+            const milestones = normalized.milestones || [
+                { name: "Design Validation", status: "Completed", priority: "High", progress: 100 },
+                { name: "Procurement", status: "In Progress", priority: "Medium", progress: 20 },
+                { name: "Structural Review", status: "Pending", priority: "High", progress: 0 },
+                { name: "Site Execution", status: "Pending", priority: "High", progress: 0 },
+                { name: "Final Handover", status: "Pending", priority: "Low", progress: 0 }
+            ];
+
+            // Default decision
+            const decision = normalized.decision || {
+                direction: "Continue Initial Setup",
+                reason: "The project has been registered successfully with default baseline criteria.",
+                review: "14 days",
+                escalation: "No"
+            };
+
+            // Default schedule
+            let schedule = normalized.schedule;
+            if (!schedule) {
+                if (normalized.status.toLowerCase() === "active" || normalized.status.toLowerCase() === "in progress") {
+                    schedule = "On Track";
+                } else if (normalized.status.toLowerCase() === "pending") {
+                    schedule = "Watchlist";
+                } else {
+                    schedule = "On Track";
+                }
+            }
+
+            return {
+                ...normalized,
+                schedule: schedule,
+                budgetUsage: normalized.budgetUsage !== undefined ? Number(normalized.budgetUsage) : 10,
+                openIssues: normalized.openIssues !== undefined ? normalized.openIssues : (normalized.riskScore > 60 ? 8 : 1),
+                executiveSummary: normalized.description || normalized.executiveSummary || "No summary provided.",
+                aiAnalysis: aiAnalysis,
+                riskEngine: riskEngine,
+                milestones: milestones,
+                decision: decision
+            };
+        }
+
+        function hydrateProjectDetails(project) {
+            if (!project) return;
+
+            window.currentProject = project;
+
+            const title = getProjectTitle(project);
+            const location = getProjectLocation(project);
+            const status = getProjectStatus(project);
+            const type = getProjectType(project);
+
+            // Generic data attributes if available
+            document.querySelectorAll('[data-project-title]').forEach(el => el.textContent = title);
+            document.querySelectorAll('[data-project-location]').forEach(el => el.textContent = location);
+            document.querySelectorAll('[data-project-status]').forEach(el => el.textContent = status);
+            document.querySelectorAll('[data-project-type]').forEach(el => el.textContent = type);
+            document.querySelectorAll('[data-project-id]').forEach(el => el.textContent = normalizeProjectId(project));
+
+            // Fallback: update likely visible elements without changing layout
+            const pageTitle =
+                document.querySelector('#projectTitle') ||
+                document.querySelector('.project-title') ||
+                document.querySelector('h1') ||
+                document.querySelector('h2');
+
+            if (pageTitle) pageTitle.textContent = title;
+
+            const statusEl =
+                document.querySelector('#projectStatus') ||
+                document.querySelector('.project-status') ||
+                document.querySelector('[data-status]');
+
+            if (statusEl) statusEl.textContent = status;
+
+            const typeEl =
+                document.querySelector('#projectType') ||
+                document.querySelector('.project-type') ||
+                document.querySelector('[data-type]');
+
+            if (typeEl) typeEl.textContent = type;
+
+            const locationEl =
+                document.querySelector('#projectLocation') ||
+                document.querySelector('.project-location') ||
+                document.querySelector('[data-location]');
+
+            if (locationEl) locationEl.textContent = location;
+
+            console.log('Loaded project details from localStorage:', project);
+        }
+
         function getThemeToggleButton() {
             return (
                 document.getElementById("themeToggle") ||
@@ -882,31 +1320,66 @@
                 }
             };
 
-            const urlParams = new URLSearchParams(window.location.search);
-            const projectId = urlParams.get("project");
+            const staticProjects = Object.entries(PROJECT_DATASET).map(([key, value]) => ({
+                id: key,
+                projectId: key,
+                code: key,
+                ...value
+            }));
+            const localProjects = collectLocalStorageProjects();
+            const allProjects = mergeProjectsById(staticProjects, localProjects);
 
-            if (!projectId) {
-                showProjectSelector(PROJECT_DATASET);
-                return;
+            window.allProjects = allProjects;
+
+            const mergedDataset = {};
+            allProjects.forEach(p => {
+                const pid = normalizeProjectId(p);
+                mergedDataset[pid] = normalizeStoredProject(p);
+            });
+
+            const projectId = getProjectIdFromUrl();
+            const mode = getProjectModeFromUrl();
+
+            console.log('URL project id:', projectId);
+            console.log('All projects available:', allProjects.map(p => ({ id: normalizeProjectId(p), title: p.title || p.name })));
+
+            let matchedProject = null;
+            if (projectId) {
+                matchedProject = findProjectByExactId(projectId, allProjects);
+                if (matchedProject) {
+                    matchedProject = normalizeStoredProject(matchedProject);
+                }
+                console.log('Matched project:', matchedProject ? (matchedProject.title || matchedProject.name) + ' ' + projectId : 'null');
             }
 
-            const project = PROJECT_DATASET[projectId];
-            if (!project) {
+            if (projectId && !matchedProject) {
+                console.warn('Project not found for id:', projectId);
                 showNotFound();
                 return;
             }
 
-            showProjectDetails(projectId, project);
+            if (!projectId) {
+                showProjectSelector(allProjects);
+            } else {
+                showProjectDetails(projectId, matchedProject);
+                hydrateProjectDetails(matchedProject);
+
+                if (mode === 'edit') {
+                    document.body.classList.add('project-edit-mode');
+                    console.log('Project Details opened in edit mode');
+                }
+            }
 
             // Populate Switcher
             const switcher = document.getElementById('projectSwitcher');
             if (switcher) {
-                switcher.innerHTML = Object.entries(PROJECT_DATASET).map(([id, p]) => 
+                switcher.innerHTML = Object.entries(mergedDataset).map(([id, p]) => 
                     `<option value="${id}" ${id === projectId ? 'selected' : ''}>${id} - ${p.title}</option>`
                 ).join('');
                 
                 switcher.addEventListener('change', (e) => {
-                    window.location.href = `project_details.html?project=${encodeURIComponent(e.target.value)}`;
+                    const id = e.target.value;
+                    window.location.href = `project_details.html?id=${encodeURIComponent(id)}&mode=view`;
                 });
             }
 
@@ -917,18 +1390,24 @@
                 if (!href) return;
                 
                 if (href === 'reports.html' || href.startsWith('reports.html?')) {
-                    a.href = `reports.html?project=${projectId}`;
+                    a.href = `reports.html?project=${projectId || ''}`;
                 }
                 if (href === 'team_access.html' || href.startsWith('team_access.html?')) {
-                    a.href = `team_access.html?project=${projectId}`;
+                    a.href = `team_access.html?project=${projectId || ''}`;
                 }
                 if (href === 'project_details.html' || href.startsWith('project_details.html?')) {
-                    a.href = `project_details.html?project=${projectId}`;
+                    a.href = `project_details.html?project=${projectId || ''}`;
                 }
             });
+
+            // Wire search input
+            const searchInput = document.getElementById('projectSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', applyProjectFilters);
+            }
         });
 
-        function showProjectSelector(dataset) {
+        function showProjectSelector(projects) {
             document.getElementById('projectSelectionView').classList.remove('hidden');
             document.getElementById('projectDetailView').classList.add('hidden');
             document.getElementById('projectNotFoundView').classList.add('hidden');
@@ -940,61 +1419,117 @@
             document.querySelector('.header-left h1').innerText = "Project Management";
             document.querySelector('.header-left p').innerText = "Select a project to review intelligence and performance data";
 
-            renderProjectGrid(dataset);
-            
-            const searchInput = document.getElementById('projectSearch');
-            searchInput.addEventListener('input', () => renderProjectGrid(dataset));
+            renderProjectSelectorCards(projects);
         }
 
-        window.setFilter = (filter) => {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-chip').forEach(c => {
-                c.classList.toggle('active', c.innerText === filter);
-            });
-            // Re-render
-            const event = new Event('input');
-            document.getElementById('projectSearch').dispatchEvent(event);
-        };
+        function getProjectCardContainer() {
+            return (
+                document.getElementById('projectGrid') ||
+                document.getElementById('projectsGrid') ||
+                document.getElementById('projectCards') ||
+                document.querySelector('.project-grid') ||
+                document.querySelector('.projects-grid') ||
+                document.querySelector('.project-cards') ||
+                document.querySelector('[data-project-grid]')
+            );
+        }
 
-        function renderProjectGrid(dataset) {
-            const grid = document.getElementById('projectGrid');
-            const query = document.getElementById('projectSearch').value.toLowerCase();
-            
-            const filtered = Object.entries(dataset).filter(([id, p]) => {
-                const matchesSearch = p.title.toLowerCase().includes(query) || 
-                                    p.location.toLowerCase().includes(query) || 
-                                    id.toLowerCase().includes(query);
-                const matchesFilter = currentFilter === 'All' || p.status === currentFilter;
-                return matchesSearch && matchesFilter;
-            });
+        function renderProjectSelectorCards(projects) {
+            const container = getProjectCardContainer();
 
-            if (filtered.length === 0) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">No projects match your criteria.</div>`;
+            if (!container) {
+                console.error('Project card container not found. Cannot render project selector cards.');
                 return;
             }
 
-            grid.innerHTML = filtered.map(([id, p]) => `
-                <div class="p-card" onclick="openProject('${id}')">
+            const normalizedProjects = (projects || []).map(normalizeProject);
+
+            console.log('Rendering Project Details selector cards:', normalizedProjects.map(p => ({
+                id: normalizeProjectId(p),
+                title: p.title || p.name
+            })));
+
+            container.innerHTML = normalizedProjects.map(project => {
+                const projectId = normalizeProjectId(project);
+                const title = project.title || project.name || 'Untitled Project';
+                const location = project.location || 'Not specified';
+                const type = project.type || project.projectType || 'General';
+                const status = project.status || 'Pending';
+                const riskScore = project.riskScore !== undefined ? project.riskScore : (project.risk !== undefined ? project.risk : 65);
+                const progress = project.progress || 0;
+                const riskLevel = project.riskLevel || 'Medium';
+
+                return `
+                <div class="p-card" onclick="window.openProjectFromDetails('${projectId}')" style="cursor:pointer;">
                     <div class="p-card-header">
-                        <div class="p-card-type">${p.type}</div>
-                        <div class="p-card-id">${id}</div>
+                        <div class="p-card-type">${type}</div>
+                        <div class="p-card-id">${projectId}</div>
                     </div>
-                    <div class="p-card-title">${p.title}</div>
-                    <div class="p-card-loc"><i class="fas fa-location-dot"></i> ${p.location}</div>
+                    <div class="p-card-title">${title}</div>
+                    <div class="p-card-loc"><i class="fas fa-location-dot"></i> ${location}</div>
                     <div class="p-card-stats">
-                        <div class="p-stat"><label>Status</label><span>${p.status}</span></div>
-                        <div class="p-stat"><label>Risk Score</label><span style="color:${p.riskScore > 60 ? 'var(--danger)' : p.riskScore > 30 ? 'var(--warning)' : 'var(--success)'}">${p.riskScore}/100</span></div>
-                        <div class="p-stat"><label>Progress</label><span>${p.progress}%</span></div>
-                        <div class="p-stat"><label>Risk Level</label><span>${p.riskLevel}</span></div>
+                        <div class="p-stat"><label>Status</label><span>${status}</span></div>
+                        <div class="p-stat"><label>Risk Score</label><span style="color:${riskScore > 60 ? 'var(--danger)' : riskScore > 30 ? 'var(--warning)' : 'var(--success)'}">${riskScore}/100</span></div>
+                        <div class="p-stat"><label>Progress</label><span>${progress}%</span></div>
+                        <div class="p-stat"><label>Risk Level</label><span>${riskLevel}</span></div>
                     </div>
-                    <button class="btn btn-primary p-card-btn">Open Project</button>
+                    <button class="btn btn-primary p-card-btn" onclick="event.stopPropagation(); window.openProjectFromDetails('${projectId}')">Open Project</button>
                 </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
-        window.openProject = (id) => {
+        let currentProjectFilter = 'All';
+
+        function applyProjectFilters() {
+            const query = (document.querySelector('#projectSearch')?.value || '').toLowerCase().trim();
+
+            const filtered = (window.allProjects || []).filter(project => {
+                const title = (project.title || project.name || '').toLowerCase();
+                const location = (project.location || '').toLowerCase();
+                const id = normalizeProjectId(project).toLowerCase();
+                const status = (project.status || '').toLowerCase();
+
+                const matchesQuery = !query || title.includes(query) || location.includes(query) || id.includes(query);
+
+                const filter = String(currentProjectFilter || 'All').toLowerCase();
+                const matchesFilter =
+                    filter === 'all' ||
+                    status === filter.toLowerCase() ||
+                    status.includes(filter.toLowerCase());
+
+                return matchesQuery && matchesFilter;
+            });
+
+            renderProjectSelectorCards(filtered);
+        }
+
+        window.setFilter = (filter) => {
+            currentProjectFilter = filter;
+            document.querySelectorAll('.filter-chip').forEach(c => {
+                c.classList.toggle('active', c.innerText === filter);
+            });
+            applyProjectFilters();
+        };
+
+        function renderProjectGrid(dataset) {
+            const projects = Object.values(dataset);
+            renderProjectSelectorCards(projects);
+        }
+
+        window.openProjectFromDetails = function(projectId) {
+            const id = String(projectId || '').trim();
+            if (!id) {
+                console.error('Missing project id for details viewer');
+                return;
+            }
+            console.log('Opening project details:', id, 'view');
             localStorage.setItem("engisphere-selected-project-id", id);
-            window.location.href = `project_details.html?project=${id}`;
+            window.location.href = `project_details.html?id=${encodeURIComponent(id)}&mode=view`;
+        };
+
+        window.openProject = (id) => {
+            window.openProjectFromDetails(id);
         };
 
         function showNotFound() {
@@ -1051,7 +1586,11 @@
             document.getElementById('profileType').innerText = project.type;
             document.getElementById('profileRiskScore').innerText = project.riskScore + '/100';
             document.getElementById('profileProgress').innerText = project.progress + '%';
-            document.getElementById('profileSummary').innerText = project.executiveSummary;
+            const summaryText = project.executiveSummary || project.summary || project.description || '';
+            const summaryContainer = document.getElementById('profileSummary');
+            if (summaryContainer) {
+                summaryContainer.outerHTML = renderStructuredProjectSummary(summaryText);
+            }
 
             // Action Links
             document.getElementById('linkTeamAccess').href = `team_access.html?project=${id}`;
@@ -1092,5 +1631,296 @@
             document.getElementById('decisionEscalation').innerText = project.decision.escalation;
         }
     </script>
+
+<script>
+(function () {
+    function safeParseJSON(value, fallback) {
+        try {
+            return value ? JSON.parse(value) : fallback;
+        } catch (error) {
+            console.warn('Failed to parse JSON:', error);
+            return fallback;
+        }
+    }
+
+    function normalizeProjectId(project) {
+        return String(
+            project?.id ||
+            project?.projectId ||
+            project?.code ||
+            project?.ref ||
+            project?.projectCode ||
+            ''
+        ).trim();
+    }
+
+    function normalizeProject(project) {
+        const id = normalizeProjectId(project) || String(Date.now());
+
+        return {
+            ...project,
+            id,
+            projectId: id,
+            code: project.code || project.ref || project.projectCode || id,
+            title: project.title || project.projectTitle || project.name || project.projectName || 'Untitled Project',
+            name: project.name || project.title || project.projectTitle || project.projectName || 'Untitled Project',
+            location: project.location || project.projectLocation || project.city || 'Not specified',
+            type: project.type || project.projectType || project.category || 'General',
+            status: project.status || project.projectStatus || 'Active',
+            progress: project.progress ?? project.completion ?? 0,
+            riskScore: project.riskScore || project.risk || '65/100',
+            riskLevel: project.riskLevel || 'Medium'
+        };
+    }
+
+    function collectLocalStorageProjects() {
+        const keys = [
+            'engisphere_projects',
+            'projects',
+            'dashboard_projects',
+            'engisphere_project_portfolio',
+            'projectSetupState'
+        ];
+
+        const collected = [];
+
+        keys.forEach(function (key) {
+            const parsed = safeParseJSON(localStorage.getItem(key), null);
+            if (!parsed) return;
+
+            if (Array.isArray(parsed)) {
+                collected.push(...parsed);
+            } else if (Array.isArray(parsed.projects)) {
+                collected.push(...parsed.projects);
+            } else if (Array.isArray(parsed.items)) {
+                collected.push(...parsed.items);
+            } else if (parsed.id || parsed.projectId || parsed.title || parsed.projectTitle || parsed.name) {
+                collected.push(parsed);
+            }
+        });
+
+        return collected;
+    }
+
+    function getFallbackStaticProjectsFromDOM() {
+        return [];
+    }
+
+    function mergeProjectsById(staticProjects, localProjects) {
+        const map = new Map();
+
+        [...(staticProjects || []), ...(localProjects || [])].forEach(function (project) {
+            const normalized = normalizeProject(project);
+            const id = normalizeProjectId(normalized);
+            if (!id) return;
+            map.set(id, normalized);
+        });
+
+        return Array.from(map.values());
+    }
+
+    function getProjectCardContainer() {
+        return (
+            document.querySelector('#projectSelectionView .project-grid') ||
+            document.querySelector('#projectSelectionView .projects-grid') ||
+            document.querySelector('#projectSelectionView .project-cards') ||
+            document.querySelector('#projectSelectionView [data-project-grid]') ||
+            document.getElementById('projectGrid') ||
+            document.getElementById('projectsGrid') ||
+            document.getElementById('projectCards') ||
+            document.getElementById('projectSelectionView')
+        );
+    }
+
+    function escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>"']/g, function (char) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[char];
+        });
+    }
+
+    window.openProjectFromDetails = function (projectId) {
+        const id = String(projectId || '').trim();
+        if (!id) {
+            console.error('Missing project id for Project Details open');
+            return;
+        }
+        console.log('Opening Project Details card:', id);
+        window.location.href = `project_details.html?id=${encodeURIComponent(id)}&mode=view`;
+    };
+
+    window.findProjectByExactId = function (projectId, projects) {
+        const target = String(projectId || '').trim();
+        if (!target) return null;
+        return (projects || []).find(function (project) {
+            return normalizeProjectId(project) === target;
+        }) || null;
+    };
+
+    function renderProjectSelectorCards(projects) {
+        const container = getProjectCardContainer();
+
+        if (!container) {
+            console.error('Project card container not found');
+            return;
+        }
+
+        const normalizedProjects = (projects || []).map(normalizeProject);
+
+        console.log('Rendering Project Details selector cards:', normalizedProjects.map(function (p) {
+            return {
+                id: normalizeProjectId(p),
+                title: p.title || p.name
+            };
+        }));
+
+        container.innerHTML = normalizedProjects.map(function (project) {
+            const projectId = normalizeProjectId(project);
+            const title = escapeHTML(project.title || project.name || 'Untitled Project');
+            const location = escapeHTML(project.location || 'Not specified');
+            const type = escapeHTML(project.type || 'General');
+            const status = escapeHTML(project.status || 'Active');
+            const riskScore = escapeHTML(project.riskScore || '65/100');
+            const progress = escapeHTML(project.progress ?? 0);
+            const riskLevel = escapeHTML(project.riskLevel || 'Medium');
+            const code = escapeHTML(project.code || projectId);
+
+            return `
+                <div class="project-card p-card" onclick="window.openProjectFromDetails('${escapeHTML(projectId)}')" style="cursor:pointer;">
+                    <div class="project-card-header">
+                        <div>
+                            <div class="project-category">${type}</div>
+                            <h3>${title}</h3>
+                            <p class="project-location">📍 ${location}</p>
+                        </div>
+                        <span class="project-code">${code}</span>
+                    </div>
+
+                    <div class="project-card-metrics">
+                        <div>
+                            <small>STATUS</small>
+                            <strong>${status}</strong>
+                        </div>
+                        <div>
+                            <small>RISK SCORE</small>
+                            <strong>${riskScore}</strong>
+                        </div>
+                        <div>
+                            <small>PROGRESS</small>
+                            <strong>${progress}%</strong>
+                        </div>
+                        <div>
+                            <small>RISK LEVEL</small>
+                            <strong>${riskLevel}</strong>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary p-card-btn" onclick="event.stopPropagation(); window.openProjectFromDetails('${escapeHTML(projectId)}')">
+                        Open Project
+                    </button>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function getProjectIdFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        return String(params.get('id') || params.get('projectId') || '').trim();
+    }
+
+    function hydrateProjectDetailsIfFunctionExists(project) {
+        if (!project) return;
+
+        if (typeof window.hydrateProjectDetails === 'function') {
+            window.hydrateProjectDetails(project);
+            return;
+        }
+
+        const titleEl = document.querySelector('[data-project-title], #projectTitle, .project-title, h1');
+        if (titleEl) titleEl.textContent = project.title || project.name || 'Untitled Project';
+
+        const locationEl = document.querySelector('[data-project-location], #projectLocation, .project-location');
+        if (locationEl) locationEl.textContent = project.location || 'Not specified';
+
+        const statusEl = document.querySelector('[data-project-status], #projectStatus, .project-status');
+        if (statusEl) statusEl.textContent = project.status || 'Active';
+
+        const summaryText = project.executiveSummary || project.summary || project.description || '';
+        const summaryContainer = document.getElementById('profileSummary');
+        if (summaryContainer) {
+            summaryContainer.outerHTML = renderStructuredProjectSummary(summaryText);
+        }
+
+        window.currentProject = project;
+    }
+
+    function getExistingStaticProjectsArray() {
+        // Use existing real static project arrays only if they exist.
+        // Never parse DOM and never generate fake Static Project cards.
+        if (Array.isArray(window.staticProjects)) return window.staticProjects;
+        if (Array.isArray(window.demoProjects)) return window.demoProjects;
+        if (Array.isArray(window.projectData)) return window.projectData;
+        if (Array.isArray(window.projects)) return window.projects;
+        return [];
+    }
+
+    function initializeProjectDetailsSelector() {
+        const localProjects = collectLocalStorageProjects();
+        const existingStaticProjects = getExistingStaticProjectsArray();
+
+        // localStorage is the source of truth when available.
+        const sourceProjects = localProjects.length > 0 ? localProjects : existingStaticProjects;
+
+        const allProjects = mergeProjectsById([], sourceProjects);
+
+        // Safety: remove any fake Static Project entries.
+        window.allProjects = allProjects.filter(function (project) {
+            const id = normalizeProjectId(project);
+            const title = String(project.title || project.name || '');
+            return !/^STATIC-\d+$/i.test(id) && !/^Static Project \d+$/i.test(title);
+        });
+
+        window.renderProjectSelectorCards = renderProjectSelectorCards;
+        window.normalizeProjectId = normalizeProjectId;
+
+        console.log('localStorage projects count:', localProjects.length);
+        console.log('existing static projects count:', existingStaticProjects.length);
+        console.log('window.allProjects initialized:', window.allProjects.length, window.allProjects.map(function (p) {
+            return {
+                id: normalizeProjectId(p),
+                title: p.title || p.name
+            };
+        }));
+
+        renderProjectSelectorCards(window.allProjects);
+
+        const projectId = getProjectIdFromUrl();
+
+        if (projectId) {
+            const matchedProject = window.findProjectByExactId(projectId, window.allProjects);
+
+            console.log('URL project id:', projectId);
+            console.log('Matched project:', matchedProject ? `${matchedProject.title || matchedProject.name} ${normalizeProjectId(matchedProject)}` : 'null');
+
+            if (matchedProject) {
+                hydrateProjectDetailsIfFunctionExists(matchedProject);
+            } else {
+                console.warn('Project not found for id:', projectId);
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeProjectDetailsSelector);
+    } else {
+        initializeProjectDetailsSelector();
+    }
+})();
+</script>
 </body>
 </html>

@@ -577,7 +577,7 @@
                 
                 <div class="modal-field">
                     <label>Assigned Projects</label>
-                    <div class="project-checks">
+                    <div class="project-checks" id="approveProjectChecks">
                         <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0001"> PRJ-0001</label>
                         <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0002"> PRJ-0002</label>
                         <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0003"> PRJ-0003</label>
@@ -685,6 +685,53 @@
             });
         }
 
+        function getAllProjects() {
+            const staticProjects = [
+                { id: "PRJ-0001", title: "Dubai Smart Bridge" },
+                { id: "PRJ-0002", title: "Riyadh Metro Expansion" },
+                { id: "PRJ-0003", title: "Doha Coastal Tunnel" },
+                { id: "PRJ-0004", title: "Abu Dhabi Smart District" },
+                { id: "PRJ-0005", title: "Jeddah Flood Defense" }
+            ];
+            let localProjects = [];
+            try {
+                localProjects = JSON.parse(localStorage.getItem('engisphere_projects') || '[]');
+            } catch(e) {
+                console.error(e);
+            }
+            
+            const map = new Map();
+            staticProjects.forEach(p => map.set(p.id, p));
+            localProjects.forEach(p => {
+                const id = String(p.id || p.projectId || p.code || '').trim();
+                if (id) {
+                    map.set(id, {
+                        id: id,
+                        title: p.title || p.name || `Project ${id}`
+                    });
+                }
+            });
+            return Array.from(map.values());
+        }
+
+        function updateProjectNamesMapping() {
+            getAllProjects().forEach(p => {
+                PROJECT_NAMES[p.id] = p.title;
+            });
+        }
+
+        function populateProjectSwitcher() {
+            const switcher = document.getElementById('projectSwitcher');
+            if (switcher) {
+                const projects = getAllProjects();
+                const currentVal = switcher.value || '';
+                switcher.innerHTML = projects.map(p => `
+                    <option value="${p.id}">${p.id} - ${p.title}</option>
+                `).join('');
+                if (currentVal) switcher.value = currentVal;
+            }
+        }
+
         function setText(id, value) {
             const el = document.getElementById(id);
             if (el) el.textContent = value;
@@ -751,17 +798,40 @@
 
             document.getElementById('approveUserId').value = userId;
             document.getElementById('approveUserEmail').textContent = `Approving access for ${user.fullName} (${user.email})`;
-            document.getElementById('approveRole').value = user.role || 'Engineer';
             
-            // Clear checks
-            document.querySelectorAll('input[name="proj"]').forEach(ch => ch.checked = false);
+            // Normalize case-sensitivity for requested role selection
+            const rawRole = String(user.role || 'Engineer').trim();
+            const normalizedRole = rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase();
+            document.getElementById('approveRole').value = normalizedRole;
+            
+            // Render project checkboxes dynamically
+            const container = document.getElementById('approveProjectChecks');
+            if (container) {
+                const projects = getAllProjects();
+                container.innerHTML = projects.map(p => `
+                    <label class="check-item" style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 13px;">
+                        <input type="checkbox" name="proj" value="${p.id}"> ${p.id} - ${p.title}
+                    </label>
+                `).join('');
+            }
+            
+            // Auto check the current active project by default
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentProjectId = urlParams.get("project") || localStorage.getItem("engisphere-selected-project-id") || "PRJ-0001";
+            
+            document.querySelectorAll('input[name="proj"]').forEach(ch => {
+                ch.checked = (ch.value === currentProjectId);
+            });
             
             document.getElementById('approveModal').classList.add('active');
         }
 
         function submitApproval() {
             const userId = document.getElementById('approveUserId').value;
-            const role = document.getElementById('approveRole').value;
+            let role = document.getElementById('approveRole').value;
+            // Case-insensitivity normalization
+            role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
+            
             const projects = Array.from(document.querySelectorAll('input[name="proj"]:checked')).map(ch => ch.value);
             
             if (projects.length === 0) {
@@ -843,7 +913,9 @@
             const fullName = document.getElementById('inviteName').value.trim();
             const email = document.getElementById('inviteEmail').value.trim();
             const organization = document.getElementById('inviteOrg').value.trim();
-            const role = document.getElementById('inviteRole').value;
+            let role = document.getElementById('inviteRole').value;
+            // Case-insensitivity normalization
+            role = role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
 
             if (!fullName || !email || !organization) {
                 showToast("Please fill all fields.");
@@ -862,8 +934,11 @@
         }
 
         function updateTeamPage(projectId) {
+            updateProjectNamesMapping();
+            populateProjectSwitcher();
+
             const users = Auth.getUsers();
-            const projectName = PROJECT_NAMES[projectId] || "Dubai Smart Bridge";
+            const projectName = PROJECT_NAMES[projectId] || `Project ${projectId}`;
             
             // Filter users for this project
             const approvedForProject = users.filter(u => u.status === 'approved' && u.assignedProjects.includes(projectId));
@@ -1014,6 +1089,8 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initThemeToggle();
+            updateProjectNamesMapping();
+            populateProjectSwitcher();
             const urlParams = new URLSearchParams(window.location.search);
             const projectId = urlParams.get("project") || localStorage.getItem("engisphere-selected-project-id") || "PRJ-0001";
             updateTeamPage(projectId);

@@ -805,7 +805,7 @@
                 <div id="aiSolutionOutput" class="ai-solution-output hidden">
                     <div class="ai-output-header">
                         <div><div class="ai-kicker">AI Generated Engineering Map</div><h3 id="aiOutputTitle">Solution Plan</h3></div>
-                        <span class="ai-confidence">Confidence 94%</span>
+                        <span class="ai-confidence" id="aiConfidence">Confidence 94%</span>
                     </div>
                     <div class="ai-output-grid">
                         <div class="ai-output-card danger"><span>01</span><h4>Diagnosis</h4><p id="aiDiagnosis"></p></div>
@@ -839,29 +839,115 @@
             L.control.zoom({ position: "bottomright" }).addTo(map);
         }
 
+        function inferProjectCoordinates(project) {
+            const text = [
+                project.location,
+                project.title,
+                project.name,
+                project.city,
+                project.country
+            ].join(' ').toLowerCase();
+
+            if (text.includes('dubai')) return { lat: 25.2048, lng: 55.2708 };
+            if (text.includes('riyadh')) return { lat: 24.7136, lng: 46.6753 };
+            if (text.includes('jeddah')) return { lat: 21.4858, lng: 39.1925 };
+            if (text.includes('doha')) return { lat: 25.2854, lng: 51.5310 };
+            if (text.includes('cairo')) return { lat: 30.0444, lng: 31.2357 };
+            if (text.includes('abu dhabi')) return { lat: 24.4539, lng: 54.3773 };
+            if (text.includes('qatar')) return { lat: 25.2854, lng: 51.5310 };
+            if (text.includes('saudi')) return { lat: 24.7136, lng: 46.6753 };
+            if (text.includes('egypt')) return { lat: 30.0444, lng: 31.2357 };
+            if (text.includes('uae') || text.includes('united arab emirates')) return { lat: 25.2048, lng: 55.2708 };
+
+            return { lat: 24.7136, lng: 46.6753 };
+        }
+
+        function normalizeProject(project) {
+            const id = String(project.id || project.projectId || project.code || '').trim() || 'PRJ-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            const title = project.title || project.name || project.projectName || 'Untitled Project';
+            const location = project.location || project.city || project.country || 'Unknown';
+            const status = project.status || project.stage || 'Pending';
+            const type = project.type || project.projectType || project.category || 'Infrastructure';
+            const riskScore = parseInt(project.riskScore || project.risk || project.score || 55, 10);
+            const progress = parseInt(project.progress || project.operationalProgress || 0, 10);
+            const budget = project.budget || project.cost || '';
+            const summary = project.summary || project.description || project.executiveSummary || '';
+            
+            let lat = project.lat || project.latitude;
+            let lng = project.lng || project.longitude;
+            
+            if (lat === undefined || lng === undefined || lat === null || lng === null) {
+                const coords = inferProjectCoordinates({ location, title, status, type });
+                lat = coords.lat;
+                lng = coords.lng;
+            }
+            
+            return {
+                id,
+                title,
+                location,
+                status,
+                type,
+                riskScore,
+                progress,
+                budget,
+                summary,
+                lat: parseFloat(lat),
+                lng: parseFloat(lng),
+                latitude: parseFloat(lat),
+                longitude: parseFloat(lng)
+            };
+        }
+
         async function fetchProjects() {
             const fallbackProjects = [
-                { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", status: "Active", type: "Infrastructure", progress: 92, latitude: 25.2048, longitude: 55.2708 },
-                { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", status: "In Progress", type: "Transportation", progress: 67, latitude: 24.7136, longitude: 46.6753 },
-                { id: "PRJ-0003", title: "Doha Energy Control Center", location: "Doha, Qatar", status: "Pending", type: "Energy", progress: 35, latitude: 25.2854, longitude: 51.5310 },
-                { id: "PRJ-0004", title: "Cairo Residential District", location: "Cairo, Egypt", status: "Completed", type: "Residential", progress: 100, latitude: 30.0444, longitude: 31.2357 },
-                { id: "PRJ-0005", title: "Riyadh Business Innovation Tower", location: "Riyadh, Saudi Arabia", status: "Pending", type: "Commercial", progress: 45, latitude: 24.7743, longitude: 46.7386 }
+                { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", status: "Active", type: "Infrastructure", progress: 92, latitude: 25.2048, longitude: 55.2708, riskScore: 40 },
+                { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", status: "In Progress", type: "Transportation", progress: 67, latitude: 24.7136, longitude: 46.6753, riskScore: 68 },
+                { id: "PRJ-0003", title: "Doha Energy Control Center", location: "Doha, Qatar", status: "Pending", type: "Energy", progress: 35, latitude: 25.2854, longitude: 51.5310, riskScore: 50 },
+                { id: "PRJ-0004", title: "Cairo Residential District", location: "Cairo, Egypt", status: "Completed", type: "Residential", progress: 100, latitude: 30.0444, longitude: 31.2357, riskScore: 30 },
+                { id: "PRJ-0005", title: "Riyadh Business Innovation Tower", location: "Riyadh, Saudi Arabia", status: "Pending", type: "Commercial", progress: 45, latitude: 24.7743, longitude: 46.7386, riskScore: 75 }
             ];
 
+            let remoteProjects = [];
             try {
                 const token = localStorage.getItem("token");
                 const res = await fetch(`${API_BASE_URL}/projects`, {
                     headers: { "Authorization": `Bearer ${token}` }
                 });
                 if (res.ok) {
-                    projects = await res.json();
+                    remoteProjects = await res.json();
                 } else {
-                    projects = fallbackProjects;
+                    remoteProjects = fallbackProjects;
                 }
             } catch (err) {
                 console.warn("Using fallback projects", err);
-                projects = fallbackProjects;
+                remoteProjects = fallbackProjects;
             }
+
+            // Load localStorage projects
+            let localProjects = [];
+            try {
+                localProjects = JSON.parse(localStorage.getItem('engisphere_projects') || '[]');
+            } catch (e) {
+                console.error(e);
+            }
+
+            // Merge without duplicates by id
+            const map = new Map();
+            fallbackProjects.forEach(p => {
+                const norm = normalizeProject(p);
+                map.set(norm.id, norm);
+            });
+            remoteProjects.forEach(p => {
+                const norm = normalizeProject(p);
+                map.set(norm.id, norm);
+            });
+            localProjects.forEach(p => {
+                const norm = normalizeProject(p);
+                map.set(norm.id, norm);
+            });
+
+            projects = Array.from(map.values());
 
             renderProjects(projects);
             addMarkers(projects);
@@ -880,8 +966,8 @@
             if (!list.length) { container.innerHTML = '<div class="empty-state">No projects found.</div>'; return; }
             container.innerHTML = list.map(p => `
                 <div class="project-card ${selectedProject?.id === p.id ? 'active' : ''}" onclick="selectProject('${p.id}')">
-                    <div class="project-card-title">${p.title || p.name}</div>
-                    <div class="project-card-sub"><span class="status-badge status-${p.status.toLowerCase().replace(/ /g, '')}">${p.status}</span> <span>${p.location || 'Dubai'}</span></div>
+                    <div class="project-card-title">${p.title}</div>
+                    <div class="project-card-sub"><span class="status-badge status-${p.status.toLowerCase().replace(/ /g, '')}">${p.status}</span> <span>${p.location}</span></div>
                 </div>
             `).join("");
         }
@@ -891,7 +977,6 @@
             markers = [];
             markersByProjectId = {};
             
-            // Jitter coordinates to avoid stacking
             const locationCount = {};
             
             list.forEach(p => {
@@ -909,7 +994,18 @@
                     }
 
                     const m = L.marker([lat, lng]).addTo(map);
-                    m.bindPopup(`<strong>${p.title || p.name}</strong><br>${p.location || 'Dubai'}`);
+                    const popupContent = `
+                        <div style="font-family: inherit; font-size: 13px; line-height: 1.4; color: var(--text-main);">
+                            <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">${p.title}</div>
+                            <div style="margin-bottom: 2px;"><strong>Location:</strong> ${p.location}</div>
+                            <div style="margin-bottom: 2px;"><strong>Status:</strong> ${p.status}</div>
+                            <div style="margin-bottom: 6px;"><strong>Risk Score:</strong> <span style="font-weight: 700; color: ${p.riskScore >= 70 ? 'var(--danger)' : p.riskScore >= 50 ? 'var(--warning)' : 'var(--success)'}">${p.riskScore}/100</span></div>
+                            <a href="project_details.html?id=${p.id}&mode=view" class="btn-action" style="display: block; text-align: center; text-decoration: none; padding: 6px 10px; background: var(--primary); color: #fff; border-radius: 6px; font-weight: 600; font-size: 12px; margin-top: 6px;">
+                                Open Project Details
+                            </a>
+                        </div>
+                    `;
+                    m.bindPopup(popupContent);
                     m.on("click", () => selectProject(p.id));
                     markers.push(m);
                     markersByProjectId[p.id] = m;
@@ -923,8 +1019,8 @@
 
             renderProjects(projects);
             document.getElementById("aiSelectedProject").innerHTML = `
-                <div style="font-weight:700; color:var(--text-main); margin-bottom:4px;">${selectedProject.title || selectedProject.name}</div>
-                <div style="font-size:12px; color:var(--text-muted);">${selectedProject.location || 'Dubai'}</div>
+                <div style="font-weight:700; color:var(--text-main); margin-bottom:4px;">${selectedProject.title}</div>
+                <div style="font-size:12px; color:var(--text-muted);">${selectedProject.location}</div>
             `;
             
             if (selectedProject.latitude && selectedProject.longitude) {
@@ -936,112 +1032,141 @@
             document.getElementById("aiSolutionOutput").classList.add("hidden");
         }
 
+        function generateLocalSolutionPlan(project) {
+            const risk = Number(project.riskScore || 55);
+            const type = String(project.type || '').toLowerCase();
+            const location = String(project.location || '');
+            const status = String(project.status || '');
+
+            let confidence = risk >= 70 ? 91 : risk >= 50 ? 94 : 96;
+
+            let diagnosis = [];
+            let rootCauses = [];
+            let actions = [];
+            let technical = [];
+            let riskReduction = [];
+            let timeline = [];
+            let cost = [];
+
+            if (risk >= 70) {
+                diagnosis.push('High-risk delivery profile requiring immediate governance and technical review.');
+                diagnosis.push('Requires close monitoring of critical path and rapid response coordination.');
+                rootCauses.push('Potential schedule pressure, stakeholder dependencies, and unresolved technical interfaces.');
+                rootCauses.push('High exposure due to complexity, permitting bottlenecks, and coordination delays.');
+                actions.push('Create a 14-day recovery sprint with accountable owners.');
+                actions.push('Conduct daily triage meetings on blockers and critical path alignment.');
+                riskReduction.push('Escalate critical risks to the steering committee and review mitigation status weekly.');
+                riskReduction.push('Establish a formal change-control board to manage scope creep and design iterations.');
+            } else if (risk >= 50) {
+                diagnosis.push('Moderate-risk project with manageable delivery exposure.');
+                diagnosis.push('Standard execution controls are sufficient but require periodic validation.');
+                rootCauses.push('Some scope, permitting, or coordination items may require refinement.');
+                rootCauses.push('Minor resource constraints or stakeholder response lag detected.');
+                actions.push('Validate scope assumptions and update the execution plan.');
+                actions.push('Hold weekly review sessions with municipal and contractor liaisons.');
+                riskReduction.push('Track open risks and assign owners for medium-priority items.');
+                riskReduction.push('Verify contingency allocation and review contractor performance monthly.');
+            } else {
+                diagnosis.push('Stable project profile with low-to-moderate delivery risk.');
+                diagnosis.push('Performance metrics are healthy and within standard tolerances.');
+                rootCauses.push('No major blocker detected from current project profile.');
+                rootCauses.push('Resource utilization and milestone cadence are fully aligned.');
+                actions.push('Continue planned monitoring and maintain reporting cadence.');
+                actions.push('Conduct standard monthly review of risk registers and operational audits.');
+                riskReduction.push('Keep contingency measures active and review monthly.');
+                riskReduction.push('Document success patterns for knowledge transfer to new initiatives.');
+            }
+
+            if (type.includes('infrastructure') || type.includes('transport') || type.includes('rail') || type.includes('road') || type.includes('bridge') || type.includes('tunnel')) {
+                technical.push('Review utilities, mobility access, traffic interfaces, and public realm constraints.');
+                technical.push('Verify structural designs against heavy load limits and long-term durability standards.');
+                actions.push('Coordinate with municipality, transport, and utility stakeholders.');
+                actions.push('Deploy ground-penetrating radar for unmapped utility relocations.');
+            } else if (type.includes('commercial') || type.includes('business') || type.includes('tower') || type.includes('office')) {
+                technical.push('Validate tenant requirements, MEP capacity, vertical transport, and operational readiness.');
+                technical.push('Examine high-spec facade material sourcing and curtain wall procurement.');
+                actions.push('Freeze core design packages and prioritize mechanical elevator installation.');
+                actions.push('Establish rigid change-control board for specialized spatial zones.');
+            } else if (type.includes('energy') || type.includes('solar') || type.includes('power') || type.includes('grid')) {
+                technical.push('Review grid interface, operational resilience, and safety-critical systems.');
+                technical.push('Validate high-voltage equipment certifications and delivery schedules.');
+                actions.push('Expedite shipment tracking for specialized substation hardware.');
+                actions.push('Coordinate grid connection sequence directly with electricity transmission authority.');
+            } else {
+                technical.push('Conduct discipline-level review for civil, MEP, schedule, and stakeholder interfaces.');
+                technical.push('Audit site logistics, material staging areas, and crane coverage efficiency.');
+                actions.push('Optimize heavy equipment layout to minimize spatial congestion.');
+                actions.push('Deploy automated progress capturing tools for weekly visual verification.');
+            }
+
+            if (location.toLowerCase().includes('jeddah')) {
+                technical.push('Account for waterfront conditions, coastal access, pedestrian movement, and smart parking integration.');
+                technical.push('Implement marine-edge safety protocols and coastal durability standards for base civil works.');
+                actions.push('Prioritize public access, marine-edge safety, and mobility phasing.');
+                actions.push('Consult waterfront zoning specialists to speed up local municipal approvals.');
+            }
+
+            if (location.toLowerCase().includes('riyadh')) {
+                technical.push('Review urban heat, district mobility, stakeholder logistics, and city authority coordination.');
+                technical.push('Schedule outdoor operations around temperature peaks and check local cooling shelters.');
+            }
+
+            if (location.toLowerCase().includes('dubai')) {
+                technical.push('Review authority approvals, high-density access, and smart infrastructure integration.');
+                technical.push('Leverage established municipal digital twin systems for immediate layout validation.');
+            }
+
+            timeline.push('Update milestone baseline and monitor variance weekly.');
+            timeline.push('Identify long-lead approvals and procurement dependencies.');
+
+            cost.push('Review contingency allocation against current risk score.');
+            cost.push('Compare budget assumptions with project scope and market benchmarks.');
+
+            return {
+                confidence,
+                diagnosis,
+                rootCauses,
+                actions,
+                technical,
+                riskReduction,
+                timeline,
+                cost
+            };
+        }
+
         async function generatePremiumAISolutionMap() {
             if (!selectedProject) { showPremiumToast("Please select a project first."); return; }
             const btn = document.getElementById("aiGenerateBtn");
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing Sector...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running Local AI Engine...';
             
-            try {
-                const token = localStorage.getItem("token");
-                const res = await fetch(`${API_BASE_URL}/ai/solution-radar`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
-                    body: JSON.stringify({ project_id: selectedProject.id })
-                });
-                const data = await res.json();
-                const output = parseAIOutput(data.analysis, selectedProject);
-                
-                document.getElementById("aiDiagnosis").textContent = output.diagnosis;
-                document.getElementById("aiRootCauses").textContent = output.rootCauses;
-                document.getElementById("aiActions").textContent = output.actions;
-                document.getElementById("aiRecommendations").textContent = output.recommendations;
-                document.getElementById("aiRisk").textContent = output.risk;
-                document.getElementById("aiTimeline").textContent = output.timeline;
-                document.getElementById("aiCost").textContent = output.cost;
-                
-                document.getElementById("aiSolutionOutput").classList.remove("hidden");
-                showPremiumToast("AI Intelligence Synced");
-            } catch (err) {
-                console.error(err);
-                showPremiumToast("AI Engine Offline");
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-brain"></i> Generate AI Solution Map';
-            }
-        }
+            // Short loading delay of 650ms
+            setTimeout(() => {
+                try {
+                    const plan = generateLocalSolutionPlan(selectedProject);
+                    
+                    const toHTML = (arr) => arr.map(item => `• ${item}`).join('<br><br>');
 
-        function parseAIOutput(text, project) {
-            const pName = project.title || project.name;
-            const progress = project.progress || 0;
-            const loc = project.location || 'Dubai';
-            const type = (project.title + " " + (project.type || "")).toLowerCase();
-
-            let profile = 'Default';
-            if (type.includes('transp') || type.includes('metro') || type.includes('rail') || type.includes('road')) profile = 'Transportation';
-            else if (type.includes('energy') || type.includes('solar') || type.includes('power') || type.includes('grid')) profile = 'Energy';
-            else if (type.includes('resid') || type.includes('apart') || type.includes('villa') || type.includes('housing')) profile = 'Residential';
-            else if (type.includes('tower') || type.includes('business') || type.includes('office') || type.includes('comm')) profile = 'Business';
-            else if (type.includes('infra') || type.includes('bridge') || type.includes('utility')) profile = 'Infrastructure';
-
-            const templates = {
-                Transportation: {
-                    diagnosis: `${pName} is at ${progress}% progress in ${loc}. AI monitoring indicates schedule pressure around route coordination, station interfaces, permits, and contractor synchronization.`,
-                    rootCauses: "Delays originate from interface conflicts between civil works and systems integration, coupled with utility diversion bottlenecks.",
-                    actions: "Accelerate systems testing cycles, escalate authority permit clearances for remaining zones, and deploy additional specialized MEP teams.",
-                    recommendations: "Implement digital twin tracking for rolling stock readiness and automate signaling interface validation protocols.",
-                    risk: "Mitigate operational readiness risk by prioritizing safety commissioning and power-on milestones.",
-                    timeline: "Critical path recovery possible by shifting systems install to 24/7 parallel shifts in non-conflict zones.",
-                    cost: "Reduce overruns by optimizing specialized plant hire duration and streamlining vendor claim settlements."
-                },
-                Energy: {
-                    diagnosis: `${pName} requires tighter control over equipment delivery, grid integration readiness, commissioning sequence, and safety compliance.`,
-                    rootCauses: "Supply chain volatility for long-lead specialized hardware and grid connection authority synchronization are primary constraints.",
-                    actions: "Expedite shipment tracking for transformers/panels and finalize grid-on agreements with local utilities.",
-                    recommendations: "Utilize risk-weighted commissioning sequences to allow partial generation while finalizing secondary systems.",
-                    risk: "Address high-voltage safety compliance gaps and stabilize subcontractor specialist availability.",
-                    timeline: "Potential for 10% timeline reduction via early partial load testing and modular site assembly.",
-                    cost: "Optimize capital expenditure through vendor performance auditing and reduced energy-idle site consumption."
-                },
-                Residential: {
-                    diagnosis: `${pName} shows delivery dependency across structural works, finishing trades, inspection cycles, and handover readiness.`,
-                    rootCauses: "Fragmented finishing trade coordination and high rejection rates in preliminary inspections are slowing momentum.",
-                    actions: "Establish a rapid-response quality control unit and synchronize material delivery with active floor work-plans.",
-                    recommendations: "Deploy a mobile progress tracking app for site foremen to reduce reporting silos and speed up defect rectification.",
-                    risk: "Minimize handover risk by pre-empting municipality inspection requirements and stabilizing MEP contractor throughput.",
-                    timeline: "Recovery achievable through floor-by-floor finishing parallelization and accelerated facade closing.",
-                    cost: "Limit rework costs by enforcing strict first-fix quality gatekeepers and bulk material procurement stabilization."
-                },
-                Business: {
-                    diagnosis: `${pName} shows early-stage delivery exposure around design finalization, tenant requirements, authority approvals, and MEP coordination.`,
-                    rootCauses: "Ongoing design iterations for high-spec commercial zones and delayed specialized curtain wall material approvals.",
-                    actions: "Freeze core design packages, prioritize vertical transport installation, and finalize tenant-fitout technical specs.",
-                    recommendations: "Leverage BIM 4D scheduling for floor-stacking visibility and automate MEP clash detection resolution.",
-                    risk: "Reduce lease-readiness risk by prioritizing core shell completion and fire-life-safety certification.",
-                    timeline: "Shift to top-down finishing approach to enable early tenant access for lower floors during upper floor construction.",
-                    cost: "Optimize MEP equipment scaling and reduce design-change variability through rigid change-control boards."
-                },
-                Infrastructure: {
-                    diagnosis: `${pName} is at ${progress}% progress. AI monitoring identifies execution risk across site access, bridge/utility interfaces, procurement timing, and quality control.`,
-                    rootCauses: "Unforeseen ground conditions and delayed utility relocations by third-party providers are the critical blockers.",
-                    actions: "Renegotiate site access permits with authorities and deploy ground-penetrating radar for unmapped utility detection.",
-                    recommendations: "Utilize modular bridge/drainage elements to bypass site congestion and reduce casting-time dependencies.",
-                    risk: "Control public safety exposure and environmental impact through automated site boundary monitoring.",
-                    timeline: "Recover lost days by utilizing pre-cast manufacturing off-site and high-strength concrete curing additives.",
-                    cost: "Minimize mobilization costs by centralizing heavy plant equipment and optimizing earthwork haulage routes."
-                },
-                Default: {
-                    diagnosis: `${pName} in ${loc} is at ${progress}% progress. AI suggests a baseline focus on schedule transparency and resource allocation.`,
-                    rootCauses: "General reporting latency and lack of cross-departmental milestone synchronization.",
-                    actions: "Deploy a unified project control dashboard and conduct weekly critical-path alignment workshops.",
-                    recommendations: "Implement predictive analytics for manpower forecasting and automate daily site progress snapshots.",
-                    risk: "Stabilize execution by identifying early warning signals in procurement lead-times and labor productivity.",
-                    timeline: "Linear recovery planned via improved resource leveling and task-dependency logic optimization.",
-                    cost: "Maintain budget through strict variations control and waste reduction in bulk material handling."
+                    document.getElementById("aiDiagnosis").innerHTML = toHTML(plan.diagnosis);
+                    document.getElementById("aiRootCauses").innerHTML = toHTML(plan.rootCauses);
+                    document.getElementById("aiActions").innerHTML = toHTML(plan.actions);
+                    document.getElementById("aiRecommendations").innerHTML = toHTML(plan.technical);
+                    document.getElementById("aiRisk").innerHTML = toHTML(plan.riskReduction);
+                    document.getElementById("aiTimeline").innerHTML = toHTML(plan.timeline);
+                    document.getElementById("aiCost").innerHTML = toHTML(plan.cost);
+                    
+                    document.getElementById("aiConfidence").textContent = `Confidence ${plan.confidence}%`;
+                    
+                    document.getElementById("aiSolutionOutput").classList.remove("hidden");
+                    showPremiumToast("Local AI Analysis Synced");
+                } catch (err) {
+                    console.error(err);
+                    showPremiumToast("Local AI Engine Error");
+                } finally {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-brain"></i> Generate AI Solution Map';
                 }
-            };
-
-            return templates[profile];
+            }, 650);
         }
 
         function toggleAppTheme() {

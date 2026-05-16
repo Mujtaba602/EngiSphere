@@ -1,37 +1,125 @@
-# 🏗️ EngiSphere - Integrated Engineering Management System
+# EngiSphere
 
-EngiSphere is a professional software solution designed to bridge the gap between engineering firms and their clients. It provides a transparent, secure, and efficient environment for project tracking and management.
+EngiSphere is an AI-assisted engineering project intelligence and management platform. It helps engineering teams manage projects, visualize project locations, analyze risks, control team access, and review reports from one integrated workspace.
 
-## ✨ Key Features
-* **Secure Authentication:** Full JWT (JSON Web Token) implementation with password hashing (Bcrypt).
-* **Engineer Dashboard:** Real-time project tracking, CRUD operations, and data visualization using Chart.js.
-* **Client Portal:** A transparent view for clients to follow their project's progress and site reports.
-* **AI Integration:** Includes **EngiBot** for engineering queries and **DevSpace** for system diagnostics.
+---
 
-## 🛠️ Tech Stack
-* **Backend:** Python (FastAPI), SQLAlchemy, SQLite.
-* **Frontend:** HTML5, CSS3, JavaScript (Vanilla).
-* **Security:** OAuth2 with JWT, CORS Middleware.
+## Features
 
-## 🚀 MVP Features
+- Secure login interface
+- Project Command Center dashboard
+- AI-assisted project setup workflow
+- Project details and engineering profile pages
+- Interactive Geospatial Radar using Leaflet and OpenStreetMap
+- AI Solution Map with engineering recommendations
+- AI EngiBot for project and risk-related questions
+- Team Access with Admin, Engineer, and Viewer roles
+- Reports and Documents Center
+- Local data persistence using browser localStorage
 
-The following features were developed and delivered as part of the final development sprint:
+---
 
-| Feature | Description |
-|---|---|
-| **Project Progress Tracking** | Real-time progress, status, and risk updates stored in localStorage with merge logic |
-| **PDF Export Reports** | Professional A4-landscape PDF reports with project health and recommendations section |
-| **RBAC (Frontend MVP)** | Role-based access control enforced at the UI layer for all major pages |
-| **Notification Center** | In-app notification system with severity levels and anti-spam cooldowns |
-| **AI Project Analysis** | Rule-based local AI engine: Risk Score, Health Status, Delay Probability, Recommendations |
-| **Geospatial Radar** | Interactive Leaflet map with AI-colored markers, filter chips, and enriched popups |
-| **Audit Log MVP** | Structured audit event logging for key user actions across the platform |
-| **Dashboard Analytics** | Project Health Overview with executive summary, best/worst project cards, and AI indicators |
+## Main Modules
 
-> **Security Notice:** RBAC is implemented at the **frontend MVP level**. Production deployment must enforce permissions in the **backend API** as well to ensure true security.
+### Dashboard
+Displays portfolio statistics, active projects, risk indicators, progress, open risks, and reports generated.
 
-## 👥 Contributors
-* **Mujtaba Mohammed** - Lead Software Engineer & CEO
-* **Ahmedmutasim7** - Chief Technology Officer (CTO)
-* **Azzam-249** - Head of Operations
-* **AliMohammed49** - Lead Data Scientist
+### Project Setup
+Allows users to create engineering projects through a structured workflow including identity, scope, requirements, documents, feasibility, and report stages.
+
+### Project Details
+Shows project profile information such as status, location, type, risk score, budget, timeline, client, and executive summary.
+
+### Geospatial Radar
+Displays projects on an interactive map and connects project data with location-based visualization.
+
+### AI Solution Map
+Generates structured recommendations including diagnosis, root causes, immediate actions, technical recommendations, risk reduction, timeline recovery, and cost optimization.
+
+### AI EngiBot
+Provides engineering assistance for project summaries, risk questions, and portfolio analysis.
+
+### Team Access
+Manages approved users, pending requests, and role-based permissions.
+
+### Reports Center
+Provides generated reports, document overview, open risks, pending reviews, report preview, and recommendations.
+
+---
+
+## Technologies Used
+
+- HTML
+- CSS
+- JavaScript
+- Leaflet.js
+- OpenStreetMap
+- Browser localStorage
+- Rule-based AI logic
+
+---
+
+## Example Test Project
+
+**Jeddah Waterfront Mobility Program**
+
+- Location: Jeddah, Saudi Arabia
+- Type: Infrastructure
+- Status: Active
+- Risk Score: 72/100
+- Budget: 85,000,000
+- Client: Jeddah Municipality
+
+This project appears across the Dashboard, Project Details, Geospatial Radar, AI Solution Map, and AI EngiBot.
+
+---
+
+## How to Run
+
+Clone the repository:
+
+```bash
+git clone <repository-url>
+```
+
+Run a local server:
+
+```bash
+python3 -m http.server 8000
+```
+
+Open:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+## Testing Summary
+
+Tested workflows include:
+
+- Login and access
+- Project creation
+- Dashboard update
+- Project details display
+- Map marker rendering
+- AI Solution Map output
+- AI EngiBot responses
+- Team access approval
+- Reports preview
+- Data persistence after refresh
+
+---
+
+## Limitations
+
+This is an MVP prototype. It currently uses localStorage instead of a backend database, and the AI logic is rule-based. Future versions can include backend APIs, database integration, secure authentication, real AI models, PDF export, and advanced GIS layers.
+
+---
+
+## Purpose
+
+EngiSphere demonstrates how AI-assisted engineering analysis, geospatial visualization, access control, and reporting can be combined into one platform to support engineering project decision-making.
+

@@ -1530,6 +1530,211 @@
             };
         }
 
+        function getNormalizedProjects() {
+            let list = [];
+            try {
+                list = JSON.parse(localStorage.getItem('engisphere_projects') || '[]');
+            } catch (e) {
+                console.error(e);
+            }
+            const baseline = [
+                { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", status: "Active", type: "Infrastructure", progress: 92, riskScore: 40 },
+                { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", status: "In Progress", type: "Transportation", progress: 67, riskScore: 68 },
+                { id: "PRJ-0003", title: "Doha Energy Control Center", location: "Doha, Qatar", status: "Pending", type: "Energy", progress: 35, riskScore: 50 },
+                { id: "PRJ-0004", title: "Cairo Residential District", location: "Cairo, Egypt", status: "Completed", type: "Residential", progress: 100, riskScore: 30 },
+                { id: "PRJ-0005", title: "Riyadh Business Innovation Tower", location: "Riyadh, Saudi Arabia", status: "Pending", type: "Commercial", progress: 45, riskScore: 75 }
+            ];
+            
+            const map = new Map();
+            baseline.forEach(p => {
+                const norm = normalizeProject(p);
+                map.set(norm.title.toLowerCase(), norm);
+            });
+            list.forEach(p => {
+                const norm = normalizeProject(p);
+                map.set(norm.title.toLowerCase(), norm);
+            });
+            
+            return Array.from(map.values());
+        }
+
+        function normalizeProject(p) {
+            const id = p.id || p.projectId || p.code || 'PRJ-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+            const title = p.title || p.name || p.projectName || 'Untitled Project';
+            const location = p.location || p.city || p.country || 'Unknown';
+            const type = p.type || p.projectType || p.category || 'Infrastructure';
+            const status = p.status || p.stage || 'Pending';
+            const riskScore = Number(p.riskScore || p.risk || p.score || 55);
+            const progress = p.progress || p.operationalProgress || 0;
+            const budget = p.budget || p.estimatedBudget || p.cost || 'Not specified';
+            const summary = p.summary || p.description || p.executiveSummary || '';
+            return { id, title, location, type, status, riskScore, progress, budget, summary };
+        }
+
+        function findMatchedProject(message) {
+            const m = message.toLowerCase().trim();
+            const projects = getNormalizedProjects();
+            
+            for (const p of projects) {
+                if (m.includes(p.title.toLowerCase())) {
+                    return p;
+                }
+            }
+            
+            const ignoreList = ['the', 'project', 'program', 'feasibility', 'smart', 'for', 'with', 'district', 'waterfront', 'mobility'];
+            for (const p of projects) {
+                const tokens = p.title.toLowerCase().split(/\s+/).filter(t => t.length > 3 && !ignoreList.includes(t));
+                if (tokens.length > 0 && tokens.every(token => m.includes(token))) {
+                    return p;
+                }
+            }
+            
+            for (const p of projects) {
+                const titleFirstWord = p.title.split(/\s+/)[0].toLowerCase();
+                if (m.includes(titleFirstWord) && (m.includes('summarize') || m.includes('overview') || m.includes('لخص') || m.includes('نبذة'))) {
+                    return p;
+                }
+            }
+            
+            return null;
+        }
+
+        function generateProjectSummaryResponse(project) {
+            const risk = Number(project.riskScore || 55);
+            let keyEngineering = [];
+            let nextSteps = [];
+
+            if (project.title.toLowerCase().includes('jeddah') || project.location.toLowerCase().includes('jeddah')) {
+                keyEngineering.push('Waterfront mobility dynamics: must optimize public realm access, marine-edge safety, and pedestrian corridor phasing.');
+                keyEngineering.push('Jeddah coastal conditions: design foundations to resist high soil salinity, high groundwater table, and tidal movements.');
+                keyEngineering.push('Smart parking and mobility integration: connect transit modes with smart traffic management systems.');
+                
+                nextSteps.push('Conduct specialized marine foundation analysis and geotechnical survey.');
+                nextSteps.push('Consult municipality waterfront planning division for fast-track approvals.');
+                nextSteps.push('Verify smart mobility sensor node placement with digital twin simulation.');
+            } else if (project.title.toLowerCase().includes('riyadh') || project.location.toLowerCase().includes('riyadh')) {
+                keyEngineering.push('Urban heat island mitigation: schedule outdoor civil/structural operations around daily peak temperatures.');
+                keyEngineering.push('District mobility alignment: synchronize station interfaces directly with local municipal transport lines.');
+                
+                nextSteps.push('Deploy temperature shelters and enforce hydration scheduling.');
+                nextSteps.push('Validate coordinate alignment between utility networks and sub-pile locations.');
+            } else {
+                keyEngineering.push('Civil & structural interfaces: verify structural pile-load capacity and load distribution parameters.');
+                keyEngineering.push('Supply chain and logistics: expedite procurement for specialized MEP and long-lead elements.');
+                
+                nextSteps.push('Verify baseline schedule dependencies with critical path review.');
+                nextSteps.push('Implement daily cross-discipline engineering coordination workshops.');
+            }
+
+            const desc = project.summary || `A high-priority ${project.type.toLowerCase()} development program in ${project.location}. Managed under a ${project.status.toLowerCase()} status with an active baseline progress of ${project.progress}%.`;
+
+            return {
+                briefAnalysis: [
+                    `Project Summary — ${project.title}`,
+                    `Location: ${project.location}`,
+                    `Type: ${project.type} | Status: ${project.status}`,
+                    `Risk Score: ${risk}/100 | Progress: ${project.progress}% | Budget: ${project.budget}`
+                ],
+                keyDeliveryRisks: [
+                    `Risk Profile: Rating at ${risk >= 70 ? 'High Risk' : risk >= 50 ? 'Moderate Risk' : 'Low Risk'} (${risk}/100).`,
+                    `Interface Risks: Coordination across civil, structural, and public realm elements remains highly sensitive.`,
+                    desc
+                ],
+                recoveryActions: keyEngineering,
+                timelineRecommendation: [
+                    `Execute dynamic rebaselining of critical milestones every 7 days.`,
+                    `Implement automated site progress audits using telemetry tools.`
+                ],
+                executiveNote: nextSteps
+            };
+        }
+
+        function getHighestRiskProject() {
+            const projects = getNormalizedProjects();
+            if (projects.length === 0) return null;
+            let highest = projects[0];
+            projects.forEach(p => {
+                if (Number(p.riskScore) > Number(highest.riskScore)) {
+                    highest = p;
+                }
+            });
+            return highest;
+        }
+
+        function generateHighestRiskResponse(project) {
+            const risk = Number(project.riskScore || 55);
+            let mainRisks = [];
+            let rootCauses = [];
+            let mitigations = [];
+
+            if (project.title.toLowerCase().includes('jeddah') || project.location.toLowerCase().includes('jeddah')) {
+                mainRisks.push('Coastal/waterfront interface constraints, leading to complex foundation soil conditions.');
+                mainRisks.push('Stakeholder and permitting coordination delays across coastal municipalities.');
+                mainRisks.push('Mobility phasing and public access disruption during critical transit hub excavations.');
+                mainRisks.push('Schedule pressure and unresolved technical dependencies between civil and marine packages.');
+
+                rootCauses.push('Late definition of waterfront public realm interfaces and high groundwater salinity.');
+                rootCauses.push('Supply chain lag for marine-edge reinforcement steel.');
+
+                mitigations.push('Establish a daily interface control room covering civil, marine, and municipal agencies.');
+                mitigations.push('Run high-frequency soil stress tests and deploy coastal waterproofing membranes.');
+            } else {
+                mainRisks.push('Schedule pressure on critical path due to delayed technical sign-offs.');
+                mainRisks.push('Resource constraints on specialized contractor categories.');
+
+                rootCauses.push('Late interface definitions between multidisciplinary engineering packages.');
+                rootCauses.push('Supply chain volatility affecting long-lead MEP equipment delivery.');
+
+                mitigations.push('Conduct 72-hour dependency mapping sessions across all engineering leads.');
+                mitigations.push('Escalate procurement blockers and finalize alternate supplier options.');
+            }
+
+            return {
+                briefAnalysis: [
+                    `Highest Risk Project Identified: ${project.title}`,
+                    `Location: ${project.location} | Current Status: ${project.status}`,
+                    `Calculated Risk Score: ${risk}/100 (Critical Delivery Profile)`
+                ],
+                keyDeliveryRisks: mainRisks,
+                recoveryActions: rootCauses,
+                timelineRecommendation: mitigations,
+                executiveNote: [
+                    `Executive Note: This project requires immediate weekly steering committee oversight and a design freeze on all open interfaces.`
+                ]
+            };
+        }
+
+        function generatePortfolioResponse() {
+            const projects = getNormalizedProjects();
+            let brief = [`Unified Portfolio Scan: ${projects.length} Mapped Projects Active.`];
+            let risks = [];
+            let actions = [];
+            let timeline = [];
+
+            projects.forEach((p, idx) => {
+                const item = `[${p.id}] ${p.title} — Location: ${p.location} | Status: ${p.status} | Risk Score: ${p.riskScore}/100`;
+                if (idx < 2) {
+                    risks.push(item);
+                } else if (idx < 4) {
+                    actions.push(item);
+                } else {
+                    timeline.push(item);
+                }
+            });
+
+            if (timeline.length === 0) timeline.push('All projects parsed and categorized in risk engine.');
+
+            return {
+                briefAnalysis: brief,
+                keyDeliveryRisks: risks,
+                recoveryActions: actions,
+                timelineRecommendation: timeline,
+                executiveNote: [
+                    'Recommendation: Leverage the Geospatial Radar dashboard to view interactive coordinates, or deploy AI EngiBot on individual project files.'
+                ]
+            };
+        }
+
         async function sendMessage() {
             if (isSending) return;
             const text = userInput.value.trim();
@@ -1545,10 +1750,49 @@
             setSendingState(true);
             scrollToBottom();
 
-            const intent = detectIntent(text);
             const typingId = "typing-" + Date.now();
             chatThread.insertAdjacentHTML("beforeend", `<div class="msg-row bot" id="${typingId}" data-prompt="${text}"><div class="msg-bubble"><div class="typing"><span></span><span></span><span></span></div></div></div>`);
             scrollToBottom();
+
+            const m = text.toLowerCase().trim();
+
+            // 1. PORTFOLIO WORKFLOWS
+            if (m.includes("list project") || m.includes("show all project") || m.includes("portfolio summary") || m.includes("اعرض المشاريع")) {
+                setTimeout(() => {
+                    const response = generatePortfolioResponse();
+                    renderBotResponse(typingId, response, "PORTFOLIO INTELLIGENCE READY", "engineering_report", text);
+                    setSendingState(false);
+                }, 750);
+                return;
+            }
+
+            // 2. HIGHEST RISK WORKFLOWS
+            if (m.includes("highest risk") || m.includes("main risk") || m.includes("أخطر مشروع") || m.includes("أعلى مخاطرة")) {
+                setTimeout(() => {
+                    const highest = getHighestRiskProject();
+                    if (highest) {
+                        const response = generateHighestRiskResponse(highest);
+                        renderBotResponse(typingId, response, "CRITICAL RISK IDENTIFIED", "engineering_report", text);
+                    } else {
+                        renderBotResponse(typingId, "No projects loaded from local storage database.", "LOCAL SYSTEM", "clarify", text);
+                    }
+                    setSendingState(false);
+                }, 750);
+                return;
+            }
+
+            // 3. PROJECT-SPECIFIC MATCHING WORKFLOWS
+            const matchedProject = findMatchedProject(text);
+            if (matchedProject) {
+                setTimeout(() => {
+                    const response = generateProjectSummaryResponse(matchedProject);
+                    renderBotResponse(typingId, response, "LOCAL ENGINEERING INTELLIGENCE READY", "engineering_report", text);
+                    setSendingState(false);
+                }, 750);
+                return;
+            }
+
+            const intent = detectIntent(text);
 
             // 1. Handle Priority Overrides Immediately
             if (intent === "global_override") {
