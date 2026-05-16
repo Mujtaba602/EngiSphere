@@ -1499,30 +1499,22 @@ body.dark-theme .settings-card {
 
   <div class="toast" id="toast"></div>
 
- <script>
+ <script src="assets/js/auth.js"></script>
+  <script>
+    // Immediate guard check
+    if (!Auth.guardPage()) {
+        // Redirection handled by guardPage
+    }
+  </script>
+  <script>
   const API_BASE_URL = "http://127.0.0.1:8000";
 
-  window.requireAuth = function (page) {
-    const currentToken = localStorage.getItem("access_token");
-
-    if (!currentToken) {
-      window.location.href = "login.html";
-      return;
-    }
-
-    window.location.href = page;
-  };
-
   function clearAuthData() {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("token");
-    localStorage.removeItem("token_type");
-    localStorage.removeItem("user_email");
+    Auth.logout();
   }
 
   window.logout = function () {
-    clearAuthData();
-    window.location.href = "login.html";
+    Auth.logout();
   };
 
   function setTextByIds(ids, value) {
@@ -1575,19 +1567,14 @@ body.dark-theme .settings-card {
   }
 
   document.addEventListener("DOMContentLoaded", function () {
-    const token = localStorage.getItem("access_token");
-
+    const user = Auth.getCurrentUser();
+    if (!user) return;
     const body = document.body;
     const toast = document.getElementById("toast");
     const themeToggle = document.getElementById("themeToggle");
     const darkModeSwitch = getElementByIds(["darkModeSwitch", "darkSwitch"]);
     const authActions = document.getElementById("authActions");
     const passwordForm = getElementByIds(["settingsPasswordForm", "passwordForm"]);
-
-    if (!token) {
-      window.location.href = "login.html";
-      return;
-    }
 
     function showToast(message, type = "info") {
       if (!toast) {
@@ -1633,10 +1620,8 @@ body.dark-theme .settings-card {
     });
 
     // Initial switch state
-    document.addEventListener("DOMContentLoaded", () => {
-        const isDark = document.body.classList.contains("dark-theme");
-        updateDarkSwitch(isDark);
-    });
+    const isDark = document.body.classList.contains("dark-theme");
+    updateDarkSwitch(isDark);
 
     function renderAuthActions() {
       if (!authActions) return;
@@ -1661,31 +1646,11 @@ body.dark-theme .settings-card {
 
     async function loadUserInfo() {
       try {
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
+        const user = Auth.getCurrentUser();
+        if (!user) return;
 
-        if (response.status === 401 || response.status === 403) {
-          clearAuthData();
-          window.location.href = "login.html";
-          return;
-        }
-
-        if (!response.ok) {
-          showToast("Unable to load account information.", "error");
-          applyFallbackUserInfo();
-          return;
-        }
-
-        const user = await response.json();
-
-        const fullName = user.full_name || user.name || "EngiSphere User";
-        const email = user.email || localStorage.getItem("user_email") || "Not available";
-
-        localStorage.setItem("user_email", email);
+        const fullName = user.fullName || "EngiSphere User";
+        const email = user.email || "Not available";
 
         setTextByIds(["settingsInit", "userInitial"], getInitial(fullName, email));
         setTextByIds(["settingsName", "userName"], fullName);
@@ -1696,7 +1661,6 @@ body.dark-theme .settings-card {
 
       } catch (error) {
         console.error("Failed to load user info:", error);
-        showToast("Backend connection failed.", "error");
         applyFallbackUserInfo();
       }
     }
@@ -1751,46 +1715,28 @@ body.dark-theme .settings-card {
           passwordBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
         }
 
-        const response = await fetch(`${API_BASE_URL}/users/update-password`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            old_password: currentPassword,
-            new_password: newPassword
-          })
-        });
+        // Simulate backend delay
+        await new Promise(r => setTimeout(r, 1000));
 
-        if (response.status === 401 || response.status === 403) {
-          clearAuthData();
-          window.location.href = "login.html";
-          return;
-        }
-
-        let data = {};
-
-        try {
-          data = await response.json();
-        } catch (_) {
-          data = {};
-        }
-
-        if (!response.ok) {
-          const errorMessage = getReadableError(data, "Password update failed.");
-          throw new Error(errorMessage);
+        // Update local password
+        const users = JSON.parse(localStorage.getItem('engisphereUsers') || '[]');
+        const currentUser = Auth.getCurrentUser();
+        const userIdx = users.findIndex(u => u.id === currentUser.id);
+        
+        if (userIdx !== -1) {
+            users[userIdx].password = newPassword;
+            localStorage.setItem('engisphereUsers', JSON.stringify(users));
         }
 
         if (passwordForm) {
           passwordForm.reset();
         }
 
-        showToast("Password updated successfully.", "success");
+        showToast("Password updated successfully (Demo Mode).", "success");
 
       } catch (error) {
         console.error("Password update error:", error);
-        showToast(error.message || "Password update failed.", "error");
+        showToast("Password update failed.", "error");
 
       } finally {
         if (passwordBtn) {

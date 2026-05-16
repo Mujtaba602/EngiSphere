@@ -3,11 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports | EngiSphere</title>
+    <title>Reports & Documents Center | EngiSphere</title>
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     
+    <script src="assets/js/auth.js"></script>
+    <script>
+        if (!Auth.guardPage()) {
+            // Redirection happens inside guardPage if not authorized
+        }
+    </script>
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <script>
@@ -55,7 +61,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: var(--sidebar-width);
+            width: 280px;
             background: var(--sidebar);
             border-right: 1px solid var(--border-soft);
             display: flex;
@@ -171,26 +177,53 @@
         }
 
         .nav-section {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin: 14px 0 6px 14px;
-            letter-spacing: 1px;
+            margin: 20px 0 10px 10px;
+            letter-spacing: 0.12em;
         }
 
         .nav-link {
+            height: 54px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            border-radius: 14px;
+            gap: 16px;
+            padding: 0 18px;
+            margin: 6px 0;
+            border-radius: 16px;
             color: var(--text-muted);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 700;
+            font-size: 15px;
             transition: var(--transition);
-            margin-bottom: 4px;
+        }
+
+        .nav-link i {
+            width: 22px;
+            min-width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #eef4ff;
+            color: var(--primary);
+        }
+
+        .dark-theme .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            background: var(--primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .nav-link.active i {
+            color: #ffffff !important;
         }
 
         .nav-link:hover {
@@ -226,51 +259,223 @@
         .header h1 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
         .header p { color: var(--text-muted); font-size: 16px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        /* Controls Section */
+        .controls-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid var(--border-soft);
+            box-shadow: var(--shadow-premium);
+        }
+
+        .search-wrap {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-wrap i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 46px;
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .select-input {
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border-soft);
+            background: var(--bg-soft);
+            color: var(--text-main);
+            outline: none;
+            font-family: inherit;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* Stats Cards */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 20px; padding: 24px; box-shadow: var(--shadow-premium); }
         .stat-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
-        .stat-value { font-size: 20px; font-weight: 800; color: var(--text-main); }
+        .stat-value { font-size: 24px; font-weight: 800; color: var(--text-main); }
 
-        .grid-layout { display: grid; grid-template-columns: 1.5fr 1fr; gap: 30px; }
-        .content-section { background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 24px; padding: 32px; box-shadow: var(--shadow-premium); }
+        /* Tab Switcher */
+        .tab-switcher {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-soft);
+            padding: 6px;
+            border-radius: 14px;
+            width: fit-content;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-soft);
+        }
+
+        .tab-btn {
+            padding: 10px 24px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tab-btn.active {
+            background: var(--card-bg);
+            color: var(--primary);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .grid-layout { display: grid; grid-template-columns: 1.6fr 1fr; gap: 30px; }
+        .content-section { background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 24px; padding: 32px; box-shadow: var(--shadow-premium); min-height: 500px; position: relative; }
         .section-title { font-size: 18px; font-weight: 800; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
         .section-title i { color: var(--primary); }
 
-        /* Report Cards */
-        .report-list { display: grid; gap: 16px; }
-        .report-card { padding: 20px; border-radius: 18px; background: var(--bg-soft); border: 1px solid var(--border-soft); transition: var(--transition); }
-        .report-card:hover { border-color: var(--primary); }
-        .report-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-        .report-card-top h3 { font-size: 15px; font-weight: 700; }
-        .report-card p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; line-height: 1.5; }
+        /* Report/Document Lists */
+        .item-list { display: grid; gap: 16px; }
+        .item-card { padding: 20px; border-radius: 18px; background: var(--bg-soft); border: 1px solid var(--border-soft); transition: var(--transition); cursor: pointer; }
+        .item-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+        .item-card.selected { border-color: var(--primary); background: var(--primary-soft); }
+        .item-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+        .item-card h3 { font-size: 15px; font-weight: 700; color: var(--text-main); }
+        .item-card p { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5; }
+        .item-meta { display: flex; gap: 12px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+        
         .badge { padding: 4px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
         .badge-ready { background: var(--success); color: white; }
         .badge-draft { background: var(--warning); color: white; }
+        .badge-review { background: var(--primary); color: white; }
 
         /* Preview Panel */
+        .preview-content { display: none; }
+        .preview-content.active { display: block; }
         .preview-header { padding-bottom: 16px; border-bottom: 1px solid var(--border-soft); margin-bottom: 24px; }
-        .preview-header h2 { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .preview-header h2 { font-size: 20px; font-weight: 800; color: var(--primary); line-height: 1.3; }
         .preview-body { font-size: 14px; line-height: 1.7; color: var(--text-main); }
         .preview-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
         .meta-item { background: var(--bg-soft); padding: 12px; border-radius: 12px; }
         .meta-item strong { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
         .preview-box { background: rgba(37, 99, 235, 0.03); border: 1px dashed var(--primary); border-radius: 16px; padding: 20px; margin-bottom: 24px; }
-        .preview-box h4 { margin-bottom: 12px; font-size: 15px; }
+        .preview-box h4 { margin-bottom: 12px; font-size: 15px; font-weight: 800; }
         .preview-list { list-style: none; display: grid; gap: 10px; }
         .preview-list li { display: flex; align-items: flex-start; gap: 10px; }
         .preview-list li i { color: var(--primary); margin-top: 4px; font-size: 12px; }
 
-        .actions { display: flex; gap: 12px; margin-top: 30px; }
+        .actions { display: flex; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
         .btn { padding: 12px 20px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; transition: var(--transition); border: 1px solid var(--border-soft); display: inline-flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--primary); color: white; border: none; }
         .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
         .btn-outline { background: var(--card-bg); color: var(--text-main); }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
 
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
 
-        .exit-link { margin-top: auto; color: var(--danger) !important; }
-        .exit-link:hover { background: rgba(239, 68, 68, 0.08); box-shadow: inset 4px 0 0 var(--danger); color: var(--danger) !important; }
+        .modal-overlay.active { display: flex; }
+
+        .modal-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            border: 1px solid var(--border-soft);
+        }
+
+        .modal-card h2 { margin-bottom: 24px; font-size: 22px; font-weight: 800; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-soft); background: var(--bg-soft); color: var(--text-main); font-family: inherit; outline: none; }
+        .form-control:focus { border-color: var(--primary); }
+        
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
+
+        /* Toast */
+        #toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 16px 24px;
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 3000;
+        }
+        #toast.show { transform: translateY(0); opacity: 1; }
+
+        /* Document Row (List View) */
+        .doc-row {
+            display: grid;
+            grid-template-columns: 40px 1fr 100px 120px 80px;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            background: var(--bg-soft);
+            border: 1px solid var(--border-soft);
+            margin-bottom: 10px;
+            transition: var(--transition);
+        }
+        .doc-row:hover { border-color: var(--primary); }
+        .doc-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--card-bg); display: flex; align-items: center; justify-content: center; color: var(--primary); }
+        .doc-info h4 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+        .doc-info p { font-size: 11px; color: var(--text-muted); }
+        .doc-cat { font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; }
+        .doc-date { font-size: 11px; color: var(--text-muted); }
+        .doc-type { font-size: 11px; font-weight: 800; color: var(--text-muted); }
+
         .theme-toggle { background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--text-main); padding: 10px 16px; border-radius: 12px; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 13px; }
+
+        @media (max-width: 1200px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -286,264 +491,895 @@
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
 
-            <a href="home.html" class="nav-link">
+            <a href="home.html" class="nav-link" onclick="window.location.assign('home.html'); return false;">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
 
-            <a href="index.html" class="nav-link">
+            <a href="index.html" class="nav-link" onclick="window.location.assign('index.html'); return false;">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="solutions.html" class="nav-link">
+            <a href="solutions.html" class="nav-link" onclick="window.location.assign('solutions.html'); return false;">
                 <i class="fas fa-satellite"></i>
                 <span>Geospatial Radar</span>
             </a>
 
-            <a href="ai_chat.html" class="nav-link">
+            <a href="ai_chat.html" class="nav-link" onclick="window.location.assign('ai_chat.html'); return false;">
                 <i class="fas fa-brain"></i>
                 <span>AI EngiBot</span>
             </a>
 
             <div class="nav-section">Management</div>
 
-            <a href="project_details.html" class="nav-link">
+            <a href="project_details.html" class="nav-link" onclick="window.location.assign('project_details.html'); return false;">
                 <i class="fas fa-folder-open"></i>
                 <span>Project Details</span>
             </a>
 
-            <a href="team_access.html" class="nav-link">
+            <a href="team_access.html" class="nav-link" onclick="window.location.assign('team_access.html'); return false;">
                 <i class="fas fa-users-gear"></i>
                 <span>Team Access</span>
             </a>
 
-            <a href="reports.html" class="nav-link active">
-                <i class="fas fa-file-invoice"></i>
+            <a href="reports.html" class="nav-link active" onclick="window.location.assign('reports.html'); return false;">
+                <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
         </nav>
 
-        <a href="login.html" class="nav-link exit-link">
+        <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
             <i class="fas fa-power-off"></i>
             <span>Exit System</span>
         </a>
     </aside>
 
-    <button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-chevron-left"></i></button>
+    <button id="sidebarToggle" class="sidebar-toggle" onclick="toggleSidebar()"><i class="fas fa-chevron-left"></i></button>
 
     <main class="main">
         <div class="header">
             <div>
-                <h1>Reports</h1>
-                <p>Generate and review engineering intelligence reports.</p>
+                <h1>Reports & Documents Center</h1>
+                <p>Generate, review, upload, and download engineering reports and key project documents.</p>
             </div>
-            <button class="theme-toggle" id="themeToggleBtn">
-                <i class="fas fa-moon"></i>
-                <span>Theme</span>
-            </button>
+            <div style="display: flex; gap: 12px; align-items: center;">
+                <button class="theme-toggle" id="themeToggleBtn">
+                    <i class="fas fa-moon"></i>
+                    <span>Theme</span>
+                </button>
+                <button class="btn btn-primary" onclick="openUploadModal()"><i class="fas fa-plus"></i> Upload Document</button>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <label style="font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase;">Project:</label>
+                <select class="select-input" id="projectSelector" onchange="handleProjectChange()">
+                    <option value="PRJ-0001">Dubai Smart Bridge</option>
+                    <option value="PRJ-0002">Riyadh Metro Expansion</option>
+                    <option value="PRJ-0003">Doha Coastal Tunnel</option>
+                    <option value="PRJ-0004">Jeddah Smart District</option>
+                    <option value="PRJ-0005">NEOM Utility Corridor</option>
+                </select>
+            </div>
+            
+            <div class="search-wrap">
+                <i class="fas fa-search"></i>
+                <input type="text" class="search-input" id="searchFilter" placeholder="Search reports or documents..." oninput="handleSearch()">
+            </div>
+
+            <div class="filter-group">
+                <select class="select-input" id="categoryFilter" onchange="handleFilters()">
+                    <option value="all">All Categories</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Risk">Risk</option>
+                    <option value="Procurement">Procurement</option>
+                    <option value="Contract">Contract</option>
+                    <option value="Drawings">Drawings</option>
+                    <option value="Safety">Safety</option>
+                </select>
+                <select class="select-input" id="statusFilter" onchange="handleFilters()">
+                    <option value="all">All Status</option>
+                    <option value="READY">Ready</option>
+                    <option value="DRAFT">Draft</option>
+                    <option value="REVIEW">Review</option>
+                </select>
+            </div>
         </div>
 
         <div class="stats-grid">
-            <div class="stat-card"><div class="stat-label">Reports Generated</div><div class="stat-value">12</div></div>
-            <div class="stat-card"><div class="stat-label">Open Risks</div><div class="stat-value">5</div></div>
-            <div class="stat-card"><div class="stat-label">Recovery Actions</div><div class="stat-value">8</div></div>
-            <div class="stat-card"><div class="stat-label">Executive Briefs</div><div class="stat-value">3</div></div>
+            <div class="stat-card">
+                <div class="stat-label">Reports Generated</div>
+                <div class="stat-value" id="statReports">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Documents Uploaded</div>
+                <div class="stat-value" id="statDocs">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Open Risks</div>
+                <div class="stat-value" id="statRisks">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Pending Reviews</div>
+                <div class="stat-value" id="statPending">0</div>
+            </div>
+        </div>
+
+        <div class="tab-switcher">
+            <button class="tab-btn active" id="tabReports" onclick="switchTab('reports')">Reports</button>
+            <button class="tab-btn" id="tabDocs" onclick="switchTab('documents')">Documents</button>
         </div>
 
         <div class="grid-layout">
             <div class="content-section">
-                <div class="section-title"><i class="fas fa-copy"></i> Available Reports</div>
-                <div class="report-list">
-                    <div class="report-card">
-                        <div class="report-card-top">
-                            <h3>Engineering Risk Summary</h3>
-                            <span class="badge badge-ready">Ready</span>
-                        </div>
-                        <p>Comprehensive overview of technical and operational risks across the project lifecycle.</p>
-                        <button class="btn btn-outline" onclick="alert('Demo mode: Previewing Engineering Risk Summary.')">Preview</button>
-                    </div>
-                    <div class="report-card">
-                        <div class="report-card-top">
-                            <h3>Procurement Delay Report</h3>
-                            <span class="badge badge-ready">Ready</span>
-                        </div>
-                        <p>Analysis of supplier timelines, long-lead items, and critical procurement blockers.</p>
-                        <button class="btn btn-outline" onclick="alert('Demo mode: Previewing Procurement Delay Report.')">Preview</button>
-                    </div>
-                    <div class="report-card">
-                        <div class="report-card-top">
-                            <h3>Structural Integrity Review</h3>
-                            <span class="badge badge-draft">Draft</span>
-                        </div>
-                        <p>Preliminary technical review of structural constraints and load-bearing requirements.</p>
-                        <button class="btn btn-outline" onclick="alert('Demo mode: Previewing Structural Integrity Review.')">Preview</button>
-                    </div>
-                    <div class="report-card">
-                        <div class="report-card-top">
-                            <h3>Executive Decision Brief</h3>
-                            <span class="badge badge-ready">Ready</span>
-                        </div>
-                        <p>High-level intelligence summary focused on critical decision points for leadership.</p>
-                        <button class="btn btn-outline" onclick="alert('Demo mode: Previewing Executive Decision Brief.')">Preview</button>
-                    </div>
+                <div class="section-title" id="listTitle"><i class="fas fa-copy"></i> Available Reports</div>
+                <div class="item-list" id="itemList">
+                    <!-- Reports or Documents will be rendered here -->
                 </div>
             </div>
 
             <div class="content-section">
-                <div class="section-title"><i class="fas fa-file-invoice"></i> Report Preview</div>
-                <div class="preview-header">
-                    <h2>Executive Project Intelligence Report</h2>
+                <div class="section-title" id="previewTitle"><i class="fas fa-eye"></i> Preview</div>
+                <div id="previewPlaceholder" class="detail-empty" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; color: var(--text-muted);">
+                    <i class="fas fa-file-invoice" style="font-size: 48px; margin-bottom: 20px; opacity: 0.2;"></i>
+                    <p>Select a report or document to view its details.</p>
                 </div>
-                <div class="preview-body">
-                    <div class="preview-meta">
-                        <div class="meta-item"><strong>Project</strong>EngiSphere Demo</div>
-                        <div class="meta-item"><strong>Risk Level</strong>Medium</div>
+
+                <div id="previewPanel" class="preview-content">
+                    <div class="preview-header">
+                        <h2 id="prevTitle">Report Title</h2>
                     </div>
-                    <div class="preview-box">
-                        <h4>Main Concern</h4>
-                        <p style="color: var(--text-muted); font-size: 13px;">Procurement delay, dependency ownership, and milestone control.</p>
-                    </div>
-                    <div class="preview-box" style="background: var(--bg-soft); border: 1px solid var(--border-soft);">
-                        <h4>Summary</h4>
-                        <p>"The current project risk profile indicates moderate delivery exposure due to procurement constraints, approval dependencies, and unclear ownership of recovery actions. The recommended approach is to assign risk owners, establish weekly executive reporting, and monitor procurement blockers."</p>
-                    </div>
-                    <div class="preview-box">
-                        <h4>Recommendations</h4>
-                        <ul class="preview-list">
-                            <li><i class="fas fa-check"></i> Assign owners for procurement and approval risks.</li>
-                            <li><i class="fas fa-check"></i> Track critical dependencies weekly.</li>
-                            <li><i class="fas fa-check"></i> Escalate unresolved blockers within 72 hours.</li>
-                            <li><i class="fas fa-check"></i> Use EngiBot to generate structured recovery actions.</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="actions">
-                        <button class="btn btn-primary" onclick="alert('Demo report generated successfully.')"><i class="fas fa-gear"></i> Generate</button>
-                        <button class="btn btn-outline" onclick="alert('Demo mode: PDF export preview is ready.')"><i class="fas fa-file-pdf"></i> Export PDF</button>
-                        <button class="btn btn-outline" onclick="alert('Demo summary downloaded.')"><i class="fas fa-download"></i> Download</button>
+                    <div class="preview-body">
+                        <div class="preview-meta">
+                            <div class="meta-item"><strong>Project Context</strong><span id="prevProject">Project Name</span></div>
+                            <div class="meta-item"><strong>Status / Category</strong><span id="prevStatus">Category</span></div>
+                        </div>
+                        <div id="reportFields">
+                            <div class="preview-box">
+                                <h4>Main Focus / Concern</h4>
+                                <p id="prevConcern" style="color: var(--text-muted); font-size: 13px;">Description of the main concern.</p>
+                            </div>
+                            <div class="preview-box" style="background: var(--bg-soft); border: 1px solid var(--border-soft);">
+                                <h4>Intelligence Summary</h4>
+                                <p id="prevSummary">Detailed summary text goes here.</p>
+                            </div>
+                            <div class="preview-box">
+                                <h4>Recommendations</h4>
+                                <ul class="preview-list" id="prevRecs">
+                                    <!-- List items here -->
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="docFields" style="display: none;">
+                            <div class="preview-box">
+                                <h4>Document Metadata</h4>
+                                <ul class="preview-list">
+                                    <li><i class="fas fa-info-circle"></i> Type: <span id="prevDocType">PDF</span></li>
+                                    <li><i class="fas fa-calendar-alt"></i> Uploaded: <span id="prevDocDate">2026-05-15</span></li>
+                                    <li><i class="fas fa-tags"></i> Category: <span id="prevDocCat">Drawing</span></li>
+                                </ul>
+                            </div>
+                            <div class="preview-box" style="background: var(--bg-soft); border: 1px solid var(--border-soft);">
+                                <h4>Notes</h4>
+                                <p id="prevDocNotes">No notes available.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="actions" id="reportActions">
+                            <button class="btn btn-primary" onclick="handleGenerate()"><i class="fas fa-gear"></i> Generate</button>
+                            <button class="btn btn-outline" onclick="downloadReportFile()"><i class="fas fa-file-code"></i> Download Intelligence Report</button>
+                        </div>
+                        <div class="actions" id="docActions" style="display: none;">
+                            <button class="btn btn-primary" onclick="handleDownload()"><i class="fas fa-download"></i> Download File</button>
+                            <button class="btn btn-outline" onclick="handleMarkReviewed()"><i class="fas fa-check-circle"></i> Mark Reviewed</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="uploadModal">
+        <div class="modal-card">
+            <h2>Upload Document</h2>
+            <form id="uploadForm" onsubmit="handleUpload(event)">
+                <div class="form-group">
+                    <label>Document Title</label>
+                    <input type="text" id="upTitle" class="form-control" placeholder="e.g. Site Survey Q2" required>
+                </div>
+                <div class="form-group">
+                    <label>Project</label>
+                    <select id="upProject" class="form-control">
+                        <option value="PRJ-0001">Dubai Smart Bridge</option>
+                        <option value="PRJ-0002">Riyadh Metro Expansion</option>
+                        <option value="PRJ-0003">Doha Coastal Tunnel</option>
+                        <option value="PRJ-0004">Jeddah Smart District</option>
+                        <option value="PRJ-0005">NEOM Utility Corridor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="upCategory" class="form-control">
+                        <option value="Contract">Contract</option>
+                        <option value="Drawings">Drawings</option>
+                        <option value="BOQ">BOQ</option>
+                        <option value="Schedule">Schedule</option>
+                        <option value="Permit">Permit</option>
+                        <option value="Risk Register">Risk Register</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Select File</label>
+                    <input type="file" id="upFile" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <textarea id="upNotes" class="form-control" rows="3" placeholder="Add optional notes..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeUploadModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Upload Document</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast">Message here</div>
+
     <script>
-        const THEME_KEY = "theme";
+        // Data Configuration
+        const PROJECTS = {
+            "PRJ-0001": { title: "Dubai Smart Bridge", location: "Dubai, UAE", lat: 25.2048, lng: 55.2708, openRisks: 2, pending: 1, code: "DSB-X1", phase: "Construction", progress: 92, budget: "$1.2B", variance: "-2.4%", safety: 98, confidence: 95 },
+            "PRJ-0002": { title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", lat: 24.7136, lng: 46.6753, openRisks: 6, pending: 3, code: "RME-Z4", phase: "Tunnelling", progress: 64, budget: "$4.5B", variance: "+5.1%", safety: 94, confidence: 88 },
+            "PRJ-0003": { title: "Doha Coastal Tunnel", location: "Doha, Qatar", lat: 25.2854, lng: 51.5310, openRisks: 9, pending: 5, code: "DCT-Q9", phase: "Excavation", progress: 41, budget: "$2.8B", variance: "+12.8%", safety: 91, confidence: 76 },
+            "PRJ-0004": { title: "Jeddah Smart District", location: "Jeddah, Saudi Arabia", lat: 21.4858, lng: 39.1925, openRisks: 3, pending: 0, code: "JSD-K2", phase: "Finishing", progress: 78, budget: "$3.1B", variance: "+0.8%", safety: 96, confidence: 91 },
+            "PRJ-0005": { title: "NEOM Utility Corridor", location: "NEOM, Saudi Arabia", lat: 28.1020, lng: 35.1850, openRisks: 5, pending: 2, code: "NUC-S5", phase: "Foundation", progress: 57, budget: "$5.6B", variance: "+8.4%", safety: 93, confidence: 84 }
+        };
 
-        function getThemeToggleButton() {
-            return (
-                document.getElementById("themeToggle") ||
-                document.getElementById("themeToggleBtn") ||
-                document.querySelector("[data-theme-toggle]") ||
-                document.querySelector(".theme-toggle")
-            );
-        }
-
-        function applyTheme(theme) {
-            const isDark = theme === "dark";
-            document.body.classList.toggle("dark-theme", isDark);
-            document.documentElement.classList.toggle("dark-theme", isDark);
-            document.body.classList.toggle("dark", isDark);
-            document.documentElement.classList.toggle("dark", isDark);
-            localStorage.setItem(THEME_KEY, isDark ? "dark" : "light");
-            const themeToggle = getThemeToggleButton();
-            if (themeToggle) {
-                themeToggle.innerHTML = isDark ? "☀️" : "🌙";
-                themeToggle.setAttribute("aria-label", isDark ? "Switch to light mode" : "Switch to dark mode");
-                themeToggle.setAttribute("title", isDark ? "Switch to light mode" : "Switch to dark mode");
+        const projectIntelligenceData = {
+            "PRJ-0001": {
+                risks: { technical: 15, schedule: 12, procurement: 8, cost: 20, safety: 5 },
+                matrix: [
+                    { risk: "Steel Supply Chain", prob: "Low", impact: "High", owner: "Ali Khan", status: "Mitigated", action: "Material reservation locked" },
+                    { risk: "Extreme Heat Downtime", prob: "High", impact: "Medium", owner: "Sarah Ahmed", status: "Active", action: "Night shift scheduling" },
+                    { risk: "Structural Node Stress", prob: "Low", impact: "Critical", owner: "John Doe", status: "Reviewed", action: "Node reinforcement complete" },
+                    { risk: "System Integration", prob: "Medium", impact: "Medium", owner: "Mike Ross", status: "Active", action: "Early protocol testing" },
+                    { risk: "Public Access Safety", prob: "Low", impact: "High", owner: "Fatima Noor", status: "Active", action: "Barrier enforcement" }
+                ],
+                milestones: [
+                    { name: "Core Foundation", date: "2025-10-12", status: "Complete", var: "0 days" },
+                    { name: "Bridge Pylons", date: "2026-02-15", status: "Complete", var: "+4 days" },
+                    { name: "Cable Stay Assembly", date: "2026-06-20", status: "Active", var: "-2 days" },
+                    { name: "Road Deck Integration", date: "2026-11-05", status: "Pending", var: "0 days" },
+                    { name: "Handover", date: "2027-04-12", status: "Pending", var: "0 days" }
+                ]
+            },
+            "PRJ-0002": {
+                risks: { technical: 45, schedule: 55, procurement: 40, cost: 35, safety: 15 },
+                matrix: [
+                    { risk: "TBM Mechanical Failure", prob: "Medium", impact: "Critical", owner: "Robert Chen", status: "Active", action: "On-site spare parts cache" },
+                    { risk: "Geological Anomaly", prob: "High", impact: "High", owner: "Elena Petrova", status: "Active", action: "Ground radar daily audit" },
+                    { risk: "Utilities Relocation", prob: "High", impact: "Medium", owner: "Khalid Sultan", status: "Delayed", action: "Government liaison escalation" },
+                    { risk: "Ventilation Shaft Safety", prob: "Medium", impact: "High", owner: "Sam Brown", status: "Active", action: "New sensors deployment" },
+                    { risk: "Rolling Stock Delivery", prob: "Low", impact: "High", owner: "Lucy Liu", status: "On Track", action: "Factory inspection Q4" }
+                ],
+                milestones: [
+                    { name: "Main Station Shell", date: "2025-12-01", status: "Complete", var: "+14 days" },
+                    { name: "TBM Launch", date: "2026-03-10", status: "Complete", var: "+7 days" },
+                    { name: "Tunnel Boring 40%", date: "2026-07-22", status: "Active", var: "+22 days" },
+                    { name: "Track Laying", date: "2027-01-15", status: "Pending", var: "0 days" },
+                    { name: "Trial Run", date: "2027-10-10", status: "Pending", var: "0 days" }
+                ]
+            },
+            "PRJ-0003": {
+                risks: { technical: 85, schedule: 75, procurement: 60, cost: 70, safety: 40 },
+                matrix: [
+                    { risk: "Seawater Ingress", prob: "High", impact: "Critical", owner: "David Vane", status: "CRITICAL", action: "Emergency sealing protocol" },
+                    { risk: "Hydrostatic Pressure", prob: "High", impact: "High", owner: "Zaid Omar", status: "Active", action: "Real-time pressure monitoring" },
+                    { risk: "Segment Lining Crack", prob: "Medium", impact: "Critical", owner: "Nadia Shah", status: "Review", action: "Ultrasound structural scan" },
+                    { risk: "Hyperbaric Operations", prob: "High", impact: "High", owner: "Lee Kim", status: "Active", action: "Diver decompression audit" },
+                    { risk: "Concrete Durability", prob: "Medium", impact: "High", owner: "Anna White", status: "Active", action: "Salinity exposure testing" }
+                ],
+                milestones: [
+                    { name: "Marine Survey", date: "2025-08-05", status: "Complete", var: "0 days" },
+                    { name: "Portal Excavation", date: "2026-01-20", status: "Complete", var: "+18 days" },
+                    { name: "TBM Undersea Entry", date: "2026-05-12", status: "Active", var: "+35 days" },
+                    { name: "Breakthrough", date: "2027-03-15", status: "Pending", var: "0 days" },
+                    { name: "System Commissioning", date: "2027-12-01", status: "Pending", var: "0 days" }
+                ]
+            },
+            "PRJ-0004": {
+                risks: { technical: 25, schedule: 30, procurement: 45, cost: 15, safety: 10 },
+                matrix: [
+                    { risk: "Smart Grid Integration", prob: "Medium", impact: "High", owner: "Omar Bakri", status: "Active", action: "Interface freeze negotiation" },
+                    { risk: "IoT Sensor Failure", prob: "High", impact: "Low", owner: "Jin Wu", status: "Active", action: "Redundancy cluster design" },
+                    { risk: "Material Quality (Façade)", prob: "Low", impact: "Medium", owner: "Sami Jaber", status: "Mitigated", action: "Batch testing on arrival" },
+                    { risk: "Connectivity Deadzones", prob: "Medium", impact: "Medium", owner: "Hassan Ali", status: "Active", action: "Mesh network optimization" },
+                    { risk: "Privacy/Cyber Security", prob: "Low", impact: "High", owner: "Mona Salem", status: "Audited", action: "End-to-end encryption" }
+                ],
+                milestones: [
+                    { name: "Main Structure", date: "2025-11-15", status: "Complete", var: "0 days" },
+                    { name: "Façade Completion", date: "2026-03-30", status: "Complete", var: "-5 days" },
+                    { name: "Smart OS Deployment", date: "2026-07-01", status: "Active", var: "+2 days" },
+                    { name: "Testing & Commissioning", date: "2026-10-20", status: "Pending", var: "0 days" },
+                    { name: "Handover", date: "2027-01-05", status: "Pending", var: "0 days" }
+                ]
+            },
+            "PRJ-0005": {
+                risks: { technical: 55, schedule: 65, procurement: 70, cost: 50, safety: 30 },
+                matrix: [
+                    { risk: "Logistics Lead Time", prob: "High", impact: "High", owner: "Thomas Moore", status: "Active", action: "Hub storage expansion" },
+                    { risk: "Extreme Terrain Access", prob: "High", impact: "Medium", owner: "Klaus Berg", status: "Active", action: "Helicopter heavy-lift contract" },
+                    { risk: "Resource Availability", prob: "Medium", impact: "High", owner: "Leila Farid", status: "Risk", action: "Retention bonus program" },
+                    { risk: "Supply Chain Blockade", prob: "Low", impact: "Critical", owner: "Eric Schmidt", status: "Active", action: "Dual-source vendor setup" },
+                    { risk: "On-site Dust Control", prob: "High", impact: "Low", owner: "Yousef Issa", status: "Active", action: "Chemical suppressor usage" }
+                ],
+                milestones: [
+                    { name: "Logistics Hub Setup", date: "2025-09-10", status: "Complete", var: "0 days" },
+                    { name: "Corridor Blasting", date: "2026-01-05", status: "Complete", var: "+12 days" },
+                    { name: "Foundations (South)", date: "2026-06-15", status: "Active", var: "+8 days" },
+                    { name: "Utility Line Laying", date: "2027-02-10", status: "Pending", var: "0 days" },
+                    { name: "Regional Tie-in", date: "2027-08-20", status: "Pending", var: "0 days" }
+                ]
             }
-        }
+        };
 
-        function initThemeToggle() {
-            const savedTheme = localStorage.getItem(THEME_KEY) || "light";
-            applyTheme(savedTheme === "dark" ? "dark" : "light");
-            const themeToggle = getThemeToggleButton();
-            if (!themeToggle || themeToggle.dataset.bound === "true") return;
-            themeToggle.dataset.bound = "true";
-            themeToggle.addEventListener("click", function () {
-                const isDark = document.body.classList.contains("dark-theme") || 
-                              document.documentElement.classList.contains("dark-theme") || 
-                              document.body.classList.contains("dark") || 
-                              document.documentElement.classList.contains("dark");
-                applyTheme(isDark ? "light" : "dark");
-            });
-        }
+        const REPORT_TEMPLATES = [
+            { id: 'R1', title: 'Engineering Risk Summary', category: 'Risk', desc: 'Comprehensive technical and operational risk overview.', status: 'READY', concern: 'Fragmented dependency mapping.', summary: 'The risk profile shows moderate exposure in multidisciplinary packages.', recs: ['Establish risk owners', 'Weekly auditing', 'Rebaseline critical path', 'Escalate procurement blockers', 'Validate structural package', 'Use EngiBot for recovery actions', 'Update executive dashboard'] },
+            { id: 'R2', title: 'Procurement Delay Report', category: 'Procurement', desc: 'Analysis of long-lead items and supplier timelines.', status: 'READY', concern: 'Delayed delivery of specialist steel.', summary: 'Global logistics disruption is affecting critical path procurement.', recs: ['Identify alternate suppliers', 'Early material reservation', 'Weekly dependency review', 'Rebaseline critical path', 'Validate structural package', 'Use EngiBot for recovery actions', 'Update executive dashboard'] },
+            { id: 'R3', title: 'Structural Integrity Review', category: 'Engineering', desc: 'Technical review of structural constraints.', status: 'DRAFT', concern: 'Load distribution on sub-piles.', summary: 'Preliminary data indicates a 5% margin on core support columns.', recs: ['Reinforce support nodes', 'Full stress analysis', 'Weekly dependency review', 'Rebaseline critical path', 'Validate structural package', 'Use EngiBot for recovery actions', 'Update executive dashboard'] },
+            { id: 'R4', title: 'Critical Path Analysis', category: 'Engineering', desc: 'Identification of schedule blockers.', status: 'READY', concern: 'Permit approval lag.', summary: 'Scheduling conflict detected between phase 2 and phase 3 mobilization.', recs: ['Parallelize non-dependent tasks', 'Accelerate permit filing', 'Weekly dependency review', 'Rebaseline critical path', 'Validate structural package', 'Use EngiBot for recovery actions', 'Update executive dashboard'] },
+            { id: 'R5', title: 'Executive Decision Brief', category: 'Contract', desc: 'High-level intelligence for leadership.', status: 'READY', concern: 'Budget variation exposure.', summary: 'Core project margins are stable but sensitive to material price hikes.', recs: ['Hedge material costs', 'Freeze optional scope', 'Weekly dependency review', 'Rebaseline critical path', 'Validate structural package', 'Use EngiBot for recovery actions', 'Update executive dashboard'] },
+            { id: 'R6', title: 'Safety Compliance Report', category: 'Safety', desc: 'Review of site-level HSE performance.', status: 'READY', concern: 'Heat stress during day shifts.', summary: 'Site compliance is at 98% with zero LTI reported this quarter.', recs: ['Enforce mandatory cooling breaks', 'Increase hydration points', 'Weekly dependency review', 'Rebaseline critical path', 'Validate structural package', 'Use EngiBot for recovery actions', 'Update executive dashboard'] },
+            { id: 'R7', title: 'Cost & Budget Exposure', category: 'Procurement', desc: 'Financial risk and cashflow analysis.', status: 'REVIEW', concern: 'Cashflow bottleneck in Q3.', summary: 'Anticipated variation orders may exceed contingency buffer.', recs: ['Review variation logs', 'Audit subcontractor claims', 'Weekly dependency review', 'Rebaseline critical path', 'Validate structural package', 'Use EngiBot for recovery actions', 'Update executive dashboard'] }
+        ];
 
+        let state = {
+            activeProjectId: localStorage.getItem('engisphere-selected-project-id') || 'PRJ-0001',
+            activeTab: 'reports',
+            selectedItemId: null,
+            searchQuery: '',
+            categoryFilter: 'all',
+            statusFilter: 'all',
+            documents: JSON.parse(localStorage.getItem('engisphereProjectDocuments')) || []
+        };
+
+        // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
             initThemeToggle();
+            document.getElementById('projectSelector').value = state.activeProjectId;
+            renderAll();
+        });
 
-            // Project context logic
-            const PROJECT_DATASET = {
-                "PRJ-0001": { title: "Dubai Smart Bridge", location: "Dubai, UAE", type: "Smart Bridge Infrastructure", progress: 92, riskScore: 18, openRisks: 2, status: "Active", schedule: "On Track" },
-                "PRJ-0002": { title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", type: "Metro Infrastructure", progress: 64, riskScore: 54, openRisks: 6, status: "Active", schedule: "Delayed" },
-                "PRJ-0003": { title: "Doha Coastal Tunnel", location: "Doha, Qatar", type: "Coastal Tunnel", progress: 41, riskScore: 76, openRisks: 9, status: "At Risk", schedule: "Critical" },
-                "PRJ-0004": { title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", type: "Smart City District", progress: 78, riskScore: 31, openRisks: 3, status: "Active", schedule: "On Track" },
-                "PRJ-0005": { title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", type: "Flood Defense Infrastructure", progress: 57, riskScore: 49, openRisks: 5, status: "Active", schedule: "Watch" }
+        function renderAll() {
+            renderStats();
+            renderList();
+            renderPreview();
+        }
+
+        function renderStats() {
+            const project = PROJECTS[state.activeProjectId];
+            const projectDocs = state.documents.filter(d => d.projectId === state.activeProjectId);
+            
+            document.getElementById('statReports').innerText = REPORT_TEMPLATES.length;
+            document.getElementById('statDocs').innerText = projectDocs.length;
+            document.getElementById('statRisks').innerText = project.openRisks;
+            document.getElementById('statPending').innerText = project.pending;
+        }
+
+        function renderList() {
+            const list = document.getElementById('itemList');
+            const title = document.getElementById('listTitle');
+            list.innerHTML = '';
+
+            if (state.activeTab === 'reports') {
+                title.innerHTML = '<i class="fas fa-copy"></i> Available Reports';
+                const filtered = REPORT_TEMPLATES.filter(applyFilters);
+                if (filtered.length === 0) list.innerHTML = '<p style="color:var(--text-muted); padding:20px;">No reports found.</p>';
+                filtered.forEach(r => {
+                    const card = document.createElement('div');
+                    card.className = `item-card ${state.selectedItemId === r.id ? 'selected' : ''}`;
+                    card.onclick = () => selectItem(r.id);
+                    card.innerHTML = `
+                        <div class="item-card-top">
+                            <h3>${r.title}</h3>
+                            <span class="badge badge-${r.status.toLowerCase()}">${r.status}</span>
+                        </div>
+                        <p>${r.desc}</p>
+                        <div class="item-meta">
+                            <span><i class="fas fa-tag"></i> ${r.category}</span>
+                            <span><i class="fas fa-project-diagram"></i> ${PROJECTS[state.activeProjectId].title}</span>
+                        </div>
+                    `;
+                    list.appendChild(card);
+                });
+            } else {
+                title.innerHTML = '<i class="fas fa-file-invoice"></i> Project Documents';
+                const projectDocs = state.documents.filter(d => d.projectId === state.activeProjectId).filter(applyFilters);
+                if (projectDocs.length === 0) list.innerHTML = '<p style="color:var(--text-muted); padding:20px;">No documents found for this project.</p>';
+                projectDocs.forEach(d => {
+                    const row = document.createElement('div');
+                    row.className = `doc-row ${state.selectedItemId === d.id ? 'selected' : ''}`;
+                    row.onclick = () => selectItem(d.id);
+                    row.innerHTML = `
+                        <div class="doc-icon"><i class="fas ${getFileIcon(d.type)}"></i></div>
+                        <div class="doc-info">
+                            <h4>${d.title}</h4>
+                            <p>${d.notes || 'No notes'}</p>
+                        </div>
+                        <div class="doc-cat">${d.category}</div>
+                        <div class="doc-date">${d.date}</div>
+                        <div class="doc-type">${d.type}</div>
+                    `;
+                    list.appendChild(row);
+                });
+            }
+        }
+
+        function applyFilters(item) {
+            const matchesSearch = item.title.toLowerCase().includes(state.searchQuery.toLowerCase());
+            const matchesCategory = state.categoryFilter === 'all' || item.category === state.categoryFilter;
+            const matchesStatus = state.statusFilter === 'all' || (item.status && item.status === state.statusFilter);
+            return matchesSearch && matchesCategory && matchesStatus;
+        }
+
+        function getFileIcon(type) {
+            if (type.includes('pdf')) return 'fa-file-pdf';
+            if (type.includes('doc')) return 'fa-file-word';
+            if (type.includes('xls')) return 'fa-file-excel';
+            return 'fa-file-alt';
+        }
+
+        function selectItem(id) {
+            state.selectedItemId = id;
+            renderList();
+            renderPreview();
+        }
+
+        function renderPreview() {
+            const placeholder = document.getElementById('previewPlaceholder');
+            const panel = document.getElementById('previewPanel');
+            
+            if (!state.selectedItemId) {
+                placeholder.style.display = 'flex';
+                panel.classList.remove('active');
+                return;
+            }
+
+            placeholder.style.display = 'none';
+            panel.classList.add('active');
+
+            const item = state.activeTab === 'reports' 
+                ? REPORT_TEMPLATES.find(r => r.id === state.selectedItemId)
+                : state.documents.find(d => d.id === state.selectedItemId);
+
+            if (!item) return;
+
+            document.getElementById('prevTitle').innerText = item.title;
+            document.getElementById('prevProject').innerText = PROJECTS[state.activeProjectId].title;
+
+            if (state.activeTab === 'reports') {
+                document.getElementById('reportFields').style.display = 'block';
+                document.getElementById('docFields').style.display = 'none';
+                document.getElementById('reportActions').style.display = 'flex';
+                document.getElementById('docActions').style.display = 'none';
+                
+                document.getElementById('prevStatus').innerText = `${item.category} | ${item.status}`;
+                document.getElementById('prevConcern').innerText = item.concern;
+                document.getElementById('prevSummary').innerText = item.summary;
+                
+                const recsList = document.getElementById('prevRecs');
+                recsList.innerHTML = '';
+                item.recs.forEach(r => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-check"></i> ${r}`;
+                    recsList.appendChild(li);
+                });
+            } else {
+                document.getElementById('reportFields').style.display = 'none';
+                document.getElementById('docFields').style.display = 'block';
+                document.getElementById('reportActions').style.display = 'none';
+                document.getElementById('docActions').style.display = 'flex';
+
+                document.getElementById('prevStatus').innerText = item.category;
+                document.getElementById('prevDocType').innerText = item.type;
+                document.getElementById('prevDocDate').innerText = item.date;
+                document.getElementById('prevDocCat').innerText = item.category;
+                document.getElementById('prevDocNotes').innerText = item.notes || 'No additional notes provided.';
+            }
+        }
+
+        // Handlers
+        function handleProjectChange() {
+            state.activeProjectId = document.getElementById('projectSelector').value;
+            state.selectedItemId = null;
+            localStorage.setItem('engisphere-selected-project-id', state.activeProjectId);
+            renderAll();
+        }
+
+        function handleSearch() {
+            state.searchQuery = document.getElementById('searchFilter').value;
+            renderList();
+        }
+
+        function handleFilters() {
+            state.categoryFilter = document.getElementById('categoryFilter').value;
+            state.statusFilter = document.getElementById('statusFilter').value;
+            renderList();
+        }
+
+        function switchTab(tab) {
+            state.activeTab = tab;
+            state.selectedItemId = null;
+            document.getElementById('tabReports').classList.toggle('active', tab === 'reports');
+            document.getElementById('tabDocs').classList.toggle('active', tab === 'documents');
+            renderAll();
+        }
+
+        function openUploadModal() {
+            document.getElementById('uploadModal').classList.add('active');
+            document.getElementById('upProject').value = state.activeProjectId;
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').classList.remove('active');
+            document.getElementById('uploadForm').reset();
+        }
+
+        function handleUpload(e) {
+            e.preventDefault();
+            const title = document.getElementById('upTitle').value;
+            const projectId = document.getElementById('upProject').value;
+            const category = document.getElementById('upCategory').value;
+            const file = document.getElementById('upFile').files[0];
+            const notes = document.getElementById('upNotes').value;
+
+            const newDoc = {
+                id: 'DOC-' + Date.now(),
+                title: title,
+                projectId: projectId,
+                category: category,
+                type: file ? file.name.split('.').pop().toUpperCase() : 'PDF',
+                date: new Date().toISOString().split('T')[0],
+                notes: notes
             };
 
-            let selectedProjectId = new URLSearchParams(window.location.search).get("project") 
-                || localStorage.getItem("engisphere-selected-project-id") 
-                || "PRJ-0001";
-
-            if (!PROJECT_DATASET[selectedProjectId]) {
-                selectedProjectId = "PRJ-0001";
-            }
-
-            localStorage.setItem("engisphere-selected-project-id", selectedProjectId);
-
-            const project = PROJECT_DATASET[selectedProjectId];
-            document.title = `Reports | ${project.title} | EngiSphere`;
-
-            // Update Header
-            const h1 = document.querySelector('.header h1');
-            if (h1) h1.innerText = `Reports - ${project.title}`;
+            state.documents.push(newDoc);
+            localStorage.setItem('engisphereProjectDocuments', JSON.stringify(state.documents));
             
-            const pHeader = document.querySelector('.header p');
-            if (pHeader) pHeader.innerText = `Generate and review engineering intelligence reports for ${project.id || selectedProjectId}.`;
+            showToast('Document uploaded successfully!');
+            closeUploadModal();
+            renderAll();
+        }
 
-            // Update Report Preview Header and Meta
-            const previewH2 = document.querySelector('.preview-header h2');
-            if (previewH2) previewH2.innerText = `Executive Project Intelligence Report: ${project.title}`;
+        function handleDownload() {
+            const item = state.activeTab === 'reports' 
+                ? REPORT_TEMPLATES.find(r => r.id === state.selectedItemId)
+                : state.documents.find(d => d.id === state.selectedItemId);
 
-            const metaItems = document.querySelectorAll('.preview-meta .meta-item');
-            metaItems.forEach(item => {
-                if (item.innerText.includes('Project')) {
-                    item.innerHTML = `<strong>Project Context</strong>${project.title} (${selectedProjectId})`;
-                }
-                if (item.innerText.includes('Risk Level')) {
-                    const level = project.riskScore >= 70 ? 'High Risk' : project.riskScore >= 50 ? 'Medium Risk' : 'Low Risk';
-                    item.innerHTML = `<strong>Risk Level</strong>${level} (Score: ${project.riskScore})`;
-                }
+            if (!item) return;
+
+            const content = `EngiSphere ${state.activeTab === 'reports' ? 'Report' : 'Document'} Metadata\n` +
+                          `----------------------------------\n` +
+                          `Title: ${item.title}\n` +
+                          `Project: ${PROJECTS[state.activeProjectId].title}\n` +
+                          `Category: ${item.category}\n` +
+                          `Date: ${item.date || new Date().toISOString().split('T')[0]}\n` +
+                          `Status: ${item.status || 'FINAL'}\n\n` +
+                          `Notes/Summary:\n${item.summary || item.notes || 'N/A'}`;
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${item.title.replace(/\s+/g, '_')}_EngiSphere.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Metadata document downloaded.');
+        }
+
+        function downloadReportFile() {
+            const item = REPORT_TEMPLATES.find(r => r.id === state.selectedItemId);
+            if (!item) return;
+
+            const project = PROJECTS[state.activeProjectId];
+            const intel = projectIntelligenceData[state.activeProjectId];
+            const userDocs = state.documents.filter(d => d.projectId === state.activeProjectId);
+
+            const html = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>${item.title} - ${project.title}</title>
+    <style>
+        :root { --primary: #2563eb; --primary-dark: #1e4ed8; --slate: #1e293b; --slate-soft: #f1f5f9; --border: #e2e8f0; --risk-critical: #ef4444; --risk-high: #f97316; --risk-med: #eab308; --risk-low: #10b981; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: var(--slate); background: #f8fafc; line-height: 1.5; padding: 0; }
+        .report-page { max-width: 1000px; margin: 40px auto; background: white; box-shadow: 0 10px 40px rgba(0,0,0,0.08); border-radius: 12px; overflow: hidden; position: relative; }
+        .report-header { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); padding: 60px 50px; color: white; position: relative; }
+        .logo { font-size: 24px; font-weight: 800; letter-spacing: -1px; margin-bottom: 40px; }
+        .logo span { opacity: 0.8; }
+        .header-main h1 { font-size: 38px; font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
+        .header-main p { font-size: 18px; opacity: 0.9; font-weight: 500; }
+        .header-badges { display: flex; gap: 15px; margin-top: 30px; }
+        .h-badge { background: rgba(255,255,255,0.15); padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; border: 1px solid rgba(255,255,255,0.2); }
+        
+        .section { padding: 50px; border-bottom: 1px solid var(--border); }
+        .section-title { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 25px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .section-title::after { content: ""; flex: 1; height: 2px; background: var(--slate-soft); }
+        
+        .kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px; }
+        .kpi-card { background: var(--slate-soft); padding: 25px; border-radius: 16px; border: 1px solid var(--border); }
+        .kpi-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; }
+        .kpi-value { font-size: 24px; font-weight: 800; color: var(--slate); }
+        .kpi-value.critical { color: var(--risk-critical); }
+        
+        .snapshot-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+        .info-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+        .info-table td { padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .info-table td:first-child { font-weight: 700; color: #64748b; width: 160px; }
+        
+        .map-card { background: var(--slate-soft); border-radius: 16px; overflow: hidden; border: 1px solid var(--border); height: 100%; min-height: 300px; display: flex; flex-direction: column; }
+        .map-view { flex: 1; background: #e2e8f0; position: relative; overflow: hidden; }
+        .map-view iframe { width: 100%; height: 100%; border: none; }
+        .map-meta { padding: 15px; font-size: 12px; font-weight: 600; color: #64748b; background: white; border-top: 1px solid var(--border); }
+        
+        .chart-list { display: grid; gap: 15px; }
+        .chart-row { display: grid; grid-template-columns: 140px 1fr 50px; align-items: center; gap: 20px; }
+        .chart-label { font-size: 13px; font-weight: 700; }
+        .chart-bar-bg { height: 12px; background: var(--slate-soft); border-radius: 6px; overflow: hidden; }
+        .chart-bar-fill { height: 100%; background: var(--primary); border-radius: 6px; transition: width 0.5s ease; }
+        .chart-val { font-size: 13px; font-weight: 800; text-align: right; }
+        
+        .risk-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .risk-table th { background: var(--slate-soft); padding: 12px; text-align: left; font-weight: 800; text-transform: uppercase; font-size: 11px; }
+        .risk-table td { padding: 12px; border-bottom: 1px solid var(--border); }
+        .status-tag { padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; color: white; text-transform: uppercase; }
+        
+        .milestones { display: grid; gap: 15px; }
+        .ms-row { display: grid; grid-template-columns: 1fr 120px 100px 100px; align-items: center; gap: 20px; padding: 15px; background: var(--slate-soft); border-radius: 12px; }
+        .ms-name { font-weight: 700; font-size: 14px; }
+        .ms-date, .ms-status, .ms-var { font-size: 12px; font-weight: 600; }
+        
+        .intel-content { background: #f8fafc; border-radius: 16px; padding: 30px; border: 1px solid var(--border); }
+        .intel-block { margin-bottom: 25px; }
+        .intel-block h4 { font-size: 15px; font-weight: 800; margin-bottom: 10px; color: var(--primary); }
+        .intel-block p { font-size: 14px; color: #334155; line-height: 1.7; font-style: italic; border-left: 3px solid var(--primary); padding-left: 20px; }
+        
+        .recs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .rec-item { display: flex; gap: 12px; padding: 15px; background: white; border: 1px solid var(--border); border-radius: 12px; font-size: 13px; font-weight: 600; }
+        .rec-item i { color: var(--primary); }
+        
+        .docs-list { display: grid; gap: 10px; }
+        .doc-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background: var(--slate-soft); border-radius: 10px; font-size: 12px; font-weight: 600; }
+        .doc-type { color: var(--primary); font-weight: 800; }
+        
+        .footer { padding: 40px 50px; background: var(--slate); color: white; display: flex; justify-content: space-between; align-items: center; font-size: 12px; opacity: 0.8; }
+        @media print { body { background: white; } .report-page { margin: 0; box-shadow: none; border-radius: 0; } }
+    </style>
+</head>
+<body>
+    <div class="report-page">
+        <header class="report-header">
+            <div class="logo">ENGI<span>SPHERE</span></div>
+            <div class="header-main">
+                <h1>${item.title}</h1>
+                <p>Engineering Intelligence & Risk Audit | ${project.title}</p>
+            </div>
+            <div class="header-badges">
+                <div class="h-badge">ID: ${intel.code || project.code}</div>
+                <div class="h-badge">Type: ${item.category}</div>
+                <div class="h-badge">Generated: ${new Date().toLocaleDateString()}</div>
+                <div class="h-badge">Confidence: ${project.confidence}%</div>
+            </div>
+        </header>
+
+        <section class="section">
+            <div class="section-title">Project Snapshot</div>
+            <div class="snapshot-grid">
+                <div class="info-side">
+                    <table class="info-table">
+                        <tr><td>Project Code</td><td>${project.code}</td></tr>
+                        <tr><td>Location</td><td>${project.location}</td></tr>
+                        <tr><td>Current Phase</td><td>${project.phase}</td></tr>
+                        <tr><td>Overall Progress</td><td>${project.progress}%</td></tr>
+                        <tr><td>Budget Exposure</td><td>${project.budget}</td></tr>
+                        <tr><td>Schedule Variance</td><td>${project.variance}</td></tr>
+                        <tr><td>Safety Index</td><td>${project.safety}%</td></tr>
+                        <tr><td>AI Confidence</td><td>${project.confidence}%</td></tr>
+                    </table>
+                </div>
+                <div class="map-side">
+                    <div class="map-card">
+                        <div class="map-view">
+                            <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=${project.lng-0.01}%2C${project.lat-0.01}%2C${project.lng+0.01}%2C${project.lat+0.01}&layer=mapnik&marker=${project.lat}%2C${project.lng}"></iframe>
+                            <div style="position: absolute; inset: 0; pointer-events: none; border: 2px solid var(--primary); opacity: 0.1;"></div>
+                        </div>
+                        <div class="map-meta">
+                            <i class="fas fa-location-dot"></i> Coordinates: ${project.lat}, ${project.lng} | ${project.location}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Executive KPIs</div>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">Overall Risk Score</div>
+                    <div class="kpi-value ${project.riskScore > 70 ? 'critical' : ''}">${project.riskScore} / 100</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Open Risks</div>
+                    <div class="kpi-value">${project.openRisks}</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">AI Confidence</div>
+                    <div class="kpi-value">${project.confidence}%</div>
+                </div>
+            </div>
+            
+            <div class="chart-list">
+                <div class="chart-row">
+                    <div class="chart-label">Technical Risk</div>
+                    <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: ${intel.risks.technical}%"></div></div>
+                    <div class="chart-val">${intel.risks.technical}%</div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-label">Schedule Risk</div>
+                    <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: ${intel.risks.schedule}%"></div></div>
+                    <div class="chart-val">${intel.risks.schedule}%</div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-label">Procurement Risk</div>
+                    <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: ${intel.risks.procurement}%"></div></div>
+                    <div class="chart-val">${intel.risks.procurement}%</div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-label">Cost Risk</div>
+                    <div class="chart-bar-bg"><div class="chart-bar-fill" style="width: ${intel.risks.cost}%"></div></div>
+                    <div class="chart-val">${intel.risks.cost}%</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Risk Matrix & Mitigation</div>
+            <table class="risk-table">
+                <thead>
+                    <tr><th>Risk Component</th><th>Prob.</th><th>Impact</th><th>Owner</th><th>Status</th><th>Recommended Action</th></tr>
+                </thead>
+                <tbody>
+                    ${intel.matrix.map(m => `
+                        <tr>
+                            <td><strong>${m.risk}</strong></td>
+                            <td>${m.prob}</td>
+                            <td>${m.impact}</td>
+                            <td>${m.owner}</td>
+                            <td><span class="status-tag" style="background: ${m.status === 'Mitigated' ? 'var(--risk-low)' : m.status === 'CRITICAL' ? 'var(--risk-critical)' : 'var(--risk-high)'}">${m.status}</span></td>
+                            <td>${m.action}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Project Timeline & Milestones</div>
+            <div class="milestones">
+                ${intel.milestones.map(ms => `
+                    <div class="ms-row">
+                        <div class="ms-name">${ms.name}</div>
+                        <div class="ms-date">${ms.date}</div>
+                        <div class="ms-status" style="color: ${ms.status === 'Complete' ? 'var(--risk-low)' : 'var(--primary)'}">${ms.status}</div>
+                        <div class="ms-var" style="color: ${ms.var.includes('+') ? 'var(--risk-critical)' : 'var(--slate)'}">${ms.var}</div>
+                    </div>
+                `).join('')}
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Engineering Intelligence Summary</div>
+            <div class="intel-content">
+                <div class="intel-block">
+                    <h4>Main Concern</h4>
+                    <p>"${item.concern}"</p>
+                </div>
+                <div class="intel-block">
+                    <h4>AI Technical Findings</h4>
+                    <div style="font-size: 14px; color: #475569; line-height: 1.6;">
+                        ${item.summary} The integrated engineering audit suggests that the current ${project.phase} activities are meeting 85% of target tolerances, however, ${intel.matrix[0].risk} remains a persistent blocker for the subsequent integration phases. AI analysis of the schedule variance (${project.variance}) indicates a potential 12% drift if remediation actions are not enforced within the next 14 business days.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Actionable Recommendations</div>
+            <div class="recs-grid">
+                ${item.recs.map(r => `
+                    <div class="rec-item"><i class="fas fa-check-circle"></i> ${r}</div>
+                `).join('')}
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-title">Related Project Documents</div>
+            <div class="docs-list">
+                ${userDocs.length > 0 ? userDocs.map(d => `
+                    <div class="doc-item">
+                        <span>${d.title}</span>
+                        <span><span class="doc-type">${d.type}</span> | ${d.date} | ${d.category}</span>
+                    </div>
+                `).join('') : '<p style="font-size: 12px; color: #94a3b8;">No additional uploaded documents found for this project context.</p>'}
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div>&copy; 2026 EngiSphere Engineering Command Center | Confidential</div>
+            <div>Secure Intelligence Platform v4.2</div>
+        </footer>
+    </div>
+</body>
+</html>`;
+
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            const filename = `${item.title.replace(/\s+/g, '_')}_${project.title.replace(/\s+/g, '_')}_Professional_Report.html`;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('Professional Intelligence Report downloaded successfully.');
+        }
+
+        function handleGenerate() {
+            showToast('Generating updated report intelligence...');
+            setTimeout(() => showToast('Report updated with real-time project data.', 'success'), 1500);
+        }
+
+        function handleMarkReviewed() {
+            showToast('Document marked as reviewed.');
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Theme Toggle Logic
+        function initThemeToggle() {
+            const tBtn = document.getElementById('themeToggleBtn');
+            const saved = localStorage.getItem('engisphere-theme') || 'dark';
+            
+            tBtn.addEventListener('click', () => {
+                const current = document.documentElement.classList.contains('dark-theme') ? 'dark' : 'light';
+                const next = current === 'dark' ? 'light' : 'dark';
+                document.documentElement.classList.remove('dark-theme', 'light-theme');
+                document.documentElement.classList.add(next + '-theme');
+                localStorage.setItem('engisphere-theme', next);
+                tBtn.querySelector('i').className = next === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
             });
+            
+            // Set initial icon
+            tBtn.querySelector('i').className = saved === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+        }
 
-            // Update KPI
-            document.querySelectorAll('.stat-card').forEach(card => {
-                const label = card.querySelector('.stat-label')?.innerText;
-                if (label === 'Open Risks') {
-                    card.querySelector('.stat-value').innerText = project.openRisks;
-                }
-            });
-
-            // Replace generic texts
-            const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
-            let node;
-            while (node = walk.nextNode()) {
-                if (node.nodeValue.includes("EngiSphere Demo")) {
-                    node.nodeValue = node.nodeValue.replace(/EngiSphere Demo/g, project.title);
-                }
-            }
-
-            // Sync links
-            document.querySelectorAll('a').forEach(a => {
-                if (a.href.includes('project_details.html')) {
-                    a.href = `project_details.html?project=${selectedProjectId}`;
-                }
-                if (a.href.includes('team_access.html')) {
-                    a.href = `team_access.html?project=${selectedProjectId}`;
-                }
-            });
-        });
+        function toggleSidebar() {
+            window.toggleEngiSphereSidebar();
+        }
     </script>
 </body>
 </html>

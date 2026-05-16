@@ -251,7 +251,7 @@
                 <i class="fas fa-satellite"></i>
                 <span>Geospatial Radar</span>
             </a>
-            <a href="ai_chat.html" class="nav-link">
+            <a href="ai_chat.html" class="nav-link" onclick="window.location.assign('ai_chat.html'); return false;">
                 <i class="fas fa-brain"></i>
                 <span>AI EngiBot</span>
             </a>
@@ -429,7 +429,7 @@
                 </div>
                 <div class="detail-actions">
                     ${notif.projectId ? `
-                        <a href="project-details.html?projectId=${notif.projectId}" class="btn btn-primary">Open Related Project</a>
+                        <a href="project_details.html?projectId=${notif.projectId}" class="btn btn-primary">Open Related Project</a>
                         <a href="ai-radar.html?projectId=${notif.projectId}" class="btn">Run AI Radar</a>
                     ` : ''}
                     <a href="index.html" class="btn">Back to Dashboard</a>

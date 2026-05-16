@@ -21,3 +21,40 @@ venv-1/
 # OS / editor
 .DS_Store
 .vscode/
+
+# Local backups and archives
+backups/
+archive_cleanup_*/
+*.bak
+*.backup
+*.before_*
+*.working_*
+*.broken_*
+*_backup*
+*_BACKUP_*
+*_FINAL_DONE_*
+*_candidate*
+*_broken*
+*_before_*
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+backend/*.db*
+database/*.db*
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# OS/editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Local environment
+.env
+.env.*
+!.env.example

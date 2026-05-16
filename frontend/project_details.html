@@ -8,6 +8,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     
+    <script src="assets/js/auth.js"></script>
+    <script>
+        if (!Auth.guardPage()) {
+            // Redirection happens inside guardPage if not authorized
+        }
+    </script>
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <script>
@@ -55,7 +61,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: var(--sidebar-width);
+            width: 280px;
             background: var(--sidebar);
             border-right: 1px solid var(--border-soft);
             display: flex;
@@ -171,26 +177,53 @@
         }
 
         .nav-section {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin: 14px 0 6px 14px;
-            letter-spacing: 1px;
+            margin: 20px 0 10px 10px;
+            letter-spacing: 0.12em;
         }
 
         .nav-link {
+            height: 54px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            border-radius: 14px;
+            gap: 16px;
+            padding: 0 18px;
+            margin: 6px 0;
+            border-radius: 16px;
             color: var(--text-muted);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 700;
+            font-size: 15px;
             transition: var(--transition);
-            margin-bottom: 4px;
+        }
+
+        .nav-link i {
+            width: 22px;
+            min-width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #eef4ff;
+            color: var(--primary);
+        }
+
+        .dark-theme .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            background: var(--primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .nav-link.active i {
+            color: #ffffff !important;
         }
 
         .nav-link:hover {
@@ -403,45 +436,45 @@
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
 
-            <a href="home.html" class="nav-link">
+            <a href="home.html" class="nav-link" onclick="window.location.assign('home.html'); return false;">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
 
-            <a href="index.html" class="nav-link">
+            <a href="index.html" class="nav-link" onclick="window.location.assign('index.html'); return false;">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="solutions.html" class="nav-link">
+            <a href="solutions.html" class="nav-link" onclick="window.location.assign('solutions.html'); return false;">
                 <i class="fas fa-satellite"></i>
                 <span>Geospatial Radar</span>
             </a>
 
-            <a href="ai_chat.html" class="nav-link">
+            <a href="ai_chat.html" class="nav-link" onclick="window.location.assign('ai_chat.html'); return false;">
                 <i class="fas fa-brain"></i>
                 <span>AI EngiBot</span>
             </a>
 
             <div class="nav-section">Management</div>
 
-            <a href="project_details.html" class="nav-link active">
+            <a href="project_details.html" class="nav-link active" onclick="window.location.assign('project_details.html'); return false;">
                 <i class="fas fa-folder-open"></i>
                 <span>Project Details</span>
             </a>
 
-            <a href="team_access.html" class="nav-link">
+            <a href="team_access.html" class="nav-link" onclick="window.location.assign('team_access.html'); return false;">
                 <i class="fas fa-users-gear"></i>
                 <span>Team Access</span>
             </a>
 
-            <a href="reports.html" class="nav-link">
-                <i class="fas fa-file-invoice"></i>
+            <a href="reports.html" class="nav-link" onclick="window.location.assign('reports.html'); return false;">
+                <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
         </nav>
 
-        <a href="login.html" class="nav-link exit-link">
+        <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
             <i class="fas fa-power-off"></i>
             <span>Exit System</span>
         </a>

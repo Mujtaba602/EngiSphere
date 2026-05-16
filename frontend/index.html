@@ -8,6 +8,12 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script>
+        if (!Auth.guardPage()) {
+            // Redirection happens inside guardPage if not authorized
+        }
+    </script>
     <script src="assets/js/theme.js"></script>
     <script src="assets/js/sidebar.js"></script>
     <script>
@@ -102,7 +108,7 @@
         }
 
         .sidebar {
-            width: var(--sidebar-width);
+            width: 280px;
             background: var(--sidebar);
             border-right: 1px solid var(--border-soft);
             display: flex;
@@ -221,52 +227,55 @@
             color: #0f172a;
         }
 
-        body.light-theme .nav-link.active {
-            background: #EFF6FF;
-            color: #2563EB !important;
-            box-shadow: none;
-        }
-
-        body.light-theme .nav-link.active i {
-            color: #2563EB !important;
-        }
-
-        .nav-section {
-            font-size: 10px;
-            font-weight: 800;
-            color: var(--muted);
-            text-transform: uppercase;
-            margin: 14px 0 6px 14px;
-            letter-spacing: 1px;
-        }
-
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            border-radius: 14px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
-            transition: var(--transition);
-            margin-bottom: 4px;
-        }
-
-        .nav-link:hover {
-            background: var(--primary-soft);
-            color: var(--primary);
-        }
-
+        /* Sidebar Active/Hover Standards */
         .nav-link.active {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white !important;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+            background: var(--primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
         }
 
         .nav-link.active i {
-            color: white !important;
+            color: #ffffff !important;
+        }
+
+        .nav-section {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin: 20px 0 10px 10px;
+            letter-spacing: 0.12em;
+        }
+
+        .nav-link {
+            height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 18px;
+            margin: 6px 0;
+            border-radius: 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .nav-link i {
+            width: 22px;
+            min-width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #eef4ff;
+            color: var(--primary);
+        }
+        
+        body.dark-theme .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .exit-link {
@@ -2001,40 +2010,40 @@
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
 
-            <a href="home.html" class="nav-link">
+            <a href="home.html" class="nav-link" onclick="window.location.assign('home.html'); return false;">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
 
-            <a href="index.html" class="nav-link active">
+            <a href="index.html" class="nav-link active" onclick="window.location.assign('index.html'); return false;">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="solutions.html" class="nav-link">
+            <a href="solutions.html" class="nav-link" onclick="window.location.assign('solutions.html'); return false;">
                 <i class="fas fa-satellite"></i>
                 <span>Geospatial Radar</span>
             </a>
 
-            <a href="ai_chat.html" class="nav-link">
+            <a href="ai_chat.html" class="nav-link" onclick="window.location.assign('ai_chat.html'); return false;">
                 <i class="fas fa-brain"></i>
                 <span>AI EngiBot</span>
             </a>
 
             <div class="nav-section">Management</div>
 
-            <a href="project_details.html" class="nav-link">
+            <a href="project_details.html" class="nav-link" onclick="window.location.assign('project_details.html'); return false;">
                 <i class="fas fa-folder-open"></i>
                 <span>Project Details</span>
             </a>
 
-            <a href="team_access.html" class="nav-link">
+            <a href="team_access.html" class="nav-link" onclick="window.location.assign('team_access.html'); return false;">
                 <i class="fas fa-users-gear"></i>
                 <span>Team Access</span>
             </a>
 
-            <a href="reports.html" class="nav-link">
-                <i class="fas fa-file-invoice"></i>
+            <a href="reports.html" class="nav-link" onclick="window.location.assign('reports.html'); return false;">
+                <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
         </nav>
@@ -2616,9 +2625,6 @@
 <script src="assets/js/project_progress.js"></script>
 <script src="assets/js/ai_analysis.js"></script>
     <script>
-        const API_BASE_URL = "http://127.0.0.1:8000";
-        const token = localStorage.getItem("access_token");
-
         const stageToStatusMap = {
             "New Idea": "Pending",
             "Planning": "Pending",
@@ -2627,10 +2633,6 @@
             "Under Execution": "In Progress",
             "Needs Review": "Pending"
         };
-
-        if (!token) {
-            window.location.assign(new URL("login.html", window.location.href).href);
-        }
 
         let distributionChart = null;
 
@@ -3628,16 +3630,13 @@
             const f = state.feasibility || { score: 'TBD', rating: 'Pending' };
             feasibility.innerHTML = `
                 <div class="review-item"><label>Score</label><span style="color: ${f.color || 'var(--text)'}; font-weight: 800;">${f.score}</span></div>
-                <div class="review-item"><label>Rating</label><span>${f.rating}</span></div>
+                        <div class="review-item"><label>Rating</label><span>${f.rating}</span></div>
                 <div class="review-item"><label>Cost Realism</label><span>${f.costRealism || 'N/A'}</span></div>
             `;
         }
 
         function clearAuthData() {
-            localStorage.removeItem("access_token");
-            localStorage.removeItem("token");
-            localStorage.removeItem("token_type");
-            localStorage.removeItem("user_email");
+            Auth.logout();
         }
 
         function handleUnauthorized() {
@@ -3942,7 +3941,13 @@
             const tbody = document.getElementById("projectsTableBody");
             if (!tbody) return;
 
-            if (!Array.isArray(projects) || projects.length === 0) {
+            const user = Auth.getCurrentUser();
+            const isAdmin = user && user.role === 'Admin';
+            
+            // Re-filter here for safety if called from elsewhere
+            const filteredProjects = isAdmin ? projects : projects.filter(p => user && user.assignedProjects.includes(p.id));
+
+            if (!Array.isArray(filteredProjects) || filteredProjects.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="5">
@@ -3951,10 +3956,12 @@
                                     <i class="fas fa-folder-open" style="font-size:24px; color:var(--muted);"></i>
                                 </div>
                                 <h3 style="color:var(--text); font-size:16px; margin-bottom:6px;">No projects yet</h3>
-                                <p style="color:var(--muted); font-size:13px; max-width:300px; margin:0 auto;">Create your first engineering project to start tracking operations.</p>
+                                <p style="color:var(--muted); font-size:13px; max-width:300px; margin:0 auto;">${isAdmin ? 'Create your first engineering project to start tracking operations.' : 'You have not been assigned to any projects yet. Please contact your administrator.'}</p>
+                                ${isAdmin ? `
                                 <button class="new-project-btn" onclick="openModal()" style="margin-top:20px; height:38px; padding:0 20px;">
                                     <i class="fas fa-plus"></i> Create Project
                                 </button>
+                                ` : ''}
                             </div>
                         </td>
                     </tr>
@@ -3962,7 +3969,7 @@
                 return;
             }
 
-            tbody.innerHTML = projects.map(project => {
+            tbody.innerHTML = filteredProjects.map(project => {
                 const safeTitle = escapeHTML(project.title || "Untitled");
                 const safeLocation = escapeHTML(project.location || "Unknown");
                 const safeType = escapeHTML(project.type || "General");
@@ -4409,7 +4416,7 @@
             }).join("");
         }
 
-        const fallbackProjects = [
+        const DEMO_PROJECTS = [
             {
                 id: "PRJ-0001",
                 title: "Dubai Smart Bridge",
@@ -4523,103 +4530,103 @@
         }
 
         async function init() {
-            const DEMO_PROJECTS = [
-                { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", status: "Active", type: "Smart Bridge Infrastructure", progress: 92, risk_score: 18, openRisks: 2, budgetUsage: 68, scheduleHealth: "On Track" },
-                { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", status: "Active", type: "Metro Infrastructure", progress: 64, risk_score: 54, openRisks: 6, budgetUsage: 82, scheduleHealth: "Delayed" },
-                { id: "PRJ-0003", title: "Doha Coastal Tunnel", location: "Doha, Qatar", status: "At Risk", type: "Coastal Tunnel", progress: 41, risk_score: 76, openRisks: 9, budgetUsage: 91, scheduleHealth: "Critical" },
-                { id: "PRJ-0004", title: "Abu Dhabi Smart District", location: "Abu Dhabi, UAE", status: "Active", type: "Smart City District", progress: 78, risk_score: 31, openRisks: 3, budgetUsage: 73, scheduleHealth: "On Track" },
-                { id: "PRJ-0005", title: "Jeddah Flood Defense", location: "Jeddah, Saudi Arabia", status: "Active", type: "Flood Defense Infrastructure", progress: 57, risk_score: 49, openRisks: 5, budgetUsage: 79, scheduleHealth: "Watch" }
-            ];
+            const user = Auth.getCurrentUser();
+            if (!user) return; // Should not happen with guard
+            
+            const isAdmin = user.role === 'Admin';
+            
+            let rawProjects = JSON.parse(localStorage.getItem('engisphere_projects') || '[]');
+            
+            // Seed if empty
+            if (rawProjects.length === 0) {
+                rawProjects = DEMO_PROJECTS;
+                localStorage.setItem('engisphere_projects', JSON.stringify(rawProjects));
+            }
+            
+            // Filter projects based on role
+            const projects = isAdmin ? rawProjects : rawProjects.filter(p => user.assignedProjects.includes(p.id));
 
             const userWelcome = document.getElementById("userWelcome");
-            if (userWelcome) userWelcome.innerText = "Engineer";
+            if (userWelcome) userWelcome.innerText = user.fullName;
 
-            document.getElementById("totalProjects").innerText = "5";
-            document.getElementById("activeProjects").innerText = "4";
-            document.getElementById("atRiskProjects").innerText = "1";
-            document.getElementById("avgProgress").innerText = "66%";
-            document.getElementById("totalOpenRisks").innerText = "25";
-            document.getElementById("reportsGenerated").innerText = "15";
+            const activeCount = projects.filter(p => (p.status || "").toLowerCase() === 'active' || (p.status || "").toLowerCase() === 'in progress').length;
+            const atRiskCount = projects.filter(p => (p.riskLevel || "").toLowerCase() === 'high' || (p.status || "").toLowerCase() === 'at risk').length;
+            const avgProgress = projects.length > 0 ? Math.round(projects.reduce((acc, p) => acc + (p.progress || 0), 0) / projects.length) : 0;
+            const totalRisks = projects.reduce((acc, p) => acc + (p.openRisks || 0), 0);
 
+            if (document.getElementById("totalProjects")) document.getElementById("totalProjects").innerText = projects.length;
+            if (document.getElementById("activeProjects")) document.getElementById("activeProjects").innerText = activeCount;
+            if (document.getElementById("atRiskProjects")) document.getElementById("atRiskProjects").innerText = atRiskCount;
+            if (document.getElementById("avgProgress")) document.getElementById("avgProgress").innerText = avgProgress + "%";
+            if (document.getElementById("totalOpenRisks")) document.getElementById("totalOpenRisks").innerText = totalRisks;
+            if (document.getElementById("reportsGenerated")) document.getElementById("reportsGenerated").innerText = Math.round(projects.length * 2.5);
+
+            // Portfolio Intelligence
             const intellContainer = document.getElementById("portfolioIntelligenceContent");
-            if (intellContainer) {
+            if (intellContainer && projects.length > 0) {
+                const avgRisk = Math.round(projects.reduce((acc, p) => acc + (p.risk_score || 0), 0) / projects.length);
+                const highestRiskProj = [...projects].sort((a,b) => (b.risk_score || 0) - (a.risk_score || 0))[0];
+                const bestProgProj = [...projects].sort((a,b) => (b.progress || 0) - (a.progress || 0))[0];
+                const criticalCount = projects.filter(p => (p.risk_score || 0) > 60).length;
+
                 intellContainer.innerHTML = `
                 <div class="portfolio-intelligence-grid">
                     <div class="intelligence-card warning">
                         <span>Average Risk Score</span>
-                        <strong style="color:#f59e0b">46</strong>
-                        <small>Moderate portfolio risk</small>
+                        <strong style="color:#f59e0b">${avgRisk}</strong>
+                        <small>${avgRisk > 50 ? 'High' : 'Moderate'} portfolio risk</small>
                     </div>
                     <div class="intelligence-card success">
                         <span>Portfolio Health</span>
-                        <strong style="color:var(--success)">Moderate</strong>
-                        <small>Stable overall status</small>
+                        <strong style="color:var(--success)">${avgRisk < 30 ? 'Excellent' : (avgRisk < 60 ? 'Stable' : 'Critical')}</strong>
+                        <small>Overall system status</small>
                     </div>
                     <div class="intelligence-card critical">
                         <span>Highest Risk</span>
-                        <strong title="Doha Coastal Tunnel">Doha Coastal Tunnel</strong>
-                        <small>Score: 76/100</small>
+                        <strong title="${highestRiskProj.title}">${highestRiskProj.title}</strong>
+                        <small>Score: ${highestRiskProj.risk_score}/100</small>
                     </div>
                     <div class="intelligence-card blue">
                         <span>Best Progress</span>
-                        <strong title="Dubai Smart Bridge" style="color:var(--primary)">Dubai Smart Bridge</strong>
-                        <small>92% Completion</small>
+                        <strong title="${bestProgProj.title}" style="color:var(--primary)">${bestProgProj.title}</strong>
+                        <small>${bestProgProj.progress}% Completion</small>
                     </div>
                     <div class="intelligence-card critical">
-                        <span>Delayed / Critical</span>
-                        <strong style="color:#ef4444">2</strong>
-                        <small>Projects require attention</small>
+                        <span>Critical Projects</span>
+                        <strong style="color:#ef4444">${criticalCount}</strong>
+                        <small>Require immediate attention</small>
                     </div>
                 </div>`;
             }
 
+            // Top Risk Projects List
             const riskContainer = document.getElementById("topRiskProjectsList");
             if (riskContainer) {
-                riskContainer.innerHTML = `
-                <div class="top-risk-item at-risk" onclick="goToProject('PRJ-0003')" style="cursor:pointer;">
-                    <div class="top-risk-rank">01</div>
-                    <div class="top-risk-project-name">
-                        Doha Coastal Tunnel
-                        <small>Doha, Qatar</small>
-                    </div>
-                    <div>
-                        <div class="risk-score-pill" style="background:#ef4444;">76</div>
-                    </div>
-                    <div class="risk-main-factor">
-                        <span class="risk-level-label" style="color:#ef4444;">Critical</span>
-                    </div>
-                </div>
-                <div class="top-risk-item warning" onclick="goToProject('PRJ-0002')" style="cursor:pointer;">
-                    <div class="top-risk-rank">02</div>
-                    <div class="top-risk-project-name">
-                        Riyadh Metro Expansion
-                        <small>Riyadh, Saudi Arabia</small>
-                    </div>
-                    <div>
-                        <div class="risk-score-pill" style="background:#f59e0b;">54</div>
-                    </div>
-                    <div class="risk-main-factor">
-                        <span class="risk-level-label" style="color:#f59e0b;">Delayed</span>
-                    </div>
-                </div>
-                <div class="top-risk-item watch" onclick="goToProject('PRJ-0005')" style="cursor:pointer;">
-                    <div class="top-risk-rank">03</div>
-                    <div class="top-risk-project-name">
-                        Jeddah Flood Defense
-                        <small>Jeddah, Saudi Arabia</small>
-                    </div>
-                    <div>
-                        <div class="risk-score-pill" style="background:#3b82f6;">49</div>
-                    </div>
-                    <div class="risk-main-factor">
-                        <span class="risk-level-label" style="color:#3b82f6;">Watch</span>
-                    </div>
-                </div>`;
+                const sortedRisks = [...projects].sort((a,b) => (b.risk_score || 0) - (a.risk_score || 0)).slice(0, 3);
+                riskContainer.innerHTML = sortedRisks.map((p, idx) => {
+                    const color = p.risk_score > 60 ? '#ef4444' : (p.risk_score > 30 ? '#f59e0b' : '#3b82f6');
+                    const label = p.risk_score > 60 ? 'Critical' : (p.risk_score > 30 ? 'Watch' : 'Stable');
+                    return `
+                    <div class="top-risk-item" onclick="goToProject('${p.id}')" style="cursor:pointer;">
+                        <div class="top-risk-rank">0${idx+1}</div>
+                        <div class="top-risk-project-name">
+                            ${p.title}
+                            <small>${p.location}</small>
+                        </div>
+                        <div>
+                            <div class="risk-score-pill" style="background:${color};">${p.risk_score}</div>
+                        </div>
+                        <div class="risk-main-factor">
+                            <span class="risk-level-label" style="color:${color};">${label}</span>
+                        </div>
+                    </div>`;
+                }).join("");
             }
 
+            // Project Table
             const tableBody = document.getElementById("projectsTableBody");
             if (tableBody) {
-                tableBody.innerHTML = DEMO_PROJECTS.map(p => `
+                tableBody.innerHTML = projects.map(p => `
                     <tr>
                         <td>
                             <div class="project-name">${p.title}</div>
@@ -4997,7 +5004,8 @@
 <script id="viewer-readonly-rbac-guard">
 (function () {
   function getToken() {
-    return localStorage.getItem("access_token") || localStorage.getItem("token");
+    const user = Auth.getCurrentUser();
+    return user ? "demo-token" : null;
   }
 
   function toast(message) {
@@ -5090,20 +5098,10 @@
 
   async function initViewerReadonlyGuard() {
     try {
-      const token = getToken();
-      if (!token) return;
+      const user = Auth.getCurrentUser();
+      if (!user) return;
 
-      const res = await fetch("http://127.0.0.1:8000/users/me", {
-        headers: {
-          Authorization: "Bearer " + token
-        }
-      });
-
-      if (!res.ok) return;
-
-      const user = await res.json();
-
-      if (user.role === "viewer") {
+      if (user.role && user.role.toLowerCase() === "viewer") {
         window.__ENGISPHERE_VIEWER_READONLY__ = true;
         document.body.classList.add("viewer-readonly-mode");
 
@@ -5122,7 +5120,7 @@
         setTimeout(hideCreateProjectControls, 1000);
         setTimeout(hideCreateProjectControls, 2000);
 
-        console.log("Viewer read-only RBAC UI guard enabled");
+        console.log("Viewer read-only RBAC UI guard enabled (Local Auth)");
       }
     } catch (err) {
       console.warn("Viewer read-only RBAC UI guard failed:", err);

@@ -8,7 +8,13 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     
-    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/auth.js"></script>
+  <script>
+    // Guard page before rendering
+    if (!Auth.requireAdmin()) {
+        // Redirection happens inside requireAdmin if not authorized
+    }
+  </script>
     <script src="assets/js/sidebar.js"></script>
     <script>
         (function() {
@@ -55,7 +61,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: var(--sidebar-width);
+            width: 280px;
             background: var(--sidebar);
             border-right: 1px solid var(--border-soft);
             display: flex;
@@ -171,26 +177,53 @@
         }
 
         .nav-section {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin: 14px 0 6px 14px;
-            letter-spacing: 1px;
+            margin: 20px 0 10px 10px;
+            letter-spacing: 0.12em;
         }
 
         .nav-link {
+            height: 54px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            border-radius: 14px;
+            gap: 16px;
+            padding: 0 18px;
+            margin: 6px 0;
+            border-radius: 16px;
             color: var(--text-muted);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 700;
+            font-size: 15px;
             transition: var(--transition);
-            margin-bottom: 4px;
+        }
+
+        .nav-link i {
+            width: 22px;
+            min-width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #eef4ff;
+            color: var(--primary);
+        }
+
+        .dark-theme .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            background: var(--primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .nav-link.active i {
+            color: #ffffff !important;
         }
 
         .nav-link:hover {
@@ -312,6 +345,25 @@
         #toast { position: fixed; bottom: 24px; right: 24px; background: #0f172a; color: white; padding: 10px 20px; border-radius: 10px; font-size: 12px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: none; z-index: 2000; animation: slideUp 0.3s ease; }
         .dark-theme #toast { background: var(--primary); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Modal Styles */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; place-items: center; z-index: 3000; }
+        .modal-overlay.active { display: grid; }
+        .modal { background: var(--card-bg); border: 1px solid var(--border-soft); border-radius: 20px; padding: 30px; width: 100%; max-width: 450px; box-shadow: 0 30px 60px rgba(0,0,0,0.2); }
+        .modal h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: var(--text-main); }
+        .modal p { font-size: 14px; color: var(--text-muted); margin-bottom: 20px; }
+        .modal-field { margin-bottom: 20px; }
+        .modal-field label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; letter-spacing: 0.5px; }
+        .modal-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-soft); background: var(--bg-soft); color: var(--text-main); font-size: 14px; outline: none; }
+        .modal-input:focus { border-color: var(--primary); }
+        .project-checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--bg-soft); padding: 15px; border-radius: 10px; border: 1px solid var(--border-soft); }
+        .check-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--text-main); cursor: pointer; }
+        .check-item input { width: 16px; height: 16px; cursor: pointer; }
+        .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 30px; }
+        .btn-modal { padding: 10px 20px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; border: none; transition: var(--transition); }
+        .btn-modal-cancel { background: var(--bg-soft); color: var(--text-main); }
+        .btn-modal-confirm { background: var(--primary); color: white; }
+        .btn-modal-confirm:hover { background: var(--primary-dark); transform: translateY(-1px); }
     </style>
 </head>
 <body>
@@ -327,45 +379,45 @@
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
 
-            <a href="home.html" class="nav-link">
+            <a href="home.html" class="nav-link" onclick="window.location.assign('home.html'); return false;">
                 <i class="fas fa-home"></i>
                 <span>Home</span>
             </a>
 
-            <a href="index.html" class="nav-link">
+            <a href="index.html" class="nav-link" onclick="window.location.assign('index.html'); return false;">
                 <i class="fas fa-chart-line"></i>
                 <span>Dashboard</span>
             </a>
 
-            <a href="solutions.html" class="nav-link">
+            <a href="solutions.html" class="nav-link" onclick="window.location.assign('solutions.html'); return false;">
                 <i class="fas fa-satellite"></i>
                 <span>Geospatial Radar</span>
             </a>
 
-            <a href="ai_chat.html" class="nav-link">
+            <a href="ai_chat.html" class="nav-link" onclick="window.location.assign('ai_chat.html'); return false;">
                 <i class="fas fa-brain"></i>
                 <span>AI EngiBot</span>
             </a>
 
             <div class="nav-section">Management</div>
 
-            <a href="project_details.html" class="nav-link">
+            <a href="project_details.html" class="nav-link" onclick="window.location.assign('project_details.html'); return false;">
                 <i class="fas fa-folder-open"></i>
                 <span>Project Details</span>
             </a>
 
-            <a href="team_access.html" class="nav-link active">
+            <a href="team_access.html" class="nav-link active" onclick="window.location.assign('team_access.html'); return false;">
                 <i class="fas fa-users-gear"></i>
                 <span>Team Access</span>
             </a>
 
-            <a href="reports.html" class="nav-link">
-                <i class="fas fa-file-invoice"></i>
+            <a href="reports.html" class="nav-link" onclick="window.location.assign('reports.html'); return false;">
+                <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
         </nav>
 
-        <a href="login.html" class="nav-link exit-link">
+        <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
             <i class="fas fa-power-off"></i>
             <span>Exit System</span>
         </a>
@@ -413,9 +465,10 @@
                     <h2><i class="fas fa-user-check"></i> Approved Users</h2>
                     <p>Active accounts assigned to this project.</p>
                 </div>
-                <button class="btn-invite" onclick="showToast()">
-                    <i class="fas fa-plus"></i> Invite Member
-                </button>
+                    <button class="btn-invite" onclick="openInviteModal()">
+                        <i class="fas fa-user-plus"></i>
+                        Invite Member
+                    </button>
             </div>
             <div class="table-wrap">
                 <table>
@@ -504,7 +557,90 @@
             </div>
         </div>
 
-        <div id="toast">Demo mode: action not connected to backend.</div>
+        <div id="toast">Demo mode: action completed.</div>
+
+        <!-- Approve Modal -->
+        <div id="approveModal" class="modal-overlay">
+            <div class="modal">
+                <h3>Approve Access Request</h3>
+                <p id="approveUserEmail">Approving access for user@example.com</p>
+                <input type="hidden" id="approveUserId">
+                
+                <div class="modal-field">
+                    <label>Assign Role</label>
+                    <select id="approveRole" class="modal-input">
+                        <option value="Admin">Admin</option>
+                        <option value="Engineer">Engineer</option>
+                        <option value="Viewer">Viewer</option>
+                    </select>
+                </div>
+                
+                <div class="modal-field">
+                    <label>Assigned Projects</label>
+                    <div class="project-checks">
+                        <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0001"> PRJ-0001</label>
+                        <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0002"> PRJ-0002</label>
+                        <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0003"> PRJ-0003</label>
+                        <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0004"> PRJ-0004</label>
+                        <label class="check-item"><input type="checkbox" name="proj" value="PRJ-0005"> PRJ-0005</label>
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-modal btn-modal-cancel" onclick="closeModal('approveModal')">Cancel</button>
+                    <button class="btn-modal btn-modal-confirm" onclick="submitApproval()">Confirm Approval</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Invite Modal -->
+        <div id="inviteModal" class="modal-overlay">
+            <div class="modal">
+                <h3>Invite Team Member</h3>
+                <p>Add a new user to the pending approval list.</p>
+                
+                <div class="modal-field">
+                    <label>Full Name</label>
+                    <input type="text" id="inviteName" class="modal-input" placeholder="e.g. Salim Al Jaberi">
+                </div>
+                
+                <div class="modal-field">
+                    <label>Email Address</label>
+                    <input type="email" id="inviteEmail" class="modal-input" placeholder="e.g. salim@company.com">
+                </div>
+
+                <div class="modal-field">
+                    <label>Organization</label>
+                    <input type="text" id="inviteOrg" class="modal-input" placeholder="e.g. EngiSphere">
+                </div>
+                
+                <div class="modal-field">
+                    <label>Requested Role</label>
+                    <select id="inviteRole" class="modal-input">
+                        <option value="Engineer">Engineer</option>
+                        <option value="Viewer">Viewer</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="btn-modal btn-modal-cancel" onclick="closeModal('inviteModal')">Cancel</button>
+                    <button class="btn-modal btn-modal-confirm" onclick="submitInvite()">Create Invitation</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Review Modal -->
+        <div id="reviewModal" class="modal-overlay">
+            <div class="modal">
+                <h3>User Profile Details</h3>
+                <div id="reviewContent" style="font-size: 14px; line-height: 1.8;">
+                    <!-- Dynamic -->
+                </div>
+                <div class="modal-actions">
+                    <button class="btn-modal btn-modal-confirm" onclick="closeModal('reviewModal')">Close</button>
+                </div>
+            </div>
+        </div>
     </main>
 
     <script>
@@ -559,195 +695,239 @@
             if (el) el.innerHTML = html;
         }
 
-        const projectAccessData = {
-            "PRJ-0001": {
-                id: "PRJ-0001",
-                name: "Dubai Smart Bridge",
-                accessHealth: "Controlled", lastReview: "Today",
-                approvedUsers: [
-                    { initials: "AM", fullName: "Amina Al Mansoori", email: "amina.mansoori@engisphere.com", organization: "EngiSphere", jobTitle: "Platform Administrator", systemRole: "Admin", projectAccess: "Multiple Projects", status: "Active", lastActivity: "Today" },
-                    { initials: "OH", fullName: "Omar Al Haddad", email: "omar.haddad@engisphere.com", organization: "EngiSphere", jobTitle: "Structural Engineer", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Today" },
-                    { initials: "LF", fullName: "Leila Farouk", email: "leila.farouk@engisphere.com", organization: "EngiSphere", jobTitle: "IoT Systems Engineer", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Yesterday" },
-                    { initials: "DR", fullName: "Daniel Reeves", email: "daniel.reeves@northstar-consult.com", organization: "Northstar Consulting", jobTitle: "Client Representative", systemRole: "Viewer", projectAccess: "Read Only", status: "Limited", lastActivity: "This Week" }
-                ],
-                pendingRequests: [
-                    { initials: "MK", fullName: "Mariam Al Ketbi", email: "mariam.ketbi@dubai-municipality.gov", organization: "Dubai Municipality", requestedRole: "Viewer", requestedProjects: "PRJ-0001", requestedAt: "Today" }
-                ],
-                matrix: [
-                    ["Admin", "Full", "Full", "Full", "Full", "Full", "Yes"],
-                    ["Engineer", "Assigned", "Assigned", "Technical", "Assigned", "No", "No"],
-                    ["Viewer", "Read Only", "Read Only", "Summary", "No", "No", "No"]
-                ],
-                gov: [
-                    "Only admins can approve new accounts or assign users to projects.",
-                    "Engineers can access only projects assigned by an admin.",
-                    "Viewers have read-only access to approved project summaries."
-                ]
-            },
-            "PRJ-0002": {
-                id: "PRJ-0002",
-                name: "Riyadh Metro Expansion",
-                accessHealth: "Stable", lastReview: "Yesterday",
-                approvedUsers: [
-                    { initials: "SQ", fullName: "Sara Al Qahtani", email: "sara.qahtani@engisphere.com", organization: "EngiSphere", jobTitle: "Platform Administrator", systemRole: "Admin", projectAccess: "Multiple Projects", status: "Active", lastActivity: "Today" },
-                    { initials: "FH", fullName: "Faisal Al Harbi", email: "faisal.harbi@engisphere.com", organization: "EngiSphere", jobTitle: "Rail Systems Engineer", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Today" },
-                    { initials: "NO", fullName: "Noura Al Otaibi", email: "noura.otaibi@engisphere.com", organization: "EngiSphere", jobTitle: "Civil Works Engineer", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Yesterday" },
-                    { initials: "KR", fullName: "Khalid Al Rashid", email: "khalid.rashid@riyadhmetro.sa", organization: "Riyadh Metro Authority", jobTitle: "Client Representative", systemRole: "Viewer", projectAccess: "Read Only", status: "Active", lastActivity: "This Week" }
-                ],
-                pendingRequests: [
-                    { initials: "OK", fullName: "Omar Khan", email: "omar.khan@desertline-epc.com", organization: "DesertLine EPC", requestedRole: "Viewer", requestedProjects: "PRJ-0002", requestedAt: "Today" }
-                ],
-                matrix: [
-                    ["Admin", "Full", "Full", "Full", "Full", "Full", "Yes"],
-                    ["Engineer", "Assigned", "Assigned", "Technical", "Assigned", "No", "No"],
-                    ["Viewer", "Read Only", "Read Only", "Summary", "No", "No", "No"]
-                ],
-                gov: [
-                    "Riyadh Metro Authority liaisons have executive viewer access.",
-                    "Contractor engineer access requires weekly re-verification.",
-                    "System logs track all access request approvals for audit."
-                ]
-            },
-            "PRJ-0003": {
-                id: "PRJ-0003",
-                name: "Doha Coastal Tunnel",
-                accessHealth: "Elevated Risk", lastReview: "3 days ago",
-                approvedUsers: [
-                    { initials: "HK", fullName: "Hessa Al Kuwari", email: "hessa.kuwari@engisphere.com", organization: "EngiSphere", jobTitle: "Platform Administrator", systemRole: "Admin", projectAccess: "Multiple Projects", status: "Active", lastActivity: "Today" },
-                    { initials: "YD", fullName: "Youssef Darwish", email: "youssef.darwish@engisphere.com", organization: "EngiSphere", jobTitle: "Geotechnical Engineer", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Today" },
-                    { initials: "RH", fullName: "Rana Haddad", email: "rana.haddad@engisphere.com", organization: "EngiSphere", jobTitle: "Marine Risk Analyst", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Yesterday" },
-                    { initials: "PL", fullName: "Peter Lawson", email: "peter.lawson@coastal-advisory.com", organization: "Coastal Advisory Group", jobTitle: "Government Liaison", systemRole: "Viewer", projectAccess: "Read Only", status: "Limited", lastActivity: "This Week" }
-                ],
-                pendingRequests: [
-                    { initials: "ST", fullName: "Salma Al Thani", email: "salma.thani@ashghal.gov.qa", organization: "Ashghal", requestedRole: "Viewer", requestedProjects: "PRJ-0003", requestedAt: "Today" }
-                ],
-                matrix: [
-                    ["Admin", "Full", "Full", "Full", "Full", "Full", "Yes"],
-                    ["Engineer", "Assigned", "Assigned", "Technical", "Assigned", "No", "No"],
-                    ["Viewer", "Read Only", "Read Only", "Summary", "No", "No", "No"]
-                ],
-                gov: [
-                    "Elevated risk: Two external consultant accounts pending review.",
-                    "Marine risk analyst role includes deep-link EngiBot sensor access.",
-                    "All viewer access for Doha projects is restricted by Ashghal policies."
-                ]
-            },
-            "PRJ-0004": {
-                id: "PRJ-0004",
-                name: "Abu Dhabi Smart District",
-                accessHealth: "Controlled", lastReview: "Today",
-                approvedUsers: [
-                    { initials: "AM", fullName: "Amina Al Mansoori", email: "amina.mansoori@engisphere.com", organization: "EngiSphere", jobTitle: "Platform Administrator", systemRole: "Admin", projectAccess: "Multiple Projects", status: "Active", lastActivity: "Today" },
-                    { initials: "HN", fullName: "Hamad Al Nuaimi", email: "hamad.nuaimi@engisphere.com", organization: "EngiSphere", jobTitle: "Civil Engineer", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Today" },
-                    { initials: "RM", fullName: "Reem Al Mazrouei", email: "reem.mazrouei@engisphere.com", organization: "EngiSphere", jobTitle: "Project Manager", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Yesterday" },
-                    { initials: "LB", fullName: "Laura Bennett", email: "laura.bennett@urbanlogic.ae", organization: "UrbanLogic Advisory", jobTitle: "External Consultant", systemRole: "Viewer", projectAccess: "Read Only", status: "Limited", lastActivity: "This Week" }
-                ],
-                pendingRequests: [
-                    { initials: "SF", fullName: "Saeed Al Falasi", email: "saeed.falasi@adm.gov.ae", organization: "Abu Dhabi Municipality", requestedRole: "Viewer", requestedProjects: "PRJ-0004", requestedAt: "Today" }
-                ],
-                matrix: [
-                    ["Admin", "Full", "Full", "Full", "Full", "Full", "Yes"],
-                    ["Engineer", "Assigned", "Assigned", "Technical", "Assigned", "No", "No"],
-                    ["Viewer", "Read Only", "Read Only", "Summary", "No", "No", "No"]
-                ],
-                gov: [
-                    "Administrative roles for AD Smart District are unified at HQ level.",
-                    "UrbanLogic consultants have restricted access to public reports only.",
-                    "Project manager has delegated authority for technical EngiBot tasks."
-                ]
-            },
-            "PRJ-0005": {
-                id: "PRJ-0005",
-                name: "Jeddah Flood Defense",
-                accessHealth: "Stable", lastReview: "Yesterday",
-                approvedUsers: [
-                    { initials: "SQ", fullName: "Sara Al Qahtani", email: "sara.qahtani@engisphere.com", organization: "EngiSphere", jobTitle: "Platform Administrator", systemRole: "Admin", projectAccess: "Multiple Projects", status: "Active", lastActivity: "Today" },
-                    { initials: "MG", fullName: "Majed Al Ghamdi", email: "majed.ghamdi@engisphere.com", organization: "EngiSphere", jobTitle: "Hydrology Engineer", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Today" },
-                    { initials: "LB", fullName: "Lina Barakat", email: "lina.barakat@engisphere.com", organization: "EngiSphere", jobTitle: "GIS Analyst", systemRole: "Engineer", projectAccess: "Current Project", status: "Active", lastActivity: "Yesterday" },
-                    { initials: "HS", fullName: "Hani Al Subhi", email: "hani.subhi@jeddah.gov.sa", organization: "Jeddah Municipality", jobTitle: "Government Viewer", systemRole: "Viewer", projectAccess: "Read Only", status: "Active", lastActivity: "This Week" }
-                ],
-                pendingRequests: [
-                    { initials: "TR", fullName: "Thomas Reed", email: "thomas.reed@floodsafe-intl.com", organization: "FloodSafe International", requestedRole: "Engineer", requestedProjects: "PRJ-0005", requestedAt: "Today" }
-                ],
-                matrix: [
-                    ["Admin", "Full", "Full", "Full", "Full", "Full", "Yes"],
-                    ["Engineer", "Assigned", "Assigned", "Technical", "Assigned", "No", "No"],
-                    ["Viewer", "Read Only", "Read Only", "Summary", "No", "No", "No"]
-                ],
-                gov: [
-                    "Municipal viewers can monitor progress but not view detailed risk math.",
-                    "External hydrology engineers require supervisor approval for radar access.",
-                    "Access review for Jeddah projects is conducted on the first of every month."
-                ]
-            }
+        const PROJECT_NAMES = {
+            "PRJ-0001": "Dubai Smart Bridge",
+            "PRJ-0002": "Riyadh Metro Expansion",
+            "PRJ-0003": "Doha Coastal Tunnel",
+            "PRJ-0004": "Abu Dhabi Smart District",
+            "PRJ-0005": "Jeddah Flood Defense"
         };
 
-        function showToast() {
+        const GOV_NOTES = {
+            "PRJ-0001": [
+                "Only admins can approve new accounts or assign users to projects.",
+                "Engineers can access only projects assigned by an admin.",
+                "Viewers have read-only access to approved project summaries."
+            ],
+            "PRJ-0002": [
+                "Riyadh Metro Authority liaisons have executive viewer access.",
+                "Contractor engineer access requires weekly re-verification.",
+                "System logs track all access request approvals for audit."
+            ],
+            "PRJ-0003": [
+                "Elevated risk: Two external consultant accounts pending review.",
+                "Marine risk analyst role includes deep-link EngiBot sensor access.",
+                "All viewer access for Doha projects is restricted by Ashghal policies."
+            ],
+            "PRJ-0004": [
+                "Administrative roles for AD Smart District are unified at HQ level.",
+                "UrbanLogic consultants have restricted access to public reports only.",
+                "Project manager has delegated authority for technical EngiBot tasks."
+            ],
+            "PRJ-0005": [
+                "Municipal viewers can monitor progress but not view detailed risk math.",
+                "External hydrology engineers require supervisor approval for radar access.",
+                "Access review for Jeddah projects is conducted on the first of every month."
+            ]
+        };
+
+        function showToast(msg) {
             const toast = document.getElementById('toast');
             if (toast) {
+                if (msg) toast.textContent = msg;
                 toast.style.display = 'block';
                 setTimeout(() => { toast.style.display = 'none'; }, 2000);
             }
         }
 
-        function updateTeamPage(projectId) {
-            const data = projectAccessData[projectId] || projectAccessData["PRJ-0001"];
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function openApproveModal(userId) {
+            const users = Auth.getUsers();
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('approveUserId').value = userId;
+            document.getElementById('approveUserEmail').textContent = `Approving access for ${user.fullName} (${user.email})`;
+            document.getElementById('approveRole').value = user.role || 'Engineer';
             
+            // Clear checks
+            document.querySelectorAll('input[name="proj"]').forEach(ch => ch.checked = false);
+            
+            document.getElementById('approveModal').classList.add('active');
+        }
+
+        function submitApproval() {
+            const userId = document.getElementById('approveUserId').value;
+            const role = document.getElementById('approveRole').value;
+            const projects = Array.from(document.querySelectorAll('input[name="proj"]:checked')).map(ch => ch.value);
+            
+            if (projects.length === 0) {
+                showToast("Please select at least one project.");
+                return;
+            }
+
+            const users = Auth.getUsers();
+            const idx = users.findIndex(u => u.id === userId);
+            if (idx !== -1) {
+                users[idx].status = 'approved';
+                users[idx].role = role;
+                users[idx].assignedProjects = projects;
+                Auth.saveUsers(users);
+                showToast("User approved and projects assigned.");
+                closeModal('approveModal');
+                
+                const urlParams = new URLSearchParams(window.location.search);
+                updateTeamPage(urlParams.get("project") || "PRJ-0001");
+            }
+        }
+
+        function rejectUser(userId) {
+            const users = Auth.getUsers();
+            const idx = users.findIndex(u => u.id === userId);
+            if (idx !== -1) {
+                users[idx].status = 'rejected';
+                Auth.saveUsers(users);
+                showToast("User request rejected.");
+                const urlParams = new URLSearchParams(window.location.search);
+                updateTeamPage(urlParams.get("project") || "PRJ-0001");
+            }
+        }
+
+        function removeUser(userId, projectId) {
+            const users = Auth.getUsers();
+            const idx = users.findIndex(u => u.id === userId);
+            if (idx !== -1) {
+                // Prevent removing admin if it's the current admin or seed admin from all projects for demo safety
+                if (users[idx].email === 'admin@engisphere.com' && users[idx].assignedProjects.length <= 1) {
+                    showToast("Default admin access cannot be removed in demo mode.");
+                    return;
+                }
+
+                users[idx].assignedProjects = users[idx].assignedProjects.filter(p => p !== projectId);
+                Auth.saveUsers(users);
+                showToast("User removed from this project.");
+                updateTeamPage(projectId);
+            }
+        }
+
+        function openReviewModal(userId) {
+            const users = Auth.getUsers();
+            const user = users.find(u => u.id === userId);
+            if (!user) return;
+
+            const content = `
+                <div style="margin-bottom:15px;"><strong>Full Name:</strong> ${user.fullName}</div>
+                <div style="margin-bottom:15px;"><strong>Email:</strong> ${user.email}</div>
+                <div style="margin-bottom:15px;"><strong>Organization:</strong> ${user.organization}</div>
+                <div style="margin-bottom:15px;"><strong>Role:</strong> <span class="role-badge role-badge-${user.role.toLowerCase()}">${user.role}</span></div>
+                <div style="margin-bottom:15px;"><strong>Status:</strong> ${user.status.toUpperCase()}</div>
+                <div style="margin-bottom:15px;"><strong>Assigned Projects:</strong><br>
+                    <ul style="margin-top:5px; padding-left:20px;">
+                        ${user.assignedProjects.length > 0 ? user.assignedProjects.map(p => `<li>${p} - ${PROJECT_NAMES[p] || 'Unknown'}</li>`).join('') : '<li>None</li>'}
+                    </ul>
+                </div>
+                <div><strong>Registered At:</strong> ${new Date(user.createdAt).toLocaleString()}</div>
+            `;
+            document.getElementById('reviewContent').innerHTML = content;
+            document.getElementById('reviewModal').classList.add('active');
+        }
+
+        function openInviteModal() {
+            document.getElementById('inviteModal').classList.add('active');
+        }
+
+        function submitInvite() {
+            const fullName = document.getElementById('inviteName').value.trim();
+            const email = document.getElementById('inviteEmail').value.trim();
+            const organization = document.getElementById('inviteOrg').value.trim();
+            const role = document.getElementById('inviteRole').value;
+
+            if (!fullName || !email || !organization) {
+                showToast("Please fill all fields.");
+                return;
+            }
+
+            try {
+                Auth.register({ fullName, email, organization, role, password: 'password123' });
+                showToast("Invitation created as pending request.");
+                closeModal('inviteModal');
+                const urlParams = new URLSearchParams(window.location.search);
+                updateTeamPage(urlParams.get("project") || "PRJ-0001");
+            } catch (e) {
+                showToast(e.message);
+            }
+        }
+
+        function updateTeamPage(projectId) {
+            const users = Auth.getUsers();
+            const projectName = PROJECT_NAMES[projectId] || "Dubai Smart Bridge";
+            
+            // Filter users for this project
+            const approvedForProject = users.filter(u => u.status === 'approved' && u.assignedProjects.includes(projectId));
+            const pendingRequests = users.filter(u => u.status === 'pending');
+
             // 1. Header & Document Title
-            document.title = `Team Access | ${data.name} | EngiSphere`;
-            setText('headerTitle', `Team Access – ${data.name}`);
-            setText('headerSub', `Manage approved users, project roles, and access requests for ${data.id}.`);
+            document.title = `Team Access | ${projectName} | EngiSphere`;
+            setText('headerTitle', `Team Access – ${projectName}`);
+            setText('headerSub', `Manage approved users, project roles, and access requests for ${projectId}.`);
 
             // 2. KPIs
-            const admins = data.approvedUsers.filter(u => u.systemRole === 'Admin').length;
-            const engineers = data.approvedUsers.filter(u => u.systemRole === 'Engineer').length;
-            const viewers = data.approvedUsers.filter(u => u.systemRole === 'Viewer').length;
-            const orgs = new Set(data.approvedUsers.map(u => u.organization)).size;
+            const admins = approvedForProject.filter(u => u.role === 'Admin').length;
+            const engineers = approvedForProject.filter(u => u.role === 'Engineer').length;
+            const viewers = approvedForProject.filter(u => u.role === 'Viewer').length;
+            const orgs = new Set(approvedForProject.map(u => u.organization)).size;
 
-            setText('kpiApproved', data.approvedUsers.length);
+            setText('kpiApproved', approvedForProject.length);
             setText('kpiAdmins', admins);
             setText('kpiEngineers', engineers);
-            setText('kpiRequests', data.pendingRequests.length);
+            setText('kpiRequests', pendingRequests.length);
             
             const healthVal = document.getElementById('kpiHealth');
             if (healthVal) {
-                healthVal.textContent = data.accessHealth;
-                healthVal.style.color = data.accessHealth === 'Controlled' || data.accessHealth === 'Stable' ? 'var(--success)' : data.accessHealth === 'Review Needed' ? 'var(--warning)' : 'var(--danger)';
+                const health = pendingRequests.length > 1 ? "Review Needed" : pendingRequests.length === 1 ? "Attention Required" : "Stable";
+                healthVal.textContent = health;
+                healthVal.style.color = health === 'Stable' ? 'var(--success)' : health === 'Attention Required' ? 'var(--warning)' : 'var(--danger)';
             }
 
             // 3. Access Overview Strip
             setText('overviewViewers', viewers);
             setText('overviewOrgs', orgs);
-            setText('overviewReview', data.lastReview);
+            setText('overviewReview', "Today");
 
             // 4. Approved Users Table
-            const approvedHTML = data.approvedUsers.map(u => `
+            const approvedHTML = approvedForProject.map(u => {
+                const initials = u.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+                const accessText = u.role === 'Admin' ? 'Multiple Projects' : u.role === 'Viewer' ? 'Read Only' : 'Technical Access';
+                return `
                 <tr>
                     <td>
                         <div class="member-info">
-                            <div class="avatar">${u.initials}</div>
+                            <div class="avatar">${initials}</div>
                             <div><strong>${u.fullName}</strong><br><small style="color:var(--text-muted); font-size: 10px;">${u.email}</small></div>
                         </div>
                     </td>
                     <td>${u.organization}</td>
-                    <td>${u.jobTitle}</td>
-                    <td><span class="role-badge ${u.systemRole === 'Admin' ? 'role-badge-admin' : u.systemRole === 'Engineer' ? 'role-badge-engineer' : 'role-badge-viewer'}">${u.systemRole}</span></td>
-                    <td>${u.projectAccess}</td>
-                    <td><div class="status-badge"><div class="dot ${u.status === 'Active' ? 'dot-active' : 'dot-pending'}"></div> ${u.status}</div></td>
-                    <td>${u.lastActivity}</td>
+                    <td>${u.role} User</td>
+                    <td><span class="role-badge role-badge-${u.role.toLowerCase()}">${u.role}</span></td>
+                    <td>${accessText}</td>
+                    <td><div class="status-badge"><div class="dot dot-active"></div> Active</div></td>
+                    <td>Today</td>
                     <td>
                         <div style="display:flex; gap:6px;">
-                            <button class="btn-action" onclick="showToast()">Review</button>
-                            <button class="btn-action" style="color:var(--danger)" onclick="showToast()">Remove</button>
+                            <button class="btn-action" onclick="openReviewModal('${u.id}')">Review</button>
+                            <button class="btn-action" style="color:var(--danger)" onclick="removeUser('${u.id}', '${projectId}')">Remove</button>
                         </div>
                     </td>
                 </tr>
-            `).join('');
-            renderHTML('approvedUsersList', approvedHTML);
+            `}).join('');
+            renderHTML('approvedUsersList', approvedHTML || '<tr><td colspan="8" style="text-align:center; padding:40px; color:var(--text-muted)">No users assigned to this project yet.</td></tr>');
 
             // 5. Pending Requests Table
             const container = document.getElementById('pendingRequestsContainer');
-            if (data.pendingRequests.length === 0) {
+            if (pendingRequests.length === 0) {
                 renderHTML('pendingRequestsContainer', '<div class="empty-state">No pending access requests.</div>');
             } else {
                 const tableHTML = `
@@ -757,32 +937,32 @@
                                 <th>Requester</th>
                                 <th>Organization</th>
                                 <th>Requested Role</th>
-                                <th>Projects</th>
                                 <th>Requested At</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="pendingRequestsList">
-                            ${data.pendingRequests.map(r => `
+                            ${pendingRequests.map(r => {
+                                const initials = r.fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+                                return `
                                 <tr>
                                     <td>
                                         <div class="member-info">
-                                            <div class="avatar" style="background:var(--border-soft); color:var(--text-muted)">${r.initials}</div>
+                                            <div class="avatar" style="background:var(--border-soft); color:var(--text-muted)">${initials}</div>
                                             <div><strong>${r.fullName}</strong><br><small style="color:var(--text-muted); font-size: 10px;">${r.email}</small></div>
                                         </div>
                                     </td>
                                     <td>${r.organization}</td>
-                                    <td><span class="role-badge ${r.requestedRole === 'Admin' ? 'role-badge-admin' : r.requestedRole === 'Engineer' ? 'role-badge-engineer' : 'role-badge-viewer'}">${r.requestedRole}</span></td>
-                                    <td>${r.requestedProjects}</td>
-                                    <td>${r.requestedAt}</td>
+                                    <td><span class="role-badge role-badge-${r.role.toLowerCase()}">${r.role}</span></td>
+                                    <td>${new Date(r.createdAt).toLocaleDateString()}</td>
                                     <td>
                                         <div style="display:flex; gap:6px;">
-                                            <button class="btn-approve" onclick="showToast()">Approve</button>
-                                            <button class="btn-action" style="color:var(--danger)" onclick="showToast()">Reject</button>
+                                            <button class="btn-approve" onclick="openApproveModal('${r.id}')">Approve</button>
+                                            <button class="btn-action" style="color:var(--danger)" onclick="rejectUser('${r.id}')">Reject</button>
                                         </div>
                                     </td>
                                 </tr>
-                            `).join('')}
+                            `}).join('')}
                         </tbody>
                     </table>
                 `;
@@ -790,7 +970,12 @@
             }
 
             // 6. Permission Matrix
-            const matrixHTML = data.matrix.map(row => `
+            const matrix = [
+                ["Admin", "Full", "Full", "Full", "Full", "Full", "Yes"],
+                ["Engineer", "Assigned", "Assigned", "Technical", "Assigned", "No", "No"],
+                ["Viewer", "Read Only", "Read Only", "Summary", "No", "No", "No"]
+            ];
+            const matrixHTML = matrix.map(row => `
                 <tr>
                     <td style="font-weight: 800;">${row[0]}</td>
                     ${row.slice(1).map(cell => `
@@ -801,7 +986,8 @@
             renderHTML('permissionMatrixList', matrixHTML);
 
             // 7. Access Governance
-            const govHTML = data.gov.map(note => `<div class="gov-card"><p>${note}</p></div>`).join('');
+            const notes = GOV_NOTES[projectId] || GOV_NOTES["PRJ-0001"];
+            const govHTML = notes.map(note => `<div class="gov-card"><p>${note}</p></div>`).join('');
             renderHTML('governanceNotesList', govHTML);
 
             // 8. Context Persistence
@@ -809,13 +995,21 @@
                 const href = link.getAttribute('href');
                 if (href && (href.includes('project_details.html') || href.includes('reports.html') || href.includes('team_access.html'))) {
                     const base = href.split('?')[0];
-                    link.setAttribute('href', `${base}?project=${data.id}`);
+                    link.setAttribute('href', `${base}?project=${projectId}`);
                 }
             });
 
             const switcher = document.getElementById('projectSwitcher');
-            if (switcher) switcher.value = data.id;
-            localStorage.setItem("engisphere-selected-project-id", data.id);
+            if (switcher) switcher.value = projectId;
+            localStorage.setItem("engisphere-selected-project-id", projectId);
+
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => {
+                    localStorage.removeItem("engisphere-user");
+                    window.location.href = "login.html";
+                });
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {

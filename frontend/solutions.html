@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="assets/js/sidebar.js"></script>
     <style>
         :root {
             /* Premium Engineering SaaS Palette - Sync with index.html */
@@ -30,7 +31,7 @@
             --shadow-premium: 0 12px 30px rgba(15, 23, 42, 0.06);
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             --sidebar-width: 260px;
-            --sidebar-collapsed-width: 88px;
+            --sidebar-collapsed-width: 80px;
         }
 
         body.dark-theme {
@@ -67,17 +68,89 @@
 
         /* Sidebar - Exact Match with Dashboard */
         .sidebar {
-            width: var(--sidebar-width);
+            width: 280px;
             background: var(--sidebar);
             border-right: 1px solid var(--border-soft);
             display: flex;
             flex-direction: column;
             padding: 28px 18px;
             transition: var(--transition);
-            z-index: 2000;
+            z-index: 1000;
+            position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
+            overflow-y: auto;
             flex-shrink: 0;
-            position: relative;
+        }
+
+        body.sidebar-collapsed .sidebar {
+            width: var(--sidebar-collapsed-width);
+            padding: 28px 12px;
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            position: fixed;
+            left: calc(var(--sidebar-width) - 18px);
+            top: 24px;
+            z-index: 1100;
+            width: 36px;
+            height: 36px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-soft);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--primary);
+            color: white;
+            transform: scale(1.1);
+        }
+
+        body.sidebar-collapsed .sidebar-toggle {
+            left: calc(var(--sidebar-collapsed-width) - 18px);
+        }
+
+        .sidebar-toggle i {
+            transition: transform 0.3s ease;
+        }
+
+        body.sidebar-collapsed .sidebar-toggle i {
+            transform: rotate(180deg);
+        }
+
+        /* Collapsed Sidebar Item Logic */
+        body.sidebar-collapsed .logo-text,
+        body.sidebar-collapsed .nav-section,
+        body.sidebar-collapsed .nav-link span,
+        body.sidebar-collapsed .exit-text {
+            display: none;
+        }
+
+        body.sidebar-collapsed .nav-link {
+            justify-content: center;
+            padding: 12px 0;
+            width: 48px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        body.sidebar-collapsed .nav-link i {
+            font-size: 18px;
+            margin: 0;
+        }
+        
+        body.sidebar-collapsed .logo {
+            justify-content: center;
         }
 
         .logo {
@@ -115,36 +188,53 @@
         }
 
         .nav-section {
-            font-size: 10px;
+            font-size: 12px;
             font-weight: 800;
             color: var(--text-muted);
             text-transform: uppercase;
-            margin: 14px 0 6px 14px;
-            letter-spacing: 1px;
+            margin: 20px 0 10px 10px;
+            letter-spacing: 0.12em;
         }
 
         .nav-link {
+            height: 54px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            border-radius: 14px;
+            gap: 16px;
+            padding: 0 18px;
+            margin: 6px 0;
+            border-radius: 16px;
             color: var(--text-muted);
             text-decoration: none;
-            font-weight: 600;
-            font-size: 13px;
+            font-weight: 700;
+            font-size: 15px;
             transition: var(--transition);
-            margin-bottom: 4px;
         }
 
-        .nav-link:hover {
-            background: var(--primary-soft);
+        .nav-link i {
+            width: 22px;
+            min-width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #eef4ff;
             color: var(--primary);
+        }
+
+        .dark-theme .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .nav-link.active {
-            background: var(--primary-soft);
-            color: var(--primary);
+            background: var(--primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .nav-link.active i {
+            color: #ffffff !important;
         }
 
         .exit-link {
@@ -158,31 +248,8 @@
         }
 
         /* Sidebar Collapsed State */
-        .sidebar.collapsed { width: var(--sidebar-collapsed-width); padding: 28px 12px; }
-        .sidebar.collapsed .logo-text,
-        .sidebar.collapsed .nav-section,
-        .sidebar.collapsed .nav-text,
-        .sidebar.collapsed .exit-text {
-            display: none !important;
-        }
-        .sidebar.collapsed .logo { justify-content: center; }
-        .sidebar.collapsed .nav-link { 
-            width: 56px; height: 56px; padding: 0; justify-content: center; margin-left: auto; margin-right: auto; border-radius: 18px;
-        }
-        .sidebar.collapsed .nav-link i { font-size: 18px; margin: 0; }
 
-        .sidebar-toggle { 
-            position: fixed; left: calc(var(--sidebar-width) - 18px); top: 24px; z-index: 2100; width: 36px; height: 36px; 
-            background: var(--card-bg); border: 1px solid var(--border-soft); color: var(--primary); border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); outline: none; 
-        }
-        .sidebar-toggle:hover { background: var(--primary); color: white; transform: scale(1.1); }
-        body.sidebar-collapsed .sidebar-toggle { left: calc(var(--sidebar-collapsed-width) - 18px); }
-        .sidebar-toggle i { transition: transform 0.3s ease; }
-        body.sidebar-collapsed .sidebar-toggle i { transform: rotate(180deg); }
-
-        body.sidebar-collapsed .main-radar { margin-left: 0; }
+        body.sidebar-collapsed .main-radar { margin-left: var(--sidebar-collapsed-width); }
 
         /* Main Map Viewport */
         .main-radar {
@@ -191,6 +258,11 @@
             overflow: hidden;
             background: var(--bg-main);
             transition: var(--transition);
+            margin-left: 280px;
+        }
+
+        body.sidebar-collapsed .main-radar {
+            margin-left: var(--sidebar-collapsed-width);
         }
 
         #map {
@@ -206,7 +278,7 @@
             left: 22px;
             bottom: 22px;
             width: 320px;
-            z-index: 1200;
+            z-index: 100;
             background: var(--card-bg);
             border: 1px solid var(--border-soft);
             border-radius: 28px;
@@ -637,15 +709,42 @@
 
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
-            <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span class="nav-text">Home</span></a>
-            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span class="nav-text">Dashboard</span></a>
-            <a href="solutions.html" class="nav-link active"><i class="fas fa-satellite"></i><span class="nav-text">Geospatial Radar</span></a>
-            <a href="ai_chat.html" class="nav-link"><i class="fas fa-brain"></i><span class="nav-text">AI EngiBot</span></a>
+            <a href="home.html" class="nav-link" onclick="window.location.assign('home.html'); return false;">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+
+            <a href="index.html" class="nav-link" onclick="window.location.assign('index.html'); return false;">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="solutions.html" class="nav-link active" onclick="window.location.assign('solutions.html'); return false;">
+                <i class="fas fa-satellite"></i>
+                <span>Geospatial Radar</span>
+            </a>
+
+            <a href="ai_chat.html" class="nav-link" onclick="window.location.assign('ai_chat.html'); return false;">
+                <i class="fas fa-brain"></i>
+                <span>AI EngiBot</span>
+            </a>
 
             <div class="nav-section">Management</div>
-            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-open"></i><span class="nav-text">Project Details</span></a>
-            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span class="nav-text">Team Access</span></a>
-            <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i><span class="nav-text">Reports</span></a>
+
+            <a href="project_details.html" class="nav-link" onclick="window.location.assign('project_details.html'); return false;">
+                <i class="fas fa-folder-open"></i>
+                <span>Project Details</span>
+            </a>
+
+            <a href="team_access.html" class="nav-link" onclick="window.location.assign('team_access.html'); return false;">
+                <i class="fas fa-users-gear"></i>
+                <span>Team Access</span>
+            </a>
+
+            <a href="reports.html" class="nav-link" onclick="window.location.assign('reports.html'); return false;">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
         </nav>
 
         <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
@@ -654,7 +753,7 @@
         </a>
     </aside>
 
-    <button id="sidebarToggle" class="sidebar-toggle" data-sidebar-toggle><i class="fas fa-chevron-left"></i></button>
+    <button id="sidebarToggle" class="sidebar-toggle"><i class="fas fa-chevron-left"></i></button>
 
     <main class="main-radar">
         <div id="map"></div>
@@ -1005,45 +1104,13 @@
             addMarkers(filtered);
         }
 
-        const SIDEBAR_KEY = "sidebarCollapsed";
-
-        function setSidebarCollapsed(isCollapsed) {
-            const sidebar = document.querySelector(".sidebar");
-            const mainContent = document.querySelector(".main-radar");
-            if (!sidebar) return;
-
-            sidebar.classList.toggle("collapsed", isCollapsed);
-            document.body.classList.toggle("sidebar-collapsed", isCollapsed);
-            
-            localStorage.setItem(SIDEBAR_KEY, isCollapsed ? "true" : "false");
-
-            const toggle = document.querySelector("[data-sidebar-toggle]");
-            if (toggle) {
-                toggle.setAttribute("aria-expanded", isCollapsed ? "false" : "true");
-                toggle.setAttribute("title", isCollapsed ? "Expand sidebar" : "Collapse sidebar");
-            }
-        }
-
-        function initSidebarCollapse() {
-            const sidebar = document.querySelector(".sidebar");
-            const toggle = document.querySelector("[data-sidebar-toggle]");
-            if (!sidebar) return;
-
-            const savedCollapsed = localStorage.getItem(SIDEBAR_KEY) === "true";
-            setSidebarCollapsed(savedCollapsed);
-
-            if (!toggle || toggle.dataset.bound === "true") return;
-            toggle.dataset.bound = "true";
-            toggle.addEventListener("click", function (e) {
-                e.preventDefault();
-                const currentlyCollapsed = sidebar.classList.contains("collapsed");
-                setSidebarCollapsed(!currentlyCollapsed);
-            });
-        }
-
         document.addEventListener("DOMContentLoaded", () => {
-            initSidebarCollapse();
-            // ... other initializations if needed
+            // Sidebar invalidation for map
+            window.addEventListener("engisphere-sidebar-toggled", () => {
+                setTimeout(() => {
+                    if (window.map) window.map.invalidateSize();
+                }, 300);
+            });
         });
     </script>
 </body>

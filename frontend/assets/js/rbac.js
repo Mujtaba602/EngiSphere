@@ -7,10 +7,9 @@
  *     on the backend (FastAPI middleware / dependency injection).
  *
  * Storage keys used:
- *   access_token    — JWT returned by /login
- *   user_email      — email saved at login
- *   engisphere_role — role saved at login (or fetched from /users/me)
- *   engisphere_user — full user object (optional)
+ *   engisphereUsers        — Master list of users and their status
+ *   engisphereCurrentUser  — Currently logged in user session
+ *   engisphere_projects    — Master list of projects
  */
 
 window.EngiSphereRBAC = (function () {
@@ -77,40 +76,21 @@ window.EngiSphereRBAC = (function () {
     // ── User / role resolution ─────────────────────────────────────────────
 
     function getCurrentUser() {
+        if (window.Auth && typeof window.Auth.getCurrentUser === "function") {
+            return window.Auth.getCurrentUser();
+        }
         try {
-            const raw = localStorage.getItem("engisphere_user");
+            const raw = localStorage.getItem("engisphereCurrentUser");
             if (raw) return JSON.parse(raw);
         } catch (_) { /* ignore */ }
-        const email = localStorage.getItem("user_email");
-        return email ? { email } : null;
+        return null;
     }
 
     function getCurrentRole() {
-        // 1. Explicit role key
-        const stored = localStorage.getItem("engisphere_role");
-        if (stored && ROLES.includes(stored.toLowerCase())) {
-            return stored.toLowerCase();
+        const user = getCurrentUser();
+        if (user && user.role) {
+            return user.role.toLowerCase();
         }
-
-        // 2. Role from full user object
-        try {
-            const raw = localStorage.getItem("engisphere_user");
-            if (raw) {
-                const user = JSON.parse(raw);
-                const r = (user.role || user.access_level || "").toLowerCase();
-                if (ROLES.includes(r)) return r;
-                // Map TeamMember access_level → RBAC role
-                const mapped = _mapAccessLevel(user.access_level || user.role || "");
-                if (mapped) return mapped;
-            }
-        } catch (_) { /* ignore */ }
-
-        // 3. Fallback: if logged-in user has no role, treat as admin for demo
-        //    (in production this should be "viewer" or redirect to login)
-        if (localStorage.getItem("access_token")) {
-            return "admin";
-        }
-
         return null; // not logged in
     }
 

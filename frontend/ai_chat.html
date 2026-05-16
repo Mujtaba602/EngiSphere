@@ -6,6 +6,10 @@
     <title>EngiSphere | AI EngiBot Console</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/theme.js"></script>
+    <script src="assets/js/sidebar.js"></script>
     <style>
         :root {
             /* Premium Engineering SaaS Palette */
@@ -85,7 +89,7 @@
 
         /* Sidebar */
         .sidebar {
-            width: var(--sidebar-width);
+            width: 280px;
             background: var(--sidebar);
             border-right: 1px solid var(--border-soft);
             display: flex;
@@ -109,14 +113,54 @@
         .logo-text { font-size: 20px; font-weight: 800; color: var(--text-main); letter-spacing: -0.8px; line-height: 1; }
         .logo-text span { color: var(--primary); }
 
-        .nav-section { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin: 14px 0 6px 14px; letter-spacing: 1px; }
-        .nav-link {
-            display: flex; align-items: center; gap: 14px;
-            padding: 12px 16px; border-radius: 14px;
-            color: var(--text-muted); text-decoration: none;
-            font-weight: 600; font-size: 13.5px; transition: var(--transition);
+        .nav-section {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin: 20px 0 10px 10px;
+            letter-spacing: 0.12em;
         }
-        .nav-link:hover, .nav-link.active { background: var(--primary-soft); color: var(--primary); }
+        .nav-link {
+            height: 54px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 18px;
+            margin: 6px 0;
+            border-radius: 16px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .nav-link i {
+            width: 22px;
+            min-width: 22px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .nav-link:hover:not(.active) {
+            background: #eef4ff;
+            color: var(--primary);
+        }
+
+        body.dark-theme .nav-link:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-link.active {
+            background: var(--primary) !important;
+            color: #ffffff !important;
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+        }
+
+        .nav-link.active i {
+            color: #ffffff !important;
+        }
         .exit-link { margin-top: auto; color: var(--danger) !important; }
 
         /* Main Workspace */
@@ -622,15 +666,42 @@
 
         <nav style="flex:1;">
             <div class="nav-section">Core Systems</div>
-            <a href="home.html" class="nav-link"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="index.html" class="nav-link"><i class="fas fa-chart-line"></i><span>Dashboard</span></a>
-            <a href="solutions.html" class="nav-link"><i class="fas fa-satellite"></i><span>Geospatial Radar</span></a>
-            <a href="ai_chat.html" class="nav-link active"><i class="fas fa-brain"></i><span>AI EngiBot</span></a>
+            <a href="home.html" class="nav-link" onclick="window.location.assign('home.html'); return false;">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+
+            <a href="index.html" class="nav-link" onclick="window.location.assign('index.html'); return false;">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="solutions.html" class="nav-link" onclick="window.location.assign('solutions.html'); return false;">
+                <i class="fas fa-satellite"></i>
+                <span>Geospatial Radar</span>
+            </a>
+
+            <a href="ai_chat.html" class="nav-link active" onclick="window.location.assign('ai_chat.html'); return false;">
+                <i class="fas fa-brain"></i>
+                <span>AI EngiBot</span>
+            </a>
 
             <div class="nav-section">Management</div>
-            <a href="project_details.html" class="nav-link"><i class="fas fa-folder-open"></i><span>Project Details</span></a>
-            <a href="team_access.html" class="nav-link"><i class="fas fa-users-gear"></i><span>Team Access</span></a>
-            <a href="reports.html" class="nav-link"><i class="fas fa-file-invoice"></i><span>Reports</span></a>
+
+            <a href="project_details.html" class="nav-link" onclick="window.location.assign('project_details.html'); return false;">
+                <i class="fas fa-folder-open"></i>
+                <span>Project Details</span>
+            </a>
+
+            <a href="team_access.html" class="nav-link" onclick="window.location.assign('team_access.html'); return false;">
+                <i class="fas fa-users-gear"></i>
+                <span>Team Access</span>
+            </a>
+
+            <a href="reports.html" class="nav-link" onclick="window.location.assign('reports.html'); return false;">
+                <i class="fas fa-file-alt"></i>
+                <span>Reports</span>
+            </a>
         </nav>
 
         <a href="#" onclick="logout(); return false;" class="nav-link exit-link">
@@ -748,6 +819,7 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
             </div>
 
@@ -771,11 +843,8 @@
         </div>
     </div>
 
-    <script src="assets/js/sidebar.js"></script>
     <script>
-        const API_BASE_URL = "http://127.0.0.1:8001";
-        const token = localStorage.getItem("token") || localStorage.getItem("access_token");
-        if (!token) window.location.assign("login.html");
+        const API_BASE_URL = "http://127.0.0.1:8000";
 
         const chatBox = document.getElementById("chatBox");
         const chatThread = document.getElementById("chatThread");
@@ -792,8 +861,13 @@
         let activeConversation = null;
 
         document.addEventListener("DOMContentLoaded", () => {
+            // Early authentication guard
+            if (typeof Auth !== "undefined" && typeof Auth.guardPage === "function") {
+                if (!Auth.guardPage()) return;
+            }
+
             applyAppTheme();
-            userInput.focus();
+            if (userInput) userInput.focus();
             
             // Initializing multi-conversation engine
             initConversationEngine();
@@ -1633,7 +1707,14 @@
         function toggleAppTheme() { const isDark = document.body.classList.toggle("dark-theme"); localStorage.setItem("engisphere-theme", isDark ? "dark" : "light"); updateThemeUI(isDark); }
         function updateThemeUI(isDark) { const icon = document.getElementById("themeIcon"); if (icon) icon.className = isDark ? "fas fa-sun" : "fas fa-moon"; }
         function applyAppTheme() { const saved = localStorage.getItem("engisphere-theme") || "dark"; const isDark = saved === "dark"; document.body.classList.toggle("dark-theme", isDark); updateThemeUI(isDark); }
-        function logout() { localStorage.clear(); window.location.assign("login.html"); }
+        function logout() {
+            if (window.Auth && typeof Auth.logout === 'function') {
+                Auth.logout();
+            } else {
+                localStorage.removeItem('engisphereCurrentUser');
+                window.location.href = 'login.html';
+            }
+        }
 
         // --- BOT ACTION HANDLERS ---
         function copyBotResponse(btn, id) {
@@ -1720,13 +1801,28 @@
         async function loadPortfolioAnalysis() {
             const panel = document.getElementById("portfolioAnalysisPanel");
             const content = document.getElementById("portfolioAnalysisContent");
+            if (!panel || !content) return;
+            
             panel.style.display = "block";
-            content.innerHTML = `<p style="font-size:12px;">Scanning portfolio...</p>`;
-            try {
-                const resp = await fetch(`${API_BASE_URL}/projects`, { headers: { "Authorization": `Bearer ${token}` } });
-                const projects = await resp.json();
-                content.innerHTML = `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">${projects.slice(0,4).map(p => `<div style="background:var(--bg-soft); padding:16px; border-radius:16px; font-size:13px; border:1px solid var(--border-soft);"><b>${p.title || p.name}</b><div style="margin-top:4px; color:var(--primary); font-weight:700;">${p.status}</div><div style="font-size:11px; margin-top:4px; color:var(--text-muted);">Risk: ${p.risk_level || 'Low'}</div></div>`).join('')}</div>`;
-            } catch (_) { content.innerHTML = `<p style="font-size:12px;">Data unavailable.</p>`; }
+            content.innerHTML = `<p style="font-size:12px;">Scanning portfolio intelligence...</p>`;
+            
+            setTimeout(() => {
+                const projects = JSON.parse(localStorage.getItem('engisphere_projects') || '[]');
+                if (projects.length === 0) {
+                    content.innerHTML = `<p style="font-size:12px;">No active projects found for analysis.</p>`;
+                    return;
+                }
+                
+                content.innerHTML = `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                    ${projects.slice(0,4).map(p => `
+                        <div style="background:var(--bg-soft); padding:16px; border-radius:16px; font-size:13px; border:1px solid var(--border-soft);">
+                            <div style="font-weight:800; margin-bottom:4px;">${p.title}</div>
+                            <div style="color:var(--primary); font-weight:700; font-size:11px;">Status: ${p.status}</div>
+                            <div style="font-size:11px; margin-top:4px; color:var(--text-muted);">Risk Score: ${p.risk_score}/100</div>
+                            <div style="font-size:11px; color:var(--text-muted);">Progress: ${p.progress}%</div>
+                        </div>`).join('')}
+                </div>`;
+            }, 800);
         }
     </script>
 </body>

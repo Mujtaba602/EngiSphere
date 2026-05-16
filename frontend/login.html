@@ -5,6 +5,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="assets/js/theme.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    if (!Auth.guardPage()) {
+        // Redirection handled by guardPage
+    }
+  </script>
 
   <title>EngiSphere | Login</title>
 
@@ -22,27 +28,48 @@
       --shadow: 0 22px 60px rgba(15, 23, 42, 0.075);
     }
 
-    body.dark-theme {
-      --ink: #ffffff;
-      --muted: #cbd5e1;
-      --soft: #020617;
-      --panel: #0f172a;
-      --line: rgba(255, 255, 255, 0.10);
-    }
+  body.dark-theme {
+    --ink: #f8fafc;
+    --muted: #94a3b8;
+    --soft: #020617;
+    --panel: #0f172a;
+    --line: rgba(148, 163, 184, 0.18);
+    --input-bg: #0b1120;
+    --label: #cbd5e1;
+    --subtitle: #cbd5e1;
+  }
 
-    body.light-theme {
-      --ink: #0f172a;
-      --muted: #64748b;
-      --soft: #f8fafc;
-      --panel: #ffffff;
-      --line: #e2e8f0;
-    }
+  body.light-theme {
+    --ink: #0f172a;
+    --muted: #64748b;
+    --soft: #f8fafc;
+    --panel: #ffffff;
+    --line: #e2e8f0;
+    --input-bg: #f8fafc;
+    --label: #334155;
+    --subtitle: #64748b;
+  }
 
-    body.light-theme .right,
-    body.light-theme .card {
-      background: #ffffff;
-      border-color: #e2e8f0;
-    }
+  /* Force dark theme for auth card area */
+  .right {
+    padding: 70px 70px 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-left: 1px solid var(--line);
+    background: var(--soft);
+    transition: background 0.3s ease;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 430px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 26px;
+    padding: 40px;
+    box-shadow: 0 25px 70px rgba(2, 6, 23, 0.35);
+  }
 
     body.light-theme .submit-btn {
       box-shadow: 0 12px 26px rgba(37, 99, 235, 0.1);
@@ -131,8 +158,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border-left: 1px solid #eef2f7;
-      background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+      border-left: 1px solid var(--line);
+      background: var(--soft);
     }
 
     .brand {
@@ -245,25 +272,23 @@
     .card {
       width: 100%;
       max-width: 430px;
-      background: #ffffff !important;
-      border: 1px solid #e5e7eb !important;
+      background: var(--panel);
+      border: 1px solid var(--line);
       border-radius: 26px;
-      padding: 34px;
-      box-shadow: 0 22px 60px rgba(15, 23, 42, 0.08);
+      padding: 40px;
+      box-shadow: 0 25px 70px rgba(2, 6, 23, 0.35);
     }
 
     .card h2 {
       font-size: 34px;
       letter-spacing: -1.2px;
       margin-bottom: 10px;
-      color: #0f172a !important;
-      display: block !important;
-      visibility: visible !important;
+      color: var(--ink);
       font-weight: 800;
     }
 
     .subtitle {
-      color: #64748b !important;
+      color: var(--subtitle);
       line-height: 1.7;
       font-size: 15px;
       margin-bottom: 26px;
@@ -275,12 +300,12 @@
 
     .field label {
       display: block;
-      margin-bottom: 8px;
-      font-size: 12px;
-      color: #334155;
+      margin-bottom: 9px;
+      font-size: 11px;
+      color: var(--label);
       font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
     }
 
     .input-wrap {
@@ -298,26 +323,26 @@
 
     .input {
       width: 100%;
-      height: 56px;
-      border: 1px solid #dbe3ef !important;
+      height: 58px;
+      border: 1px solid var(--line);
       border-radius: 16px;
-      background: #f8fafc !important;
+      background: var(--input-bg);
       padding: 0 48px 0 46px;
       font-family: inherit;
-      font-size: 14px;
-      color: #0f172a !important;
+      font-size: 14.5px;
+      color: var(--ink);
       outline: none;
-      transition: 0.2s ease;
+      transition: all 0.3s ease;
     }
 
     .input:focus {
-      border-color: #2563eb;
-      background: #ffffff !important;
-      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+      border-color: var(--primary);
+      background: var(--input-bg);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
     }
 
     .input::placeholder {
-      color: #94a3b8 !important;
+      color: #64748b;
     }
 
     .toggle-pass {
@@ -344,8 +369,8 @@
       height: 56px;
       border: none;
       border-radius: 16px;
-      background: #2563eb !important;
-      color: #ffffff !important;
+      background: var(--primary);
+      color: #ffffff;
       font-family: inherit;
       font-size: 15px;
       font-weight: 800;
@@ -356,33 +381,39 @@
     }
 
     .submit-btn:hover {
-      background: #1d4ed8 !important;
+      background: var(--primary-dark);
       transform: translateY(-1px);
     }
 
     .submit-btn:disabled {
-      opacity: 0.5 !important;
-      background: #94a3b8 !important;
+      opacity: 0.7;
       cursor: not-allowed;
       transform: none;
     }
 
     .footer-text {
-      margin-top: 22px;
+      margin-top: 24px;
       text-align: center;
-      color: #64748b !important;
-      font-size: 14px;
+      color: var(--muted);
+      font-size: 14.5px;
     }
 
     .footer-text a {
-      color: #2563eb !important;
+      color: #60a5fa;
       font-weight: 800;
+      margin-left: 4px;
+      transition: color 0.2s;
+    }
+
+    .footer-text a:hover {
+      color: #93c5fd;
+      text-decoration: underline;
     }
 
     .small-note {
-      margin-top: 22px;
-      padding-top: 20px;
-      border-top: 1px solid #eef2f7;
+      margin-top: 26px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
       color: #94a3b8;
       font-size: 12px;
       line-height: 1.6;
@@ -600,14 +631,8 @@
   </main>
 
   <script>
-    const API_BASE_URL = "http://127.0.0.1:8001";
+
     const HOME_PAGE = "home.html";
-
-    const existingToken = localStorage.getItem("access_token");
-
-    if (existingToken) {
-      window.location.href = "./home.html";
-    }
 
     function showToast(message, type = "success") {
       const toast = document.getElementById("toast");
@@ -640,93 +665,33 @@
       }
     }
 
-    async function safeJson(response) {
-      const text = await response.text();
-
-      try {
-        return text ? JSON.parse(text) : {};
-      } catch {
-        return { raw: text };
-      }
-    }
-
-    function goDashboard() {
-      window.location.href = "./home.html";
-    }
-
-    document.getElementById("loginForm").addEventListener("submit", async function (e) {
+    // Handle Form Submission
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
       e.preventDefault();
-
-      const btn = document.getElementById("loginBtn");
-      const email = document.getElementById("email").value.trim().toLowerCase();
+      const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
-
-      if (!email || !password) {
-        showToast("Please enter your email and password.", "error");
-        return;
-      }
+      const btn = document.getElementById("loginBtn");
 
       btn.disabled = true;
-      btn.textContent = "Authenticating...";
+      btn.textContent = "Verifying...";
 
       try {
-        const formData = new URLSearchParams();
-
-        // FastAPI OAuth2PasswordRequestForm expects username
-        formData.append("username", email);
-        formData.append("password", password);
-
-        const response = await fetch(`${API_BASE_URL}/login`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          body: formData
-        });
-
-        const data = await safeJson(response);
-
-        console.log("LOGIN RESPONSE:", response.status, data);
-
-        if (!response.ok) {
-          showToast(
-            data.detail || "Access denied. Please verify your credentials.",
-            "error"
-          );
-          return;
-        }
-
-        if (!data.access_token) {
-          showToast("Authentication succeeded but no token was returned.", "error");
-          return;
-        }
-
-       localStorage.setItem("access_token", data.access_token);
-localStorage.setItem("token_type", data.token_type || "bearer");
-localStorage.setItem("user_email", email);
-
-showToast("Access granted. Redirecting...", "success");
-
-console.log("TOKEN SAVED:", localStorage.getItem("access_token"));
-console.log("REDIRECTING TO:", new URL("home.html", window.location.href).href);
-
-setTimeout(() => {
-  window.location.assign(new URL("home.html", window.location.href).href);
-}, 300);
-
-return;
-
-      } catch (error) {
-        console.error("Login error:", error);
-        showToast("SYSTEM OFFLINE: Cannot reach core server.", "error");
-      } finally {
-        // Only re-enable if we are NOT redirecting (i.e. an error occurred)
-        if (!localStorage.getItem("access_token")) {
-          btn.disabled = false;
-          btn.textContent = "Sign In";
-        }
+        Auth.login(email, password);
+        showToast("Login successful. Welcome back!", "success");
+        setTimeout(() => {
+          window.location.href = HOME_PAGE;
+        }, 1200);
+      } catch (err) {
+        showToast(err.message, "error");
+        btn.disabled = false;
+        btn.textContent = "Sign In";
       }
     });
+
+    // Auto-redirect if already logged in
+    if (Auth.getCurrentUser()) {
+      window.location.href = HOME_PAGE;
+    }
   </script>
 </body>
 </html>

@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <script src="assets/js/theme.js"></script>
+  <script src="assets/js/auth.js"></script>
 
   <style>
     :root {
@@ -471,7 +472,7 @@
         </div>
 
         <div class="cta-actions">
-          <a href="#" onclick="requireAuth('index.html'); return false;" class="btn btn-primary">
+          <a href="index.html" onclick="requireAuth('index.html'); return false;" class="btn btn-primary">
             <i class="fas fa-table-columns"></i>
             Open Workspace
           </a>
@@ -500,29 +501,21 @@
 
   <script>
     window.requireAuth = function (page) {
-      const token = localStorage.getItem("access_token");
-
-      if (!token) {
+      if (!Auth.getCurrentUser()) {
         window.location.href = "login.html";
         return;
       }
-
       window.location.href = page;
     };
 
-    function clearAuthData() {
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("token");
-      localStorage.removeItem("token_type");
-      localStorage.removeItem("user_email");
-    }
-
     window.logout = function () {
-      clearAuthData();
-      window.location.href = "login.html";
+      Auth.logout();
     };
 
     document.addEventListener("DOMContentLoaded", function () {
+      if (window.Auth && Auth.getCurrentUser()) {
+          // Optional: update UI if logged in
+      }
     });
   </script>
 </body>

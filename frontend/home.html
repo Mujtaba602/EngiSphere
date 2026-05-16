@@ -9,8 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-  <script src="assets/js/theme.js"></script>
-  <script src="assets/js/sidebar.js"></script>
+   <script src="assets/js/auth.js"></script>
+   <script>
+     if (!Auth.guardPage()) {
+         // Redirection handled by guardPage
+     }
+   </script>
+   <script src="assets/js/theme.js"></script>
+   <script src="assets/js/sidebar.js"></script>
 
   <style>
     :root {
@@ -80,7 +86,7 @@
     }
 
     .sidebar {
-        width: 260px;
+        width: 280px;
         background: var(--sidebar);
         border-right: 1px solid var(--border);
         display: flex;
@@ -303,33 +309,49 @@
     }
 
     .nav-section {
-        font-size: 10px;
+        font-size: 12px;
         font-weight: 800;
         color: var(--muted);
         text-transform: uppercase;
-        margin: 14px 0 6px 14px;
-        letter-spacing: 1px;
+        margin: 20px 0 10px 10px;
+        letter-spacing: 0.12em;
     }
 
     .nav-link {
+        height: 54px;
         display: flex;
         align-items: center;
-        gap: 14px;
-        padding: 12px 16px;
-        border-radius: 14px;
-        color: var(--secondary);
+        gap: 16px;
+        padding: 0 18px;
+        margin: 6px 0;
+        border-radius: 16px;
+        color: var(--muted);
         text-decoration: none;
-        font-weight: 600;
-        font-size: 13px;
-        transition: 0.25s;
-        margin-bottom: 4px;
+        font-weight: 700;
+        font-size: 15px;
+        transition: all 0.25s ease;
     }
 
-    .nav-link:hover,
-    .nav-link.active {
-        background: rgba(59, 130, 246, 0.1);
+    .nav-link i {
+        width: 22px;
+        min-width: 22px;
+        font-size: 18px;
+        text-align: center;
+    }
+
+    .nav-link:hover {
+        background: #eef4ff;
         color: var(--primary);
-        box-shadow: inset 4px 0 0 var(--primary);
+    }
+
+    .nav-link.active {
+        background: var(--primary) !important;
+        color: #ffffff !important;
+        box-shadow: 0 12px 28px rgba(37, 99, 235, 0.22);
+    }
+
+    .nav-link.active i {
+        color: #ffffff !important;
     }
 
     .exit-link {
@@ -1185,7 +1207,7 @@ body.dark-theme .nav {
                 <span>Geospatial Radar</span>
             </a>
 
-            <a href="ai_chat.html" class="nav-link">
+            <a href="ai_chat.html" class="nav-link" onclick="window.location.assign('ai_chat.html'); return false;">
                 <i class="fas fa-brain"></i>
                 <span>AI EngiBot</span>
             </a>
@@ -1203,7 +1225,7 @@ body.dark-theme .nav {
             </a>
 
             <a href="reports.html" class="nav-link">
-                <i class="fas fa-file-invoice"></i>
+                <i class="fas fa-file-alt"></i>
                 <span>Reports</span>
             </a>
         </nav>
@@ -1417,40 +1439,10 @@ body.dark-theme .nav {
       });
     }
 
-    const API_BASE_URL = "http://127.0.0.1:8001";
-    
-    function getAuthToken() {
-      const keys = ["access_token", "token", "authToken", "engisphere-token", "engisphere_user", "currentUser"];
-      for (const key of keys) {
-        let val = localStorage.getItem(key);
-        if (val) return val;
-        val = sessionStorage.getItem(key);
-        if (val) return val;
-      }
-      return null;
-    }
-
-    function isUserAuthenticated() {
-      if (getAuthToken()) return true;
-      // Check for visible logout/exit indicators in sidebar
-      const exitLink = document.querySelector('.exit-link');
-      if (exitLink && window.getComputedStyle(exitLink).display !== 'none') {
-          return true;
-      }
-      return false;
-    }
-
-    const token = getAuthToken();
-
-    const authActions = document.getElementById("authActions");
-    const heroBtns = document.getElementById("heroBtns");
+    const API_BASE_URL = "http://127.0.0.1:8000";
 
     function clearAuthData() {
-      const keys = ["access_token", "token", "authToken", "token_type", "user_email", "engisphere-token", "engisphere_user", "currentUser"];
-      keys.forEach(k => {
-          localStorage.removeItem(k);
-          sessionStorage.removeItem(k);
-      });
+      Auth.logout();
     }
 
     window.logout = function () {
@@ -1459,9 +1451,7 @@ body.dark-theme .nav {
     };
 
     window.requireAuth = function (page) {
-      const currentToken = getAuthToken();
-
-      if (!currentToken) {
+      if (!Auth.getCurrentUser()) {
         window.location.assign(new URL("login.html", window.location.href).href);
         return;
       }
@@ -1470,6 +1460,7 @@ body.dark-theme .nav {
     };
 
     function renderLoggedOutButtons() {
+      const authActions = document.getElementById("authActions");
       if (authActions) {
         authActions.innerHTML = `
           <a href="login.html" class="btn btn-primary">
@@ -1486,6 +1477,7 @@ body.dark-theme .nav {
     }
 
     function renderLoggedInButtons(user) {
+      const authActions = document.getElementById("authActions");
       if (authActions) {
         authActions.innerHTML = `
           <div class="account-dropdown">
@@ -1523,96 +1515,56 @@ body.dark-theme .nav {
     }
 
     async function loadUserInfo() {
-      if (!isUserAuthenticated()) {
-        renderLoggedOutButtons();
-        return;
-      }
-
-      if (!token) {
-        renderLoggedInButtons({ full_name: "User" });
-        return;
-      }
-
       try {
-        const response = await fetch(`${API_BASE_URL}/users/me`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
-
-        if (response.status === 401 || response.status === 403) {
-          clearAuthData();
-          renderLoggedOutButtons();
-          return;
-        }
-
-        if (!response.ok) {
-          renderLoggedInButtons({
-            full_name: localStorage.getItem("user_email") || "User"
-          });
-          return;
-        }
-
-        const user = await response.json();
-
-        if (user.email) {
-          localStorage.setItem("user_email", user.email);
-        }
-
-        renderLoggedInButtons(user);
-
-      } catch (error) {
-        console.error("Failed to load user info:", error);
-
-        if (token) {
-          renderLoggedInButtons({
-            full_name: localStorage.getItem("user_email") || "User"
-          });
+        const user = Auth.getCurrentUser();
+        if (user) {
+          renderLoggedInButtons(user);
         } else {
           renderLoggedOutButtons();
         }
+      } catch (error) {
+        console.error("Failed to load user info:", error);
+        renderLoggedOutButtons();
       }
     }
 
+    const DEMO_PROJECTS = [
+      { id: "PRJ-0001", title: "Dubai Smart Bridge", location: "Dubai, UAE", status: "Active", type: "Infrastructure", progress: 92, risk_score: 12 },
+      { id: "PRJ-0002", title: "Riyadh Metro Expansion", location: "Riyadh, Saudi Arabia", status: "In Progress", type: "Transportation", progress: 67, risk_score: 45 },
+      { id: "PRJ-0003", title: "Doha Energy Control Center", location: "Doha, Qatar", status: "Pending", type: "Energy", progress: 35, risk_score: 72 },
+      { id: "PRJ-0004", title: "Cairo Residential District", location: "Cairo, Egypt", status: "Completed", type: "Residential", progress: 100, risk_score: 5 },
+      { id: "PRJ-0005", title: "Riyadh Business Innovation Tower", location: "Riyadh, Saudi Arabia", status: "Pending", type: "Commercial", progress: 45, risk_score: 55 }
+    ];
+
     async function loadProjectStats() {
-      if (!token) {
-        return;
+      const user = Auth.getCurrentUser();
+      if (!user) return;
+
+      let projects = JSON.parse(localStorage.getItem('engisphere_projects') || '[]');
+      if (projects.length === 0) {
+          projects = DEMO_PROJECTS;
+          localStorage.setItem('engisphere_projects', JSON.stringify(projects));
       }
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/projects/stats`, {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        });
+      const isAdmin = user.role === 'Admin';
+      const filtered = isAdmin ? projects : projects.filter(p => user.assignedProjects.includes(p.id));
 
-        if (response.status === 401 || response.status === 403) {
-          clearAuthData();
-          renderLoggedOutButtons();
-          return;
-        }
+      const stats = {
+        total: filtered.length,
+        active: filtered.filter(p => (p.status || "").toLowerCase() === 'active' || (p.status || "").toLowerCase() === 'in progress').length,
+        pending: filtered.filter(p => (p.status || "").toLowerCase() === 'pending').length,
+        completed: filtered.filter(p => (p.status || "").toLowerCase() === 'completed').length
+      };
 
-        if (!response.ok) {
-          return;
-        }
+      const statTotal = document.getElementById("statTotal");
+      const statActive = document.getElementById("statActive");
+      const statPending = document.getElementById("statPending");
+      const statCompleted = document.getElementById("statCompleted");
 
-        const stats = await response.json();
-
-        const statTotal = document.getElementById("statTotal");
-        const statActive = document.getElementById("statActive");
-        const statPending = document.getElementById("statPending");
-        const statCompleted = document.getElementById("statCompleted");
-
-        if (statTotal) statTotal.textContent = stats.total ?? 0;
-        if (statActive) statActive.textContent = stats.active ?? 0;
-        if (statPending) statPending.textContent = stats.pending ?? 0;
-        if (statCompleted) statCompleted.textContent = stats.completed ?? 0;
-
-      } catch (error) {
-        console.error("Failed to load project stats:", error);
-      }
+      if (statTotal) statTotal.textContent = stats.total;
+      if (statActive) statActive.textContent = stats.active;
+      if (statPending) statPending.textContent = stats.pending;
+      if (statCompleted) statCompleted.textContent = stats.completed;
     }
 
     const featureData = {
