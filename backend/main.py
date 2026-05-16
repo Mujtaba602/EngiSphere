@@ -9,6 +9,7 @@ from routers.projects import router as projects_router
 from routers.team_members import router as team_members_router
 from routers.tasks import router as tasks_router
 from routers.chat import router as chat_router
+from routers import admin_users
 
 
 load_dotenv()
@@ -37,6 +38,7 @@ app.include_router(projects_router)
 app.include_router(team_members_router)
 app.include_router(tasks_router)
 app.include_router(chat_router)
+app.include_router(admin_users.router)
 
 
 @app.get("/")
