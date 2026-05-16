@@ -176,3 +176,9 @@ class ProjectRiskAssessmentResponse(BaseModel):
     factors: List[str]
     recommendations: List[str]
     metrics: ProjectRiskMetrics
+
+class UserRoleUpdate(BaseModel):
+    role: str
+
+class UserRoleUpdate(BaseModel):
+    role: str
